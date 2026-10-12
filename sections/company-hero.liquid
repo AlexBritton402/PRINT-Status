@@ -23,6 +23,9 @@
   assign logo = c.metafields.custom.company_logo.value
   assign tagline = c.metafields.custom.tagline.value
   assign short = c.metafields.custom.short_link.value | strip | remove: '/'
+  if short == blank
+    assign short = c.handle
+  endif
   assign host = shop.url | remove: 'https://' | remove: 'http://'
 -%}
 

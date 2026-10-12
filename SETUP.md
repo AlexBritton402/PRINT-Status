@@ -1,74 +1,127 @@
-# PRINT Status – Company Stores: Setup (dev store first)
+# PRINT Status – Company stores setup
 
-## 1. Import the theme
-Online Store → Themes → Import theme → upload `printstatus-revamp-v1.zip`.
-It imports as a new, unpublished theme. Your original stays untouched.
+One identifier per company: the **collection handle** (example: `acme`).
 
-New files in this build:
+- Tag products `company-acme`
+- Short link is `/acme`
+- Redirect `/acme` → `/collections/acme`
+
+Use this checklist on the dev store first, then again on the live store (section 7).
+
+## 0. Theme files
+
+These files are ours. Original Horizon files stay unchanged so a later Horizon upgrade is a file drop. See [UPGRADING.md](UPGRADING.md).
 
 | File | What it does |
 |---|---|
-| `sections/company-hero.liquid` | Company header: brand color band, logo patch, name, tagline, share link |
-| `sections/company-promo.liquid` | Optional promo or announcement. Hidden if empty |
-| `sections/organization-directory.liquid` | "Shop by organization" page with search |
+| `sections/company-hero.liquid` | Company header: brand color, logo, name, tagline, share link |
+| `sections/company-promo.liquid` | Optional promo. Hidden on the storefront when empty |
+| `sections/organization-directory.liquid` | Organizations directory with search |
 | `snippets/organization-tile.liquid` | One tile in the directory |
-| `templates/collection.company.json` | Company store layout: header → promo → products |
-| `templates/page.organizations.json` | Directory page layout |
+| `templates/collection.company.json` | Company store: header → promo → products |
+| `templates/page.organizations.json` | Directory page |
+| `templates/product.company.json` | Company product page (no gang-sheet app block) |
+| `blocks/company-store-link.liquid` | “Back to [store] store” on the company product page |
 
-## 2. Create collection custom fields (one time)
+On the dev store, upload or connect this theme as an **unpublished** theme. Leave the current live theme published.
+
+## 1. Custom fields (one time)
+
 Settings → Custom data → Collections → Add definition.
+
+The namespace and key must match exactly.
 
 | Name | Namespace and key | Type |
 |---|---|---|
 | Company logo | `custom.company_logo` | File (images only) |
 | Brand color | `custom.brand_color` | Color |
 | Tagline | `custom.tagline` | Single line text |
-| Short link | `custom.short_link` | Single line text |
+| Short link | `custom.short_link` | Single line text. **Optional.** When blank, the share link uses the collection handle |
 | Promo image | `custom.promo_image` | File (images only) |
 | Promo heading | `custom.promo_heading` | Single line text |
 | Promo text | `custom.promo_text` | Multi-line text |
 | Promo link | `custom.promo_link` | URL |
 
-The namespace and key must match exactly. The theme reads these names.
+## 2. Organizations page (one time)
 
-## 3. Create the directory page (one time)
 1. Online Store → Pages → Add page.
 2. Title: `Organizations`. Leave the content blank.
 3. Theme template: `organizations`. Save.
-4. Online Store → Navigation → Main menu → add the menu item `Shop organizations`, linked to that page.
+4. Online Store → Navigation → Main menu → Add menu item.
+5. Name: `Shop Organizations`. Link: the Organizations page. Save the menu.
 
-## 4. Add a company (repeat for each, about 5 minutes)
+## 3. Add a company (about 5 minutes)
 
-| Step | Where | Fill |
-|---|---|---|
-| Collection | Products → Collections → Create | Title: `Acme Corp`, type **Manual** |
-| Template | Same page, Theme template | `company` |
-| Description | Same page | Order deadlines and pickup info (optional) |
-| Custom fields | Bottom of the collection page | Logo, brand color (hex), tagline, short link `acme` |
-| Products | Create or duplicate shirts | Add to the collection. Tags: `org-store`, `company-acme` |
-| Short link | Online Store → Navigation → URL Redirects → Create | From `/acme` → To `/collections/acme-corp` |
+Example company: handle `acme`, title `Acme Corp`.
 
-The company now appears in the directory automatically.
+1. Products → Collections → Create collection.
+2. Title: `Acme Corp`. Type: **Manual**.
+3. Search engine listing → edit the URL handle to the short slug: `acme`. Save.
+4. Theme template: `company`.
+5. Description (optional): order deadlines and pickup info.
+6. Custom fields: logo, brand color, tagline. Leave Short link blank unless this store needs a slug other than `acme`.
+7. Products: create or duplicate the shirts. On **each** product:
+   - Add the product to the `acme` collection.
+   - Tags: `org-store` and `company-acme` (the part after `company-` is the collection handle).
+   - **Theme template: `company`.** This is required on every company product (otherwise the Kixxl gang-sheet page shows).
+8. Online Store → Navigation → URL Redirects → Create redirect.
+   - From: `/acme`
+   - To: `/collections/acme`
 
-## 5. Keep company items out of the general shop (one time)
-Use a smart collection for the main catalog:
-- Title: `All products`
-- Condition: **Product tag** **is not equal to** `org-store`
+The company shows up in the directory on its own. Repeat this section for the next company, changing only the handle.
 
-Link menus to this collection, not `/collections/all`. Shopify's built-in `/collections/all` always lists everything and can't filter. Search will still find company items, which is fine because anyone can buy them.
+## 4. “All products” smart collection (one time)
 
-## 6. Tag orders by company (Shopify Flow, free)
-For each company, create a Flow workflow:
-- **Trigger:** Order created
-- **Condition:** Order → Line items → Product → Tags → *includes* `company-acme`
-- **Action:** Add order tags → `acme`
+Shopify’s `/collections/all` lists every product, including company gear. Create a smart collection for the public catalog:
 
-Filter orders by that tag to see each company's sales.
+1. Products → Collections → Create collection.
+2. Title: `All products`.
+3. Condition: Product tag **is not equal to** `org-store`.
+4. Point catalog menus at this collection, not `/collections/all`.
 
-## 7. Test checklist (Bogus Gateway on)
+Search can still find company items. That is fine; anyone can buy them.
+
+## 5. Tag orders by company (one Flow workflow)
+
+One workflow covers every company. It replaces a separate workflow per company.
+
+1. Apps → Flow → Create workflow.
+2. Trigger: **Order created**.
+3. Condition: **Order → Line items → Product → Tags — at least one — contains `company-`**. An order with no company product stops here, so the action never runs with an empty tag list.
+4. Action: **Add order tags**.
+5. In Tags, paste this Liquid. For each line-item product tag that contains `company-`, it emits the rest of the tag (`company-acme` → `acme`). Commas separate tags. Tags must be lowercase.
+
+```liquid
+{% for line_item in order.lineItems %}
+  {% for tag in line_item.product.tags %}
+    {% if tag contains "company-" %}
+      {{ tag | remove_first: "company-" }},
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+```
+
+6. Turn the workflow on.
+7. **Verify on the dev store with a test order** that contains a company product (section 6). The order should get the tag `acme`.
+
+## 6. Test checklist
+
+Bogus Gateway on. Card number `1`.
+
 - [ ] `/pages/organizations` lists the company, and search filters it
 - [ ] `/acme` redirects to the company store
-- [ ] The company store shows the logo, color, tagline and products, and the Copy link button works
-- [ ] Company products are NOT in `All products`
-- [ ] Place a test order (card `1`) → the order gets tag `acme`
-- [ ] Test on a phone
+- [ ] The company store shows the logo, color, tagline, and products, and the Copy link button works
+- [ ] Company products are absent from the `All products` collection
+- [ ] A test order of a company product gets the order tag `acme`
+- [ ] Open a company product: no “Create a Gang Sheet” button; size and color work; Add to cart works; “Back to Acme Corp store” goes to `/collections/acme`
+- [ ] A product that is in no company store shows no back link
+- [ ] Check the company store and a company product on a phone
+
+## 7. Going live
+
+Repeat sections 1–5 on the live store (custom fields, Organizations page, each company, the All products collection, and the one Flow workflow).
+
+1. Connect this repo as an **unpublished** theme on the live store (or upload a zip of the theme). Do not publish yet.
+2. Preview that theme and run the section 6 checklist against the live companies.
+3. Publish the theme.
+4. Leave the previous theme installed and unpublished so you can roll back by publishing it again.

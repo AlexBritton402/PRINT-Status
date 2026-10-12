@@ -1,0 +1,152 @@
+{%- comment -%}
+  PRINT Status – link back to the company store for this product.
+
+  Resolve the company collection for closest.product:
+    1. Tags starting with "company-": the remainder is a collection handle.
+       Keep it only when that collection exists and its template is "company".
+       Use it when exactly one distinct collection matches.
+    2. Otherwise, if there were zero tag matches, use closest.product.collections
+       when exactly one of those uses the "company" template.
+    3. Any other case renders nothing. The theme editor shows a hint instead.
+{%- endcomment -%}
+
+{%- liquid
+  assign product_resource = closest.product
+  assign seen = '|'
+  assign tag_count = 0
+  assign chosen_handle = ''
+
+  for tag in product_resource.tags
+    assign prefix = tag | slice: 0, 8
+    if prefix == 'company-'
+      assign handle = tag | remove_first: 'company-' | strip | downcase
+      if handle != blank
+        assign col = collections[handle]
+        if col.id != blank and col.template_suffix == 'company'
+          assign needle = '|' | append: handle | append: '|'
+          unless seen contains needle
+            assign seen = seen | append: handle | append: '|'
+            assign tag_count = tag_count | plus: 1
+            assign chosen_handle = handle
+          endunless
+        endif
+      endif
+    endif
+  endfor
+
+  assign c = nil
+  if tag_count == 1
+    assign c = collections[chosen_handle]
+  elsif tag_count == 0
+    assign fallback_count = 0
+    for col in product_resource.collections
+      if col.template_suffix == 'company'
+        assign fallback_count = fallback_count | plus: 1
+        assign c = col
+      endif
+    endfor
+    if fallback_count != 1
+      assign c = nil
+    endif
+  endif
+
+  assign label_template = block.settings.label
+  if label_template == blank
+    assign label_template = 'Back to [store] store'
+  endif
+-%}
+
+{%- if c.id != blank -%}
+  <a
+    class="company-store-link spacing-style"
+    href="{{ c.url }}"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <svg class="company-store-link__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>
+      {%- assign store_title = c.title | escape -%}
+      {{- label_template | escape | replace: '[store]', store_title -}}
+    </span>
+  </a>
+{%- elsif request.design_mode -%}
+  <p
+    class="company-store-link company-store-link__hint spacing-style"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    {{ block.shopify_attributes }}
+  >
+    Tag the product company-&lt;collection handle&gt; and add it to that collection.
+  </p>
+{%- endif -%}
+
+{% stylesheet %}
+  .company-store-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: inherit;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .company-store-link__icon {
+    flex: none;
+  }
+
+  .company-store-link__hint {
+    display: block;
+    margin: 0;
+    text-decoration: none;
+    opacity: 0.65;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Company store link",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Back to [store] store",
+      "info": "[store] is replaced with the company collection title."
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Company store link",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}
