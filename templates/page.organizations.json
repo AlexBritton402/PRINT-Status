@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "directory": {
+      "type": "organization-directory",
+      "settings": {
+        "heading": "Shop by organization",
+        "intro": "<p>Find your school, team, business or club and order their official gear.</p>",
+        "show_search": true,
+        "search_placeholder": "Search organizations",
+        "columns": 4,
+        "empty_text": "Organization stores are coming soon.",
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": [
+    "directory"
+  ]
+}

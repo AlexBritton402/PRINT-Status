@@ -1,0 +1,142 @@
+{%- comment -%}
+  PRINT Status – Company promo / announcement.
+  Reads collection metafields (namespace: custom):
+    promo_image (file/image), promo_heading (single line text), promo_text (multi-line text), promo_link (URL)
+  Renders nothing on the storefront when no promo is set.
+{%- endcomment -%}
+
+{%- liquid
+  assign c = collection
+  assign img = c.metafields.custom.promo_image.value
+  assign heading = c.metafields.custom.promo_heading.value
+  assign body = c.metafields.custom.promo_text.value
+  assign link = c.metafields.custom.promo_link.value
+
+  assign has_promo = false
+  if img or heading != blank or body != blank
+    assign has_promo = true
+  endif
+-%}
+
+{%- if has_promo -%}
+  <div class="section-background color-{{ section.settings.color_scheme }}"></div>
+  <div class="section section--page-width color-{{ section.settings.color_scheme }}">
+    <div class="company-promo{% unless img %} company-promo--text-only{% endunless %}">
+      {%- if img -%}
+        <div class="company-promo__media">
+          {{-
+            img
+            | image_url: width: 1400
+            | image_tag:
+              alt: heading,
+              loading: 'lazy',
+              widths: '480, 750, 1000, 1400',
+              sizes: '(min-width: 750px) 50vw, 100vw'
+          -}}
+        </div>
+      {%- endif -%}
+
+      <div class="company-promo__content">
+        {%- if heading != blank -%}
+          <h2 class="company-promo__heading">{{ heading }}</h2>
+        {%- endif -%}
+        {%- if body != blank -%}
+          <p class="company-promo__body">{{ body | newline_to_br }}</p>
+        {%- endif -%}
+        {%- if link != blank -%}
+          <a class="button" href="{{ link }}">{{ section.settings.button_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="section section--page-width">
+    <p class="company-promo__empty">
+      No promo set for this company. Add one in the collection's custom fields: promo image, heading, text, link.
+    </p>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .company-promo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(20px, 3vw, 40px);
+    align-items: center;
+    padding-block: clamp(32px, 5vw, 64px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  @media screen and (min-width: 750px) {
+    .company-promo:not(.company-promo--text-only) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .company-promo__media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+  }
+
+  .company-promo__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 60ch;
+  }
+
+  .company-promo__heading {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight, 700);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1;
+  }
+
+  .company-promo__body {
+    margin: 0;
+  }
+
+  .company-promo__empty {
+    padding: 16px;
+    margin-block: 16px;
+    border: 1px dashed var(--color-border);
+    font-size: 0.875rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Company promo",
+  "tag": "section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Content comes from each collection's custom fields. Hidden automatically when a company has no promo."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "See details"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Company promo"
+    }
+  ]
+}
+{% endschema %}

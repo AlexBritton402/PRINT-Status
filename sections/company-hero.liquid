@@ -1,0 +1,313 @@
+{%- comment -%}
+  PRINT Status – Company store header.
+  Reads per-company info from collection metafields (namespace: custom):
+    company_logo (file/image), brand_color (color), tagline (single line text), short_link (single line text)
+  Falls back gracefully when any field is empty.
+{%- endcomment -%}
+
+{%- liquid
+  assign c = collection
+
+  assign brand = c.metafields.custom.brand_color.value | append: ''
+  if brand == blank
+    assign brand = section.settings.fallback_color | append: ''
+  endif
+
+  assign brightness = brand | color_brightness
+  if brightness > 150
+    assign ink = '#000000'
+  else
+    assign ink = '#ffffff'
+  endif
+
+  assign logo = c.metafields.custom.company_logo.value
+  assign tagline = c.metafields.custom.tagline.value
+  assign short = c.metafields.custom.short_link.value | strip | remove: '/'
+  assign host = shop.url | remove: 'https://' | remove: 'http://'
+-%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--full-width color-{{ section.settings.color_scheme }} company-hero"
+  style="--company-brand: {{ brand }}; --company-ink: {{ ink }};"
+>
+  <div class="company-hero__band">
+    <div class="company-hero__inner">
+      {%- if section.settings.show_back_link -%}
+        <a class="company-hero__back" href="{{ routes.root_url }}">{{ section.settings.back_label | escape }}</a>
+      {%- endif -%}
+
+      <div class="company-hero__main">
+        {%- if logo -%}
+          <div class="company-hero__patch">
+            {{-
+              logo
+              | image_url: width: 480
+              | image_tag:
+                alt: c.title,
+                loading: 'eager',
+                widths: '160, 240, 320, 480',
+                sizes: '(min-width: 750px) 160px, 112px'
+            -}}
+          </div>
+        {%- endif -%}
+
+        <div class="company-hero__text">
+          <h1 class="company-hero__title">{{ c.title }}</h1>
+          {%- if tagline != blank -%}
+            <p class="company-hero__tagline">{{ tagline }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if section.settings.show_description and c.description != blank -%}
+        <div class="company-hero__desc rte">{{ c.description }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.show_short_link and short != blank -%}
+        <div class="company-hero__share">
+          <span class="company-hero__share-label">{{ section.settings.share_label | escape }}</span>
+          <span class="company-hero__share-url">{{ host }}/{{ short }}</span>
+          <button
+            type="button"
+            class="company-hero__copy"
+            data-copy-url="{{ shop.url }}/{{ short }}"
+            data-copied-label="{{ section.settings.copied_label | escape }}"
+          >
+            {{- section.settings.copy_label | escape -}}
+          </button>
+          <span class="visually-hidden" aria-live="polite" data-copy-status></span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const root = document.currentScript.previousElementSibling;
+    const btn = root && root.querySelector('[data-copy-url]');
+    if (!btn) return;
+    const status = root.querySelector('[data-copy-status]');
+    const original = btn.textContent;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copyUrl);
+        btn.textContent = btn.dataset.copiedLabel;
+        if (status) status.textContent = btn.dataset.copiedLabel;
+        setTimeout(() => (btn.textContent = original), 2000);
+      } catch (e) {
+        window.prompt('Copy this link:', btn.dataset.copyUrl);
+      }
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .company-hero__band {
+    background: var(--company-brand, #000);
+    color: var(--company-ink, #fff);
+  }
+
+  .company-hero__inner {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding: clamp(20px, 4vw, 40px) var(--page-margin) clamp(36px, 6vw, 72px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 3vw, 32px);
+  }
+
+  .company-hero__back {
+    align-self: flex-start;
+    color: inherit;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    opacity: 0.85;
+  }
+
+  .company-hero__back:hover {
+    opacity: 1;
+  }
+
+  .company-hero__back:focus-visible,
+  .company-hero__copy:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .company-hero__main {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
+  }
+
+  /* The one bold move: logo set on a white "printed patch" */
+  .company-hero__patch {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: clamp(112px, 16vw, 160px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    padding: 14px;
+    background: #fff;
+    border: 3px solid #000;
+    border-radius: 14px;
+    transform: rotate(-3deg);
+    box-shadow: 6px 6px 0 rgb(0 0 0 / 0.85);
+  }
+
+  .company-hero__patch img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .company-hero__text {
+    min-width: 0;
+  }
+
+  .company-hero__title {
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight, 700);
+    font-size: clamp(2.75rem, 8vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .company-hero__tagline {
+    margin: 12px 0 0;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    max-width: 48ch;
+    opacity: 0.9;
+  }
+
+  .company-hero__desc {
+    max-width: 65ch;
+    color: inherit;
+  }
+
+  .company-hero__desc :is(p, a) {
+    color: inherit;
+  }
+
+  .company-hero__share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    font-size: 0.9375rem;
+  }
+
+  .company-hero__share-label {
+    opacity: 0.8;
+  }
+
+  .company-hero__share-url {
+    font-weight: 600;
+  }
+
+  .company-hero__copy {
+    cursor: pointer;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 0.875rem;
+    color: inherit;
+    background: transparent;
+    border: 1.5px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .company-hero__copy:hover {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  @media screen and (max-width: 749px) {
+    .company-hero__main {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Company store header",
+  "tag": "section",
+  "class": "company-hero-section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Logo, brand color, tagline and short link come from each collection's custom fields (Settings → Custom data → Collections)."
+    },
+    {
+      "type": "color",
+      "id": "fallback_color",
+      "label": "Fallback brand color",
+      "info": "Used when a company has no brand color set.",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_link",
+      "label": "Show link back to main store",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Back link label",
+      "default": "PRINT Status home"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_short_link",
+      "label": "Show shareable short link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "share_label",
+      "label": "Share label",
+      "default": "Share this store"
+    },
+    {
+      "type": "text",
+      "id": "copy_label",
+      "label": "Copy button label",
+      "default": "Copy link"
+    },
+    {
+      "type": "text",
+      "id": "copied_label",
+      "label": "Copied confirmation",
+      "default": "Link copied"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Page color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Company store header"
+    }
+  ]
+}
+{% endschema %}

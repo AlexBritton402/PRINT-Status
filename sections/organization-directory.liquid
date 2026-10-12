@@ -1,0 +1,330 @@
+{%- comment -%}
+  PRINT Status – Organization directory.
+  Lists every collection using the "company" template automatically,
+  or a hand-picked list if one is chosen in the section settings.
+{%- endcomment -%}
+
+{%- liquid
+  assign picked = section.settings.collections
+  assign use_picked = false
+  if picked.size > 0
+    assign use_picked = true
+  endif
+-%}
+
+{%- capture directory_empty -%}
+  <p class="org-directory__none">
+    {%- if request.design_mode -%}
+      No company stores yet. Create a collection and set its theme template to “company” to list it here.
+    {%- else -%}
+      {{ section.settings.empty_text | escape }}
+    {%- endif -%}
+  </p>
+{%- endcapture -%}
+
+{%- capture directory_search -%}
+  {%- if section.settings.show_search -%}
+    <label class="org-directory__search">
+      <span class="visually-hidden">{{ section.settings.search_placeholder | escape }}</span>
+      <input
+        type="search"
+        placeholder="{{ section.settings.search_placeholder | escape }}"
+        autocomplete="off"
+        data-org-search
+      >
+    </label>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture directory_none -%}
+  <p class="org-directory__none" hidden data-org-none>
+    No organizations match “<span data-org-term></span>”. Check the spelling or browse the full list.
+  </p>
+{%- endcapture -%}
+
+{%- if use_picked -%}
+  <div class="section-background color-{{ section.settings.color_scheme }}"></div>
+  <div
+    class="section section--page-width color-{{ section.settings.color_scheme }}"
+    style="--org-columns: {{ section.settings.columns }};"
+  >
+    <div class="org-directory" data-org-directory>
+      <div class="org-directory__head">
+        <h1 class="org-directory__title">{{ section.settings.heading | escape }}</h1>
+        {%- if section.settings.intro != blank -%}
+          <div class="org-directory__intro">{{ section.settings.intro }}</div>
+        {%- endif -%}
+        {%- if picked.size > 0 -%}{{ directory_search }}{%- endif -%}
+      </div>
+      {%- if picked.size > 0 -%}
+        <ul class="org-directory__grid" role="list" data-org-grid>
+          {%- for c in picked -%}
+            {%- render 'organization-tile', c: c -%}
+          {%- endfor -%}
+        </ul>
+        {{ directory_none }}
+      {%- else -%}
+        {{ directory_empty }}
+      {%- endif -%}
+    </div>
+  </div>
+{%- else -%}
+  {%- paginate collections by 250 -%}
+    {%- assign company_count = 0 -%}
+    {%- for c in collections -%}
+      {%- if c.template_suffix == 'company' -%}
+        {%- assign company_count = company_count | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <div class="section-background color-{{ section.settings.color_scheme }}"></div>
+    <div
+      class="section section--page-width color-{{ section.settings.color_scheme }}"
+      style="--org-columns: {{ section.settings.columns }};"
+    >
+      <div class="org-directory" data-org-directory>
+        <div class="org-directory__head">
+          <h1 class="org-directory__title">{{ section.settings.heading | escape }}</h1>
+          {%- if section.settings.intro != blank -%}
+            <div class="org-directory__intro">{{ section.settings.intro }}</div>
+          {%- endif -%}
+          {%- if company_count > 0 -%}{{ directory_search }}{%- endif -%}
+        </div>
+        {%- if company_count > 0 -%}
+          <ul class="org-directory__grid" role="list" data-org-grid>
+            {%- for c in collections -%}
+              {%- if c.template_suffix == 'company' -%}
+                {%- render 'organization-tile', c: c -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+          {{ directory_none }}
+        {%- else -%}
+          {{ directory_empty }}
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endpaginate -%}
+{%- endif -%}
+
+<script>
+  (() => {
+    const root = document.currentScript.previousElementSibling;
+    const input = root && root.querySelector('[data-org-search]');
+    if (!input) return;
+    const tiles = [...root.querySelectorAll('[data-org-name]')];
+    const none = root.querySelector('[data-org-none]');
+    const term = root.querySelector('[data-org-term]');
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      let shown = 0;
+      tiles.forEach((t) => {
+        const match = !q || t.dataset.orgName.includes(q);
+        t.hidden = !match;
+        if (match) shown++;
+      });
+      if (none) {
+        none.hidden = shown > 0;
+        term.textContent = input.value.trim();
+      }
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .org-directory {
+    padding-block: clamp(32px, 5vw, 64px) clamp(48px, 7vw, 96px);
+  }
+
+  .org-directory__head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: clamp(24px, 4vw, 40px);
+    max-width: 60ch;
+  }
+
+  .org-directory__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight, 700);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.95;
+  }
+
+  .org-directory__intro > :last-child {
+    margin-bottom: 0;
+  }
+
+  .org-directory__search input {
+    width: 100%;
+    max-width: 420px;
+    padding: 12px 16px;
+    font: inherit;
+    color: var(--color-foreground);
+    background: var(--color-background);
+    border: 1.5px solid var(--color-foreground);
+    border-radius: 999px;
+  }
+
+  .org-directory__search input:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .org-directory__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 24px);
+  }
+
+  @media screen and (min-width: 750px) {
+    .org-directory__grid {
+      grid-template-columns: repeat(var(--org-columns, 4), minmax(0, 1fr));
+    }
+  }
+
+  .org-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .org-tile__swatch {
+    position: relative;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    background: var(--org-brand, #000);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .org-tile__patch {
+    box-sizing: border-box;
+    width: 58%;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    padding: 10%;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 10px;
+    transform: rotate(-3deg);
+    transition: transform 0.2s ease;
+  }
+
+  .org-tile__patch img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .org-tile__initials {
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight, 700);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    color: #000;
+  }
+
+  .org-tile:hover .org-tile__patch {
+    transform: rotate(0deg);
+  }
+
+  .org-tile:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 4px;
+    border-radius: 10px;
+  }
+
+  .org-tile__name {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .org-tile__count {
+    font-size: 0.875rem;
+    color: var(--color-foreground-secondary, var(--color-foreground));
+    margin-top: -6px;
+  }
+
+  .org-directory__none {
+    padding-block: 24px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .org-tile__patch {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Organization directory",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by organization"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro",
+      "default": "<p>Find your school, team, business or club and order their official gear.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search box",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Search organizations"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "collection_list",
+      "id": "collections",
+      "label": "Hand-pick organizations (optional)",
+      "info": "Leave empty to list every collection using the company template automatically."
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty message",
+      "default": "Organization stores are coming soon."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Organization directory"
+    }
+  ]
+}
+{% endschema %}

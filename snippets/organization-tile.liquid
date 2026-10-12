@@ -1,0 +1,45 @@
+{%- doc -%}
+  Renders one organization tile for the directory.
+
+  @param {collection} c - The company collection
+{%- enddoc -%}
+
+{%- liquid
+  assign brand = c.metafields.custom.brand_color.value | append: ''
+  if brand == blank
+    assign brand = '#000000'
+  endif
+  assign logo = c.metafields.custom.company_logo.value
+  assign words = c.title | split: ' '
+  assign initials = ''
+  for w in words limit: 2
+    assign letter = w | slice: 0
+    assign initials = initials | append: letter
+  endfor
+-%}
+
+<li data-org-name="{{ c.title | downcase | escape }}">
+  <a class="org-tile" href="{{ c.url }}">
+    <span class="org-tile__swatch" style="--org-brand: {{ brand }};">
+      <span class="org-tile__patch">
+        {%- if logo -%}
+          {{-
+            logo
+            | image_url: width: 400
+            | image_tag:
+              alt: '',
+              loading: 'lazy',
+              widths: '200, 300, 400',
+              sizes: '(min-width: 750px) 15vw, 30vw'
+          -}}
+        {%- else -%}
+          <span class="org-tile__initials" aria-hidden="true">{{ initials | upcase }}</span>
+        {%- endif -%}
+      </span>
+    </span>
+    <span class="org-tile__name">{{ c.title }}</span>
+    <span class="org-tile__count">
+      {%- if c.products_count == 1 -%}1 item{%- else -%}{{ c.products_count }} items{%- endif -%}
+    </span>
+  </a>
+</li>
