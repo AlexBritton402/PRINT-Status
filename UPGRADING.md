@@ -1,6 +1,10 @@
 # Upgrading Horizon
 
-PRINT Status customizations live in our own files. Original Horizon code stays byte-identical. An upgrade copies the new release's code into this theme and leaves store content in place.
+PRINT Status customizations live in our own files. Original Horizon code stays byte-identical **with one exception** (see "Edited Horizon files" below). An upgrade copies the new release's code into this theme and leaves store content in place.
+
+## Edited Horizon files (re-apply on upgrade)
+
+- `blocks/_header-logo.liquid` — one addition: when no Files logo is set (`settings.logo == blank`), render the bundled `assets/logo.png` instead of the shop-name text, so the logo ships through Git with no manual Files upload. Marked in the file with a `PRINT Status:` comment. A fresh Horizon release will overwrite this; re-apply the fallback after upgrading. `scripts/check_customizations.py` fails if the marker is missing, so an accidental overwrite is caught.
 
 This tree is Horizon **3.5.1** (`config/settings_schema.json:5`). Stay on 3.5.1 through the pilot. Move to 4.x only after the pilot, using the procedure below.
 

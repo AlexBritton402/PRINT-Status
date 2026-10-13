@@ -187,6 +187,13 @@ def main() -> int:
             + (f" (missing {', '.join(sorted(missing))})" if missing else ""),
         )
 
+    logo_path = ROOT / "blocks" / "_header-logo.liquid"
+    logo_text = logo_path.read_text() if logo_path.is_file() else ""
+    report(
+        "'logo.png' | asset_url" in logo_text,
+        "blocks/_header-logo.liquid keeps the bundled-logo fallback",
+    )
+
     details_path = ROOT / "blocks" / "_product-details.liquid"
     details_schema = schema_body(details_path) if details_path.is_file() else None
     report(
