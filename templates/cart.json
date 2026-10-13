@@ -65,6 +65,7 @@
     },
     "product_list_NNFgcy": {
       "type": "product-list",
+      "disabled": true,
       "blocks": {
         "static-header": {
           "type": "_product-list-content",
