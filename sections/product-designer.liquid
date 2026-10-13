@@ -1,0 +1,262 @@
+{%- comment -%}
+  PRINT Status – Design Studio (custom, no monthly app fee).
+  A canvas designer: upload artwork, add/style text, pick a transfer size,
+  live preview, and add to cart with the composed PNG attached to the order
+  via Shopify's native line-item file property (no external hosting needed).
+  Library vendored at assets/fabric.min.js.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = section.settings.product
+  assign variant_id = ''
+  if product != blank
+    assign variant_id = product.selected_or_first_available_variant.id
+  endif
+-%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div id="design-studio" class="section section--page-width color-{{ section.settings.color_scheme }} designer" data-designer>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="designer__heading">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+  {%- if section.settings.intro != blank -%}
+    <div class="designer__intro rte">{{ section.settings.intro }}</div>
+  {%- endif -%}
+
+  <div class="designer__layout">
+    <div class="designer__stage">
+      <canvas data-designer-canvas width="520" height="650"></canvas>
+    </div>
+
+    <div class="designer__panel">
+      <div class="designer__group">
+        <span class="designer__label">Transfer size</span>
+        <select data-designer-size class="designer__select"></select>
+      </div>
+
+      <div class="designer__group">
+        <span class="designer__label">Artwork</span>
+        <label class="button button-secondary designer__file">
+          Upload image
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-designer-upload hidden>
+        </label>
+      </div>
+
+      <div class="designer__group">
+        <span class="designer__label">Text</span>
+        <div class="designer__row">
+          <input type="text" class="designer__text-input" data-designer-text placeholder="Your text" maxlength="60">
+          <button type="button" class="button button-secondary" data-designer-add-text>Add</button>
+        </div>
+        <div class="designer__row designer__row--wrap">
+          <select class="designer__select designer__select--sm" data-designer-font>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="Impact, sans-serif">Impact</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier</option>
+            <option value="'Big Shoulders Display', sans-serif">Big Shoulders</option>
+          </select>
+          <input type="color" value="#111111" data-designer-color title="Text color" class="designer__color">
+          <button type="button" class="button button-secondary designer__btn-sm" data-designer-bold>B</button>
+        </div>
+      </div>
+
+      <div class="designer__group designer__row">
+        <button type="button" class="button button-secondary designer__btn-sm" data-designer-delete>Delete selected</button>
+        <button type="button" class="button button-secondary designer__btn-sm" data-designer-clear>Clear</button>
+      </div>
+
+      <div class="designer__group">
+        {%- if variant_id != blank -%}
+          <button type="button" class="button designer__add" data-designer-add-cart data-variant="{{ variant_id }}">
+            Add to cart
+          </button>
+        {%- else -%}
+          <p class="designer__hint">Pick a “custom transfer” product in this section’s settings to enable Add&nbsp;to&nbsp;cart.</p>
+        {%- endif -%}
+        <p class="designer__status" data-designer-status aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'fabric.min.js' | asset_url }}" defer></script>
+<script>
+(() => {
+  const root = document.currentScript.closest('[data-designer]') || document.querySelector('[data-designer]');
+  if (!root) return;
+  const canvasEl = root.querySelector('[data-designer-canvas]');
+  const status = root.querySelector('[data-designer-status]');
+  const say = (m) => { if (status) status.textContent = m; };
+
+  // Transfer sizes: "Label|widthInches|heightInches", one per line (from settings)
+  const sizesRaw = {{ section.settings.sizes | json }};
+  const sizes = String(sizesRaw).split('\n').map(s => s.trim()).filter(Boolean).map(line => {
+    const [label, w, h] = line.split('|').map(x => (x || '').trim());
+    return { label: label || 'Custom', w: parseFloat(w) || 11, h: parseFloat(h) || 14 };
+  });
+
+  function start() {
+    if (typeof fabric === 'undefined') { setTimeout(start, 120); return; }
+    const canvas = new fabric.Canvas(canvasEl, {
+      backgroundColor: {{ section.settings.canvas_bg | json }},
+      preserveObjectStacking: true,
+    });
+
+    const sizeSel = root.querySelector('[data-designer-size]');
+    sizes.forEach((s, i) => {
+      const o = document.createElement('option');
+      o.value = i; o.textContent = `${s.label} (${s.w}×${s.h} in)`;
+      sizeSel.appendChild(o);
+    });
+
+    const MAXW = 520;
+    function applySize(idx) {
+      const s = sizes[idx] || sizes[0];
+      const ratio = s.h / s.w;
+      const w = Math.min(MAXW, root.querySelector('.designer__stage').clientWidth || MAXW);
+      canvas.setWidth(w);
+      canvas.setHeight(Math.round(w * ratio));
+      canvas.renderAll();
+      canvas._psSize = s;
+    }
+    sizeSel.addEventListener('change', () => applySize(+sizeSel.value));
+    applySize(0);
+
+    // Upload artwork
+    root.querySelector('[data-designer-upload]').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        fabric.Image.fromURL(ev.target.result, (img) => {
+          const scale = Math.min((canvas.getWidth() * 0.7) / img.width, (canvas.getHeight() * 0.7) / img.height, 1);
+          img.set({ left: canvas.getWidth() / 2, top: canvas.getHeight() / 2, originX: 'center', originY: 'center' });
+          img.scale(scale);
+          canvas.add(img).setActiveObject(img);
+          canvas.renderAll();
+          say('Artwork added.');
+        }, { crossOrigin: 'anonymous' });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Add text
+    const textInput = root.querySelector('[data-designer-text]');
+    const fontSel = root.querySelector('[data-designer-font]');
+    const colorInput = root.querySelector('[data-designer-color]');
+    root.querySelector('[data-designer-add-text]').addEventListener('click', () => {
+      const val = (textInput.value || '').trim();
+      if (!val) { say('Type some text first.'); return; }
+      const t = new fabric.IText(val, {
+        left: canvas.getWidth() / 2, top: canvas.getHeight() / 2,
+        originX: 'center', originY: 'center',
+        fontFamily: fontSel.value, fill: colorInput.value, fontSize: Math.round(canvas.getWidth() / 10),
+      });
+      canvas.add(t).setActiveObject(t);
+      canvas.renderAll();
+      textInput.value = '';
+    });
+    colorInput.addEventListener('input', () => {
+      const o = canvas.getActiveObject();
+      if (o && o.set) { o.set('fill', colorInput.value); canvas.renderAll(); }
+    });
+    fontSel.addEventListener('change', () => {
+      const o = canvas.getActiveObject();
+      if (o && o.type === 'i-text') { o.set('fontFamily', fontSel.value); canvas.renderAll(); }
+    });
+    root.querySelector('[data-designer-bold]').addEventListener('click', () => {
+      const o = canvas.getActiveObject();
+      if (o && o.type === 'i-text') { o.set('fontWeight', o.fontWeight === 'bold' ? 'normal' : 'bold'); canvas.renderAll(); }
+    });
+    root.querySelector('[data-designer-delete]').addEventListener('click', () => {
+      const o = canvas.getActiveObject();
+      if (o) { canvas.remove(o); canvas.renderAll(); }
+    });
+    root.querySelector('[data-designer-clear]').addEventListener('click', () => {
+      canvas.getObjects().slice().forEach(o => canvas.remove(o));
+      canvas.renderAll(); say('Cleared.');
+    });
+
+    // Add to cart with the composed PNG attached as a file line-item property
+    const addBtn = root.querySelector('[data-designer-add-cart]');
+    if (addBtn) addBtn.addEventListener('click', async () => {
+      if (canvas.getObjects().length === 0) { say('Add artwork or text first.'); return; }
+      try {
+        say('Preparing your design…');
+        addBtn.disabled = true;
+        const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 3 });
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], 'custom-design.png', { type: 'image/png' });
+        const texts = canvas.getObjects().filter(o => o.type === 'i-text').map(o => o.text).join(' | ');
+        const s = canvas._psSize || sizes[0];
+        const fd = new FormData();
+        fd.append('id', addBtn.dataset.variant);
+        fd.append('quantity', '1');
+        fd.append('properties[Size]', `${s.label} (${s.w}×${s.h} in)`);
+        if (texts) fd.append('properties[Text]', texts);
+        fd.append('properties[Artwork]', file, 'custom-design.png');
+        const res = await fetch('/cart/add.js', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error('cart ' + res.status);
+        say('Added to cart. Taking you there…');
+        window.location.href = '/cart';
+      } catch (err) {
+        addBtn.disabled = false;
+        say('Could not add to cart. Please try again.');
+      }
+    });
+
+    window.addEventListener('resize', () => applySize(+sizeSel.value));
+    say('Ready. Upload artwork or add text.');
+  }
+  start();
+})();
+</script>
+
+{% stylesheet %}
+  .designer { padding-block: clamp(28px, 5vw, 56px); }
+  .designer__heading { text-align: center; margin: 0 0 8px; }
+  .designer__intro { text-align: center; max-width: 60ch; margin: 0 auto clamp(20px, 3vw, 32px); opacity: .8; }
+  .designer__layout { display: grid; gap: clamp(16px, 3vw, 32px); grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 850px) { .designer__layout { grid-template-columns: minmax(0,1fr) 300px; } }
+  .designer__stage {
+    background: repeating-conic-gradient(#f3f3f5 0% 25%, #fff 0% 50%) 50% / 24px 24px;
+    border: 1px solid var(--color-border, #e3e3e6); border-radius: 14px; padding: 12px;
+    display: flex; justify-content: center;
+  }
+  .designer__stage canvas { max-width: 100%; height: auto; box-shadow: 0 6px 20px rgba(0,0,0,.12); background: #fff; }
+  .designer__panel { display: flex; flex-direction: column; gap: 18px; }
+  .designer__group { display: flex; flex-direction: column; gap: 8px; }
+  .designer__label { font-weight: 600; font-size: .85rem; letter-spacing: .03em; text-transform: uppercase; opacity: .7; }
+  .designer__row { display: flex; gap: 8px; align-items: center; }
+  .designer__row--wrap { flex-wrap: wrap; }
+  .designer__select, .designer__text-input { padding: 9px 10px; border: 1px solid var(--color-border, #d9d9de); border-radius: 10px; background: #fff; }
+  .designer__select { width: 100%; }
+  .designer__select--sm { flex: 1; min-width: 120px; }
+  .designer__text-input { flex: 1; }
+  .designer__color { width: 40px; height: 40px; border: none; background: none; padding: 0; cursor: pointer; }
+  .designer__file { cursor: pointer; text-align: center; }
+  .designer__btn-sm { padding: 8px 12px; }
+  .designer__add { width: 100%; }
+  .designer__hint, .designer__status { font-size: .85rem; opacity: .7; margin: 4px 0 0; min-height: 1.2em; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Design studio",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Design your transfer" },
+    { "type": "richtext", "id": "intro", "label": "Intro" },
+    { "type": "product", "id": "product", "label": "Custom-transfer product", "info": "The product this design is added to the cart as." },
+    {
+      "type": "textarea", "id": "sizes", "label": "Transfer sizes",
+      "info": "One per line: Label|widthIn|heightIn",
+      "default": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24"
+    },
+    { "type": "color", "id": "canvas_bg", "label": "Canvas background", "default": "#ffffff" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
+  ],
+  "presets": [ { "name": "Design studio" } ]
+}
+{% endschema %}

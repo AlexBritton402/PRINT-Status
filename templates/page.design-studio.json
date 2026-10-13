@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "designer": {
+      "type": "product-designer",
+      "settings": {
+        "heading": "Design your transfer",
+        "intro": "<p>Upload your artwork or add text, pick a size, and add it to your order. Printed next business day.</p>",
+        "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
+        "canvas_bg": "#ffffff",
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": ["designer"]
+}

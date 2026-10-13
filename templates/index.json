@@ -6,8 +6,7 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */
-{
+ */{
   "sections": {
     "dtf_hero": {
       "type": "dtf-hero",
@@ -18,7 +17,7 @@
         "heading": "",
         "subheading": "",
         "button_1_label": "Upload Your Transfer",
-        "button_1_link": "/collections/all",
+        "button_1_link": "#design-studio",
         "button_2_label": "Build a Gang Sheet",
         "button_2_link": "/collections/all",
         "desktop_height": 540,
@@ -293,12 +292,23 @@
         "padding-block-start": 34,
         "padding-block-end": 48
       }
+    },
+    "design_studio": {
+      "type": "product-designer",
+      "settings": {
+        "heading": "Design your transfer",
+        "intro": "<p>Upload your artwork or add text, choose a size, and add it to your order.</p>",
+        "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
+        "canvas_bg": "#ffffff",
+        "color_scheme": "scheme-1"
+      }
     }
   },
   "order": [
     "dtf_hero",
     "services",
     "home_promise",
-    "product_list_fa6P9H"
+    "product_list_fa6P9H",
+    "design_studio"
   ]
 }
