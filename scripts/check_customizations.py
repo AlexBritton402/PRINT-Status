@@ -67,8 +67,30 @@ def walk_typed(node, found: list) -> None:
             walk_typed(value, found)
 
 
-def referenced_type_ok(type_name: str) -> bool:
-    """Section/block types must exist as files. App and @ types are not files."""
+def local_block_types() -> set[str]:
+    """Block types declared inline in a section's (or block's) own schema.
+    These are valid without a matching file, e.g. the 'service' block defined
+    inside sections/service-paths.liquid, just like Horizon's own section blocks.
+    """
+    declared: set[str] = set()
+    for folder in ("sections", "blocks"):
+        for path in (ROOT / folder).glob("*.liquid"):
+            body = schema_body(path)
+            if not body:
+                continue
+            try:
+                schema = json.loads(body)
+            except (json.JSONDecodeError, ValueError):
+                continue
+            for block in schema.get("blocks", []) or []:
+                if isinstance(block, dict) and isinstance(block.get("type"), str):
+                    declared.add(block["type"])
+    return declared
+
+
+def referenced_type_ok(type_name: str, local_types: set[str]) -> bool:
+    """Section/block types must exist as files, be declared inline in a section
+    schema, or be an app/@ platform target."""
     if type_name.startswith("shopify://apps/"):
         return True
     # @theme and @app are platform targets, not theme files.
@@ -77,6 +99,8 @@ def referenced_type_ok(type_name: str) -> bool:
     # Private types keep the underscore: blocks/_announcement.liquid.
     if not type_name or "/" in type_name or "\\" in type_name or ".." in type_name:
         return False
+    if type_name in local_types:
+        return True
     filename = f"{type_name}.liquid"
     return (ROOT / "sections" / filename).is_file() or (ROOT / "blocks" / filename).is_file()
 
@@ -180,6 +204,7 @@ def main() -> int:
     )
 
     missing_types: list[str] = []
+    local_types = local_block_types()
     type_sources: list[tuple[str, dict]] = list(parsed.items())
     for path in sorted((ROOT / "sections").glob("*-group.json")):
         rel = str(path.relative_to(ROOT))
@@ -192,7 +217,7 @@ def main() -> int:
         walk_typed(data, typed)
         for node in typed:
             type_name = node["type"]
-            if not referenced_type_ok(type_name):
+            if not referenced_type_ok(type_name, local_types):
                 missing_types.append(f"{rel}: {type_name}")
     report(
         not missing_types,

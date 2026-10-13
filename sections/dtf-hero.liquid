@@ -1,0 +1,244 @@
+{%- comment -%}
+  PRINT Status – DTF hero banner.
+  Full-bleed brand banner (image bundled in the theme's assets) with an
+  optional heading/subheading overlay and up to two call-to-action buttons.
+  Emulates the live store's DTF-first homepage hero.
+{%- endcomment -%}
+
+{%- liquid
+  assign img = section.settings.image
+  assign has_img = false
+  if img != blank
+    assign has_img = true
+  endif
+  assign overlay = section.settings.overlay_opacity | times: 0.01
+-%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--full-width color-{{ section.settings.color_scheme }} dtf-hero"
+  style="--dtf-hero-h: {{ section.settings.desktop_height }}px; --dtf-hero-h-mobile: {{ section.settings.mobile_height }}px; --dtf-hero-overlay: {{ overlay }};"
+>
+  <div class="dtf-hero__media">
+    {%- if has_img -%}
+      <img
+        class="dtf-hero__img"
+        src="{{ img | asset_url }}"
+        alt="{{ section.settings.image_alt | escape }}"
+        loading="eager"
+        fetchpriority="high"
+      >
+    {%- endif -%}
+    {%- if overlay > 0 -%}<span class="dtf-hero__scrim" aria-hidden="true"></span>{%- endif -%}
+
+    <div class="dtf-hero__content">
+      {%- if section.settings.heading != blank -%}
+        <h1 class="dtf-hero__heading">{{ section.settings.heading | escape }}</h1>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="dtf-hero__subheading">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      {%- liquid
+        assign b1 = section.settings.button_1_label | strip
+        assign b2 = section.settings.button_2_label | strip
+      -%}
+      {%- if b1 != blank or b2 != blank -%}
+        <div class="dtf-hero__buttons">
+          {%- if b1 != blank -%}
+            <a class="button dtf-hero__button" href="{{ section.settings.button_1_link | default: '#' }}">{{ b1 | escape }}</a>
+          {%- endif -%}
+          {%- if b2 != blank -%}
+            <a class="button button-secondary dtf-hero__button" href="{{ section.settings.button_2_link | default: '#' }}">{{ b2 | escape }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if has_img == false and request.design_mode -%}
+    <p class="dtf-hero__hint">Pick a banner image in this section's settings (bundled options: ad, splash, splash2).</p>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .dtf-hero__media {
+    position: relative;
+    width: 100%;
+    min-height: var(--dtf-hero-h-mobile, 320px);
+    display: grid;
+    overflow: hidden;
+  }
+
+  .dtf-hero__img {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  .dtf-hero__scrim {
+    grid-area: 1 / 1;
+    background: rgba(0, 0, 0, var(--dtf-hero-overlay, 0));
+  }
+
+  .dtf-hero__content {
+    grid-area: 1 / 1;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    text-align: center;
+    padding: clamp(24px, 6vw, 56px) var(--page-margin);
+    color: #fff;
+  }
+
+  .dtf-hero__heading {
+    margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  }
+
+  .dtf-hero__subheading {
+    margin: 0;
+    max-width: 48ch;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .dtf-hero__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .dtf-hero__hint {
+    padding: 24px var(--page-margin);
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  @media screen and (min-width: 750px) {
+    .dtf-hero__media {
+      min-height: var(--dtf-hero-h, 520px);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "DTF hero",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "image",
+      "label": "Banner image",
+      "info": "Images bundled in the theme. Add more under Assets.",
+      "options": [
+        { "value": "ad.png", "label": "Made in LA (ad)" },
+        { "value": "splash.png", "label": "DTF Transfers – LA (splash)" },
+        { "value": "splash2.png", "label": "DTF Transfers – South Bay (splash2)" },
+        { "value": "DTFadvert.png", "label": "DTF advert" },
+        { "value": "UploadGangsheet.png", "label": "Upload gang sheet" }
+      ],
+      "default": "ad.png"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "default": "PRINT Status DTF transfers, made in Los Angeles"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image darken overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (optional)",
+      "info": "Leave blank if the banner already has text.",
+      "default": ""
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading (optional)",
+      "default": ""
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button_1_label",
+      "label": "Button 1 label",
+      "default": "Upload Your Transfer"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Button 1 link"
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Button 2 label",
+      "default": "Build a Gang Sheet"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Button 2 link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 360,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "min": 240,
+      "max": 520,
+      "step": 20,
+      "unit": "px",
+      "default": 340
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "DTF hero"
+    }
+  ]
+}
+{% endschema %}

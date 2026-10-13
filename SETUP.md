@@ -104,10 +104,20 @@ One workflow covers every company. It replaces a separate workflow per company.
 6. Turn the workflow on.
 7. **Verify on the dev store with a test order** that contains a company product (section 6). The order should get the tag `acme`.
 
+## 5b. Homepage and logo (one time)
+
+The homepage (`templates/index.json`) and its two sections — **DTF hero** and **Service paths** — ship in the theme, using brand images bundled in `assets/` (`ad`, `splash`, `splash2`, `DTFadvert`, `UploadGangsheet`). No Files upload is needed for the homepage.
+
+1. **Header logo** is the one exception. Shopify binds the site-wide logo to a Files image, not a theme asset. Upload `logo.png` (in `assets/`) to **Content → Files**, then **Online Store → Themes → Customize → Theme settings → Logo** and select it. Until then the header shows the shop name as text.
+2. In **Customize**, open the **DTF hero** section and set the two buttons' links (default `/collections/all`): e.g. *Upload Your Transfer* → the upload product, *Build a Gang Sheet* → the gang-sheet product.
+3. Open **Service paths** and set each card's link to the matching product or page.
+4. Set the **main menu** (Navigation → Main menu) to match the live store: **Home · DTF Transfers · Help Center · Contact** (add Shop Organizations / Realtor later).
+
 ## 6. Test checklist
 
 Bogus Gateway on. Card number `1`.
 
+- [ ] Homepage: DTF hero banner shows, both buttons work; Service paths cards show and link correctly; featured products load; logo shows in the header
 - [ ] `/pages/organizations` lists the company, and search filters it
 - [ ] `/acme` redirects to the company store
 - [ ] The company store shows the logo, color, tagline, and products, and the Copy link button works
