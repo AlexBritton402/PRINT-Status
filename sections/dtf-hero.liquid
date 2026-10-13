@@ -52,30 +52,32 @@
     {%- endif -%}
     {%- if overlay > 0 -%}<span class="dtf-hero__scrim" aria-hidden="true"></span>{%- endif -%}
 
-    <div class="dtf-hero__content">
-      {%- if section.settings.heading != blank -%}
-        <h1 class="dtf-hero__heading">{{ section.settings.heading | escape }}</h1>
-      {%- endif -%}
-      {%- if section.settings.subheading != blank -%}
-        <p class="dtf-hero__subheading">{{ section.settings.subheading | escape }}</p>
-      {%- endif -%}
+    {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+      <div class="dtf-hero__content">
+        {%- if section.settings.heading != blank -%}
+          <h1 class="dtf-hero__heading">{{ section.settings.heading | escape }}</h1>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="dtf-hero__subheading">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
 
-      {%- liquid
-        assign b1 = section.settings.button_1_label | strip
-        assign b2 = section.settings.button_2_label | strip
-      -%}
-      {%- if b1 != blank or b2 != blank -%}
-        <div class="dtf-hero__buttons">
-          {%- if b1 != blank and section.settings.button_1_link != blank -%}
-            <a class="button dtf-hero__button" href="{{ section.settings.button_1_link }}">{{ b1 | escape }}</a>
-          {%- endif -%}
-          {%- if b2 != blank and section.settings.button_2_link != blank -%}
-            <a class="button button-secondary dtf-hero__button" href="{{ section.settings.button_2_link }}">{{ b2 | escape }}</a>
-          {%- endif -%}
-        </div>
+  {%- liquid
+    assign b1 = section.settings.button_1_label | strip
+    assign b2 = section.settings.button_2_label | strip
+  -%}
+  {%- if b1 != blank or b2 != blank -%}
+    <div class="dtf-hero__bar">
+      {%- if b1 != blank and section.settings.button_1_link != blank -%}
+        <a class="button dtf-hero__button dtf-hero__button--primary" href="{{ section.settings.button_1_link }}">{{ b1 | escape }}</a>
+      {%- endif -%}
+      {%- if b2 != blank and section.settings.button_2_link != blank -%}
+        <a class="button button-secondary dtf-hero__button dtf-hero__button--secondary" href="{{ section.settings.button_2_link }}">{{ b2 | escape }}</a>
       {%- endif -%}
     </div>
-  </div>
+  {%- endif -%}
 
   {%- if has_img == false and request.design_mode -%}
     <p class="dtf-hero__hint">Pick a banner image in this section's settings (bundled options: ad, splash, splash2).</p>
@@ -86,18 +88,14 @@
   .dtf-hero__media {
     position: relative;
     width: 100%;
-    min-height: var(--dtf-hero-h-mobile, 320px);
     display: grid;
-    overflow: hidden;
+    background: #0b0b0d;
   }
 
   .dtf-hero__img {
     grid-area: 1 / 1;
     width: 100%;
-    height: 100%;
-    min-height: inherit;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
     display: block;
   }
 
@@ -131,23 +129,60 @@
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
   }
 
-  .dtf-hero__buttons {
+  .dtf-hero__bar {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
+    background: #0b0b0d;
+    padding: 20px var(--page-margin) 24px;
+  }
+
+  .dtf-hero .dtf-hero__button {
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 14px;
+    padding: 13px 24px;
+    border: 2px solid transparent;
+    line-height: 1;
+  }
+
+  .dtf-hero .dtf-hero__button--primary {
+    background: #ff2d9b;
+    color: #fff;
+    border-color: #ff2d9b;
+  }
+
+  .dtf-hero .dtf-hero__button--primary:is(:hover, :focus-visible) {
+    background: #e01f88;
+    border-color: #e01f88;
+    color: #fff;
+  }
+
+  .dtf-hero .dtf-hero__button--secondary {
+    background: transparent;
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .dtf-hero .dtf-hero__button--secondary:is(:hover, :focus-visible) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .dtf-hero .dtf-hero__button:focus-visible {
+    outline: 2px solid #19d3e6;
+    outline-offset: 3px;
   }
 
   .dtf-hero__hint {
     padding: 24px var(--page-margin);
     text-align: center;
     opacity: 0.7;
-  }
-
-  @media screen and (min-width: 750px) {
-    .dtf-hero__media {
-      min-height: var(--dtf-hero-h, 520px);
-    }
   }
 {% endstylesheet %}
 

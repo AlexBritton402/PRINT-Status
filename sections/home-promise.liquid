@@ -65,24 +65,31 @@
   .home-promise__item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
   }
 
   .home-promise__icon {
-    width: 28px;
-    height: 28px;
-    margin-bottom: 4px;
+    width: 36px;
+    height: 36px;
+    color: #ff2d9b;
   }
 
   .home-promise__title {
     margin: 0;
-    font-weight: 600;
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .home-promise__text {
     margin: 0;
-    opacity: 0.75;
-    font-size: 0.9rem;
+    max-width: 34ch;
+    color: #6b6b70;
+    font-size: 0.95rem;
   }
 
   .home-promise__hint {

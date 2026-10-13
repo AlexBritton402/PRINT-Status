@@ -54,6 +54,7 @@
       ],
       "settings": {
         "heading": "What we print",
+        "subheading": "Custom DTF transfers and gang sheets, printed in-house and ready next day.",
         "columns": 2,
         "color_scheme": "scheme-1"
       }
@@ -94,7 +95,7 @@
       "settings": {
         "heading": "",
         "columns": 3,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-2"
       }
     },
     "product_list_fa6P9H": {

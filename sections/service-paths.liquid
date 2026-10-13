@@ -7,8 +7,15 @@
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div class="section section--page-width color-{{ section.settings.color_scheme }} service-paths">
-  {%- if section.settings.heading != blank -%}
-    <h2 class="service-paths__heading">{{ section.settings.heading | escape }}</h2>
+  {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+    <div class="service-paths__intro">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="service-paths__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="service-paths__subheading">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+    </div>
   {%- endif -%}
 
   {%- if section.blocks.size > 0 -%}
@@ -57,6 +64,9 @@
                 {%- if block.settings.text != blank -%}
                   <span class="service-paths__caption">{{ block.settings.text | escape }}</span>
                 {%- endif -%}
+                {%- if link != blank -%}
+                  <span class="service-paths__go">Start</span>
+                {%- endif -%}
               </div>
             {%- endif -%}
           {%- if link != blank -%}</a>{%- else -%}</div>{%- endif -%}
@@ -73,9 +83,22 @@
     padding-block: clamp(32px, 5vw, 64px);
   }
 
-  .service-paths__heading {
+  .service-paths__intro {
     text-align: center;
-    margin: 0 0 clamp(20px, 3vw, 36px);
+    margin: 0 auto clamp(22px, 3vw, 40px);
+    max-width: 42rem;
+  }
+
+  .service-paths__heading {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .service-paths__subheading {
+    margin: 0.45rem 0 0;
+    color: #6b6b70;
   }
 
   .service-paths__grid {
@@ -87,42 +110,85 @@
     grid-template-columns: 1fr;
   }
 
+  .service-paths__item {
+    display: flex;
+  }
+
   .service-paths__card {
-    display: block;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     border-radius: 16px;
     overflow: hidden;
     text-decoration: none;
-    color: inherit;
-    background: var(--color-background);
+    color: #fff;
+    background: #0b0b0d;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   a.service-paths__card:is(:hover, :focus-visible) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+  }
+
+  a.service-paths__card:focus-visible {
+    outline: 2px solid #19d3e6;
+    outline-offset: 3px;
   }
 
   .service-paths__img {
     width: 100%;
-    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    object-position: center;
     display: block;
   }
 
   .service-paths__text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 2px;
+    margin-top: auto;
+    padding: 16px 18px;
+    background: #0b0b0d;
+    color: #fff;
   }
 
   .service-paths__title {
-    font-weight: 600;
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 1.15rem;
   }
 
   .service-paths__caption {
-    opacity: 0.75;
-    font-size: 0.9rem;
+    color: #c9c9cf;
+    font-size: 0.95rem;
+  }
+
+  .service-paths__go {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #f5b301;
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-paths__card {
+      transition: none;
+    }
+
+    a.service-paths__card:is(:hover, :focus-visible) {
+      transform: none;
+    }
   }
 
   .service-paths__hint {
@@ -148,6 +214,12 @@
       "id": "heading",
       "label": "Heading",
       "default": "What we print"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Custom DTF transfers and gang sheets, printed in-house and ready next day."
     },
     {
       "type": "range",
