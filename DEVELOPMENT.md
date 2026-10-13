@@ -84,7 +84,7 @@ After a push to this (GitHub-connected) theme, Shopify commits the result back t
 ## 6. The plan (phases & status)
 0. Workspace — ✅ (repo, dev store, token-based deploy).
 1. **Company stores** — code ✅; needs admin setup per `SETUP.md` (custom fields, Organizations page, pilot company, redirect, Flow tag).
-2. **Homepage & nav** — ✅ live. Remaining: set main menu (admin), point hero/service buttons at real products, add real featured products.
+2. **Homepage & nav** — ✅ live. Featured product row is disabled until the store has real products (empty catalog was rendering Horizon “Product title” placeholders). Remaining: set main menu (admin), point hero/service buttons at real products, re-enable the featured row on a real collection.
 3. **Realtor program** — not started. Needs boss's realtor product list. Options: tag+Liquid gating (simple, pilot) vs B2B catalog (real gating, now on Basic). Harden either (exclude from search/sitemap/AI channels).
 4. **Third-party apps** — pending full app list from boss.
 5. **AI & discovery** — identify "their AI system"; clean titles/descriptions/FAQ.
@@ -96,7 +96,7 @@ Basic-plan notes (2026): B2B + Shopify Flow **are** on Basic now; owner-only sta
 ## 7. Next actions (prioritized)
 1. In admin: set **Main menu** = Home · DTF Transfers · Help Center · Contact.
 2. Point **hero + service buttons** at the real gang-sheet / upload products (edit `templates/index.json` settings, push).
-3. Add **real featured products** (admin) or switch the featured section's collection.
+3. Add **real featured products** (admin), then re-enable `product_list_fa6P9H` in `templates/index.json` and point it at that collection.
 4. Phase 1 admin setup (`SETUP.md`) for a pilot company; verify end-to-end.
 5. Get boss inputs: full app list, realtor product list, AI system.
 
