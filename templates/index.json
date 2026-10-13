@@ -3,8 +3,8 @@
     "dtf_hero": {
       "type": "dtf-hero",
       "settings": {
-        "image": "ad.png",
-        "image_alt": "PRINT Status DTF transfers, made in Los Angeles",
+        "image": "splash2.png",
+        "image_alt": "PRINT Status DTF transfers, made in the South Bay, California",
         "overlay_opacity": 0,
         "heading": "",
         "subheading": "",
@@ -46,6 +46,45 @@
       "settings": {
         "heading": "What we print",
         "columns": 2,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "home_promise": {
+      "type": "home-promise",
+      "blocks": {
+        "next_day": {
+          "type": "promise",
+          "settings": {
+            "icon": "stopwatch",
+            "title": "Next-day ready",
+            "text": "Order by 3:00 PM PST, printed the next business day. Times are PST; no weekend printing."
+          }
+        },
+        "pickup": {
+          "type": "promise",
+          "settings": {
+            "icon": "map_pin",
+            "title": "Free local pickup",
+            "text": "Flat-rate $7.99 shipping, or free UPS Ground over $99."
+          }
+        },
+        "any_size": {
+          "type": "promise",
+          "settings": {
+            "icon": "ruler",
+            "title": "Any size, any quantity",
+            "text": "Custom DTF transfers and gang sheets, built to your size."
+          }
+        }
+      },
+      "block_order": [
+        "next_day",
+        "pickup",
+        "any_size"
+      ],
+      "settings": {
+        "heading": "",
+        "columns": 3,
         "color_scheme": "scheme-1"
       }
     },
@@ -248,6 +287,7 @@
   "order": [
     "dtf_hero",
     "services",
+    "home_promise",
     "product_list_fa6P9H"
   ]
 }

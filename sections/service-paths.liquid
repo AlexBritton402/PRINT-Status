@@ -17,6 +17,25 @@
         {%- liquid
           assign img = block.settings.image
           assign link = block.settings.link
+          assign img_w = 1500
+          assign img_h = 1000
+          case img
+            when 'ad.png'
+              assign img_w = 2048
+              assign img_h = 946
+            when 'splash.png'
+              assign img_w = 1920
+              assign img_h = 800
+            when 'splash2.png'
+              assign img_w = 1536
+              assign img_h = 580
+            when 'DTFadvert.png'
+              assign img_w = 1300
+              assign img_h = 867
+            when 'UploadGangsheet.png'
+              assign img_w = 1536
+              assign img_h = 1024
+          endcase
         -%}
         <li class="service-paths__item" {{ block.shopify_attributes }}>
           {%- if link != blank -%}<a class="service-paths__card" href="{{ link }}">{%- else -%}<div class="service-paths__card">{%- endif -%}
@@ -24,6 +43,8 @@
               <img
                 class="service-paths__img"
                 src="{{ img | asset_url }}"
+                width="{{ img_w }}"
+                height="{{ img_h }}"
                 alt="{{ block.settings.title | escape }}"
                 loading="lazy"
               >

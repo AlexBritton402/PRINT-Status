@@ -7,6 +7,25 @@
 
 {%- liquid
   assign img = section.settings.image
+  assign img_w = 1600
+  assign img_h = 700
+  case img
+    when 'ad.png'
+      assign img_w = 2048
+      assign img_h = 946
+    when 'splash.png'
+      assign img_w = 1920
+      assign img_h = 800
+    when 'splash2.png'
+      assign img_w = 1536
+      assign img_h = 580
+    when 'DTFadvert.png'
+      assign img_w = 1300
+      assign img_h = 867
+    when 'UploadGangsheet.png'
+      assign img_w = 1536
+      assign img_h = 1024
+  endcase
   assign has_img = false
   if img != blank
     assign has_img = true
@@ -24,6 +43,8 @@
       <img
         class="dtf-hero__img"
         src="{{ img | asset_url }}"
+        width="{{ img_w }}"
+        height="{{ img_h }}"
         alt="{{ section.settings.image_alt | escape }}"
         loading="eager"
         fetchpriority="high"
@@ -45,11 +66,11 @@
       -%}
       {%- if b1 != blank or b2 != blank -%}
         <div class="dtf-hero__buttons">
-          {%- if b1 != blank -%}
-            <a class="button dtf-hero__button" href="{{ section.settings.button_1_link | default: '#' }}">{{ b1 | escape }}</a>
+          {%- if b1 != blank and section.settings.button_1_link != blank -%}
+            <a class="button dtf-hero__button" href="{{ section.settings.button_1_link }}">{{ b1 | escape }}</a>
           {%- endif -%}
-          {%- if b2 != blank -%}
-            <a class="button button-secondary dtf-hero__button" href="{{ section.settings.button_2_link | default: '#' }}">{{ b2 | escape }}</a>
+          {%- if b2 != blank and section.settings.button_2_link != blank -%}
+            <a class="button button-secondary dtf-hero__button" href="{{ section.settings.button_2_link }}">{{ b2 | escape }}</a>
           {%- endif -%}
         </div>
       {%- endif -%}
