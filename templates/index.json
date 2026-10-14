@@ -59,10 +59,10 @@
           "type": "service",
           "settings": {
             "image": "",
-            "title": "Shop Organizations",
-            "text": "Order your company's official gear",
-            "link": "/pages/organizations",
-            "accent_color": "#111111"
+            "title": "Harbor",
+            "text": "Crew sheets and event prints for the Harbor team.",
+            "link": "/harbor",
+            "accent_color": "#0B3A5B"
           }
         }
       },
