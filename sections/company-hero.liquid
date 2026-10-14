@@ -87,6 +87,12 @@
       {%- endif -%}
     </div>
   </div>
+  {%- if c.products_count == 0 -%}
+    <p class="company-hero__empty">This store has no items yet.</p>
+    <style>
+      .main-collection-grid__empty { display: none; }
+    </style>
+  {%- endif -%}
 </div>
 
 <script>
@@ -200,6 +206,13 @@
 
   .company-hero__desc :is(p, a) {
     color: inherit;
+  }
+
+  .company-hero__empty {
+    max-width: var(--page-width);
+    margin: 28px auto 8px;
+    padding-inline: var(--page-margin);
+    font-weight: 600;
   }
 
   .company-hero__share {

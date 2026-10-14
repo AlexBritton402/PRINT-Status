@@ -6,14 +6,6 @@
   Library vendored at assets/fabric.min.js.
 {%- endcomment -%}
 
-{%- liquid
-  assign product = section.settings.product
-  assign variant_id = ''
-  if product != blank
-    assign variant_id = product.selected_or_first_available_variant.id
-  endif
--%}
-
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div id="design-studio" class="section section--page-width color-{{ section.settings.color_scheme }} designer" data-designer>
   {%- if section.settings.heading != blank -%}
@@ -60,6 +52,10 @@
           <button type="button" class="designer__choice is-selected" data-turn="normal">Next day</button>
           <button type="button" class="designer__choice" data-turn="rush">Rush, same day</button>
         </div>
+        <label class="designer__qty">
+          Copies
+          <input type="number" min="1" value="1" data-designer-qty>
+        </label>
         <p class="designer__price" data-designer-price></p>
         <p class="designer__hint" data-designer-price-detail></p>
         <p class="designer__hint">Every sheet is 22 inches wide. Next day means order by 3 PM. Rush means order by noon, ready by 4 PM.</p>
@@ -101,14 +97,8 @@
       </div>
 
       <div class="designer__group">
-        <button type="button" class="button designer__download" data-designer-download>Download layout</button>
-        {%- if variant_id != blank -%}
-          <button type="button" class="button designer__add" data-designer-add-cart data-variant="{{ variant_id }}">
-            Add to cart
-          </button>
-        {%- else -%}
-          <p class="designer__hint">This download is a layout preview. Checkout uses your original artwork once the sheet is tied to a product.</p>
-        {%- endif -%}
+        <button type="button" class="button designer__order" data-designer-order>Place order</button>
+        <button type="button" class="button button-secondary designer__download" data-designer-download>Download layout</button>
         <p class="designer__status" data-designer-status aria-live="polite"></p>
       </div>
     </div>
@@ -125,6 +115,7 @@
   const say = (m) => { if (status) status.textContent = m; };
 
   const money = (n) => `$${Number(n).toFixed(2)}`;
+  const checkout = {"build":[["55766772842787","55766772875555"],["55766772908323","55766772941091"],["55766772973859","55766773006627"],["55766773039395","55766773072163"],["55766773104931","55766773137699"],["55766773170467","55766773203235"],["55766773236003","55766773268771"],["55766773301539","55766773334307"],["55766773367075","55766773399843"],["55766773432611","55766773465379"]],"upload":[["55766773563683","55766773596451"],["55766773629219","55766773661987"],["55766773694755","55766773727523"],["55766773760291","55766773793059"],["55766773825827","55766773858595"],["55766773891363","55766773924131"],["55766773956899","55766773989667"],["55766774022435","55766774055203"],["55766774087971","55766774120739"],["55766774153507","55766774186275"]],"white":[["55766774317347","55766774350115"],["55766774382883","55766774415651"],["55766774448419","55766774481187"],["55766774513955","55766774546723"],["55766774579491","55766774612259"],["55766774645027","55766774677795"],["55766774710563","55766774743331"],["55766774776099","55766774808867"],["55766774841635","55766774874403"],["55766774907171","55766774939939"]]};
   const sizes = [
     { label: '22×12', w: 22, h: 12, build: [4.99, 5.99], upload: [4.99, 5.99], white: [4.99, 6.99] },
     { label: '22×24', w: 22, h: 24, build: [9.99, 11.99], upload: [9.99, 11.99], white: [7.99, 11.99] },
@@ -168,6 +159,11 @@
     function currentSizeIndex() {
       const n = Number(sizeSel.value);
       return Number.isInteger(n) && n >= 0 && n < sizes.length ? n : 1;
+    }
+    const qtyInput = root.querySelector('[data-designer-qty]');
+    function copyCount() {
+      const n = Math.floor(Number(qtyInput && qtyInput.value));
+      return Number.isInteger(n) && n >= 1 ? n : 1;
     }
     function priceFor(s) {
       const table = whiteInk ? s.white : (s[kindSel.value] || s.build);
@@ -224,9 +220,14 @@
       canvas._psSize = s;
       canvas._psKind = kindSel.value;
       canvas._psWhite = whiteInk;
+      const qty = copyCount();
+      const unit = priceFor(s);
+      const bits = [`${s.label} in`, turnaround === 'rush' ? 'rush, same day' : 'next day'];
+      if (whiteInk) bits.push('white ink');
+      bits.push(qty === 1 ? '1 copy' : `${qty} copies`);
       if (sheetLabel) sheetLabel.textContent = `${s.label} in · ${modeName()}`;
-      if (priceEl) priceEl.textContent = money(priceFor(s));
-      if (priceDetail) priceDetail.textContent = `${s.label} in · ${turnaround === 'rush' ? 'rush, same day' : 'next day'}`;
+      if (priceEl) priceEl.textContent = money(unit * qty);
+      if (priceDetail) priceDetail.textContent = bits.join(' · ');
       markChoices();
     }
     function setKind(kind) {
@@ -262,6 +263,7 @@
         applySize(currentSizeIndex());
       });
     }
+    if (qtyInput) qtyInput.addEventListener('input', () => applySize(currentSizeIndex()));
     const applyHash = () => {
       const raw = (location.hash || '').replace('#design-', '');
       const next = hashJob(raw);
@@ -431,31 +433,38 @@
       say(`Saved a layout preview of the ${s.label} in sheet, about ${outDpi} DPI. The press file comes from your original artwork when you order.`);
     });
 
-    // Add to cart with the composed PNG attached as a file line-item property
-    const addBtn = root.querySelector('[data-designer-add-cart]');
-    if (addBtn) addBtn.addEventListener('click', async () => {
+    const orderBtn = root.querySelector('[data-designer-order]');
+    function variantId() {
+      const key = whiteInk ? 'white' : (kindSel.value === 'upload' ? 'upload' : 'build');
+      const pair = checkout[key] && checkout[key][currentSizeIndex()];
+      return pair ? pair[turnaround === 'rush' ? 1 : 0] : '';
+    }
+    if (orderBtn) orderBtn.addEventListener('click', async () => {
       if (canvas.getObjects().length === 0) { say('Add artwork or text first.'); return; }
+      const id = variantId();
+      if (!id) { say('This sheet is not connected to checkout yet.'); return; }
       try {
-        say('Preparing your design…');
-        addBtn.disabled = true;
+        say('Preparing your order…');
+        orderBtn.disabled = true;
         const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 3 });
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'custom-design.png', { type: 'image/png' });
         const texts = canvas.getObjects().filter(o => o.type === 'i-text').map(o => o.text).join(' | ');
         const s = canvas._psSize || sizes[0];
         const fd = new FormData();
-        fd.append('id', addBtn.dataset.variant);
-        fd.append('quantity', '1');
-        fd.append('properties[Size]', `${s.label} (${s.w}×${s.h} in)`);
+        fd.append('id', id);
+        fd.append('quantity', String(copyCount()));
+        fd.append('properties[Size]', `${s.label} in`);
+        fd.append('properties[Turnaround]', turnaround === 'rush' ? 'Rush, same day' : 'Next day');
+        fd.append('properties[White ink]', whiteInk ? 'Yes' : 'No');
         if (texts) fd.append('properties[Text]', texts);
-        fd.append('properties[White ink]', canvas._psWhite ? 'Yes' : 'No');
         fd.append('properties[Artwork]', file, 'custom-design.png');
         const res = await fetch('/cart/add.js', { method: 'POST', body: fd });
         if (!res.ok) throw new Error('cart ' + res.status);
         say('Added to cart. Taking you there…');
         window.location.href = '/cart';
       } catch (err) {
-        addBtn.disabled = false;
+        orderBtn.disabled = false;
         say('Could not add to cart. Please try again.');
       }
     });
@@ -518,8 +527,10 @@
   .designer__file { cursor: pointer; text-align: center; }
   .designer__btn-sm { padding: 8px 12px; }
   .designer__download,
-  .designer__add { width: 100%; }
-  .designer .designer__download {
+  .designer__order { width: 100%; }
+  .designer__qty { display: flex; align-items: center; justify-content: space-between; font-weight: 600; }
+  .designer__qty input { width: 72px; padding: 8px 10px; border: 1px solid var(--color-border, #d9d9de); border-radius: 10px; }
+  .designer .designer__order {
     background: #ff2d9b;
     color: #fff;
     border: 2px solid #ff2d9b;

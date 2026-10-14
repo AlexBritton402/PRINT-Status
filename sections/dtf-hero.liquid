@@ -68,8 +68,11 @@
     assign b1 = section.settings.button_1_label | strip
     assign b2 = section.settings.button_2_label | strip
   -%}
-  {%- if b1 != blank or b2 != blank -%}
+  {%- if b1 != blank or b2 != blank or section.settings.offer != blank -%}
     <div class="dtf-hero__bar">
+      {%- if section.settings.offer != blank -%}
+        <p class="dtf-hero__offer">{{ section.settings.offer | escape }}</p>
+      {%- endif -%}
       {%- if b1 != blank and section.settings.button_1_link != blank -%}
         <a class="button dtf-hero__button dtf-hero__button--primary" href="{{ section.settings.button_1_link }}">{{ b1 | escape }}</a>
       {%- endif -%}
@@ -136,6 +139,14 @@
     justify-content: center;
     background: #0b0b0d;
     padding: 20px var(--page-margin) 24px;
+  }
+
+  .dtf-hero__offer {
+    flex: 1 0 100%;
+    margin: 0 0 4px;
+    text-align: center;
+    color: #fff;
+    font-weight: 600;
   }
 
   .dtf-hero .dtf-hero__button {
@@ -231,6 +242,11 @@
       "type": "text",
       "id": "subheading",
       "label": "Subheading (optional)"
+    },
+    {
+      "type": "text",
+      "id": "offer",
+      "label": "Line under the banner"
     },
     {
       "type": "header",

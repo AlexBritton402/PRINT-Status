@@ -16,6 +16,7 @@
         "overlay_opacity": 0,
         "heading": "",
         "subheading": "",
+        "offer": "Next-day sheets. Pickup in Torrance by 3 PM. From $4.99.",
         "button_1_label": "Build a sheet",
         "button_1_link": "#design-build",
         "button_2_label": "Upload a finished sheet",
@@ -50,8 +51,8 @@
           "type": "service",
           "settings": {
             "image": "",
-            "title": "Supported stores",
-            "text": "Open a company store, like Harbor",
+            "title": "Company stores",
+            "text": "Open your company's page",
             "link": "/pages/organizations",
             "accent_color": "#111111"
           }
@@ -84,16 +85,16 @@
           "type": "promise",
           "settings": {
             "icon": "map_pin",
-            "title": "Free local pickup",
-            "text": "Flat-rate $7.99 shipping, or free UPS Ground over $99."
+            "title": "Pickup in Torrance",
+            "text": "Free local pickup. Shipping is $7.99, or free UPS Ground over $99."
           }
         },
         "any_size": {
           "type": "promise",
           "settings": {
             "icon": "ruler",
-            "title": "Any size, any quantity",
-            "text": "Custom vinyl sheets, built to your size."
+            "title": "22 inch sheets",
+            "text": "Lengths from 12 to 144 inches. Add as many copies as you need."
           }
         }
       },
