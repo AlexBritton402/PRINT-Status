@@ -29,8 +29,20 @@
     </div>
 
     <div class="designer__panel">
+      <span id="design-dtf"></span>
+      <span id="design-gang"></span>
+      <span id="design-vinyl"></span>
       <div class="designer__group">
-        <span class="designer__label">Transfer size</span>
+        <span class="designer__label">What you're making</span>
+        <select data-designer-kind class="designer__select">
+          <option value="dtf">DTF transfer</option>
+          <option value="gang">Gang sheet</option>
+          <option value="vinyl">Vinyl decal</option>
+        </select>
+      </div>
+
+      <div class="designer__group">
+        <span class="designer__label">Size</span>
         <select data-designer-size class="designer__select"></select>
       </div>
 
@@ -67,12 +79,13 @@
       </div>
 
       <div class="designer__group">
+        <button type="button" class="button designer__download" data-designer-download>Download print file</button>
         {%- if variant_id != blank -%}
           <button type="button" class="button designer__add" data-designer-add-cart data-variant="{{ variant_id }}">
             Add to cart
           </button>
         {%- else -%}
-          <p class="designer__hint">Pick a “custom transfer” product in this section’s settings to enable Add&nbsp;to&nbsp;cart.</p>
+          <p class="designer__hint">Test mode: download the print file. Checkout turns on after a product is connected. Kixxl is not installed on this store.</p>
         {%- endif -%}
         <p class="designer__status" data-designer-status aria-live="polite"></p>
       </div>
@@ -89,12 +102,16 @@
   const status = root.querySelector('[data-designer-status]');
   const say = (m) => { if (status) status.textContent = m; };
 
-  // Transfer sizes: "Label|widthInches|heightInches", one per line (from settings)
-  const sizesRaw = {{ section.settings.sizes | json }};
-  const sizes = String(sizesRaw).split('\n').map(s => s.trim()).filter(Boolean).map(line => {
+  const parseSizes = (raw) => String(raw).split('\n').map(s => s.trim()).filter(Boolean).map(line => {
     const [label, w, h] = line.split('|').map(x => (x || '').trim());
     return { label: label || 'Custom', w: parseFloat(w) || 11, h: parseFloat(h) || 14 };
   });
+  const catalogs = {
+    dtf: parseSizes({{ section.settings.sizes | json }}),
+    gang: parseSizes('22×24|22|24\n22×36|22|36\n22×60|22|60'),
+    vinyl: parseSizes('2×2|2|2\n3×3|3|3\n4×4|4|4\n6×6|6|6'),
+  };
+  let sizes = catalogs.dtf;
 
   function start() {
     if (typeof fabric === 'undefined') { setTimeout(start, 120); return; }
@@ -104,13 +121,16 @@
     });
 
     const sizeSel = root.querySelector('[data-designer-size]');
-    sizes.forEach((s, i) => {
-      const o = document.createElement('option');
-      o.value = i; o.textContent = `${s.label} (${s.w}×${s.h} in)`;
-      sizeSel.appendChild(o);
-    });
-
+    const kindSel = root.querySelector('[data-designer-kind]');
     const MAXW = 520;
+    function fillSizes() {
+      sizeSel.replaceChildren();
+      sizes.forEach((s, i) => {
+        const o = document.createElement('option');
+        o.value = i; o.textContent = `${s.label} (${s.w}×${s.h} in)`;
+        sizeSel.appendChild(o);
+      });
+    }
     function applySize(idx) {
       const s = sizes[idx] || sizes[0];
       const ratio = s.h / s.w;
@@ -119,9 +139,23 @@
       canvas.setHeight(Math.round(w * ratio));
       canvas.renderAll();
       canvas._psSize = s;
+      canvas._psKind = kindSel.value;
     }
+    function setKind(kind) {
+      if (!catalogs[kind]) kind = 'dtf';
+      kindSel.value = kind;
+      sizes = catalogs[kind];
+      fillSizes();
+      applySize(0);
+    }
+    kindSel.addEventListener('change', () => setKind(kindSel.value));
     sizeSel.addEventListener('change', () => applySize(+sizeSel.value));
-    applySize(0);
+    const hashKind = (location.hash || '').replace('#design-', '');
+    setKind(catalogs[hashKind] ? hashKind : 'dtf');
+    window.addEventListener('hashchange', () => {
+      const next = (location.hash || '').replace('#design-', '');
+      if (catalogs[next]) setKind(next);
+    });
 
     // Upload artwork
     root.querySelector('[data-designer-upload]').addEventListener('change', (e) => {
@@ -176,6 +210,20 @@
     root.querySelector('[data-designer-clear]').addEventListener('click', () => {
       canvas.getObjects().slice().forEach(o => canvas.remove(o));
       canvas.renderAll(); say('Cleared.');
+    });
+
+    root.querySelector('[data-designer-download]').addEventListener('click', () => {
+      if (canvas.getObjects().length === 0) { say('Add artwork or text first.'); return; }
+      const s = canvas._psSize || sizes[0];
+      const kind = canvas._psKind || 'dtf';
+      const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 3 });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `print-status-${kind}-${s.w}x${s.h}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      say(`Downloaded a test ${kind} file, ${s.w}×${s.h} in.`);
     });
 
     // Add to cart with the composed PNG attached as a file line-item property
@@ -237,7 +285,17 @@
   .designer__color { width: 40px; height: 40px; border: none; background: none; padding: 0; cursor: pointer; }
   .designer__file { cursor: pointer; text-align: center; }
   .designer__btn-sm { padding: 8px 12px; }
+  .designer__download,
   .designer__add { width: 100%; }
+  .designer .designer__download {
+    background: #ff2d9b;
+    color: #fff;
+    border: 2px solid #ff2d9b;
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .designer__hint, .designer__status { font-size: .85rem; opacity: .7; margin: 4px 0 0; min-height: 1.2em; }
 {% endstylesheet %}
 

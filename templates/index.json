@@ -17,9 +17,9 @@
         "heading": "",
         "subheading": "",
         "button_1_label": "Upload Your Transfer",
-        "button_1_link": "#design-studio",
+        "button_1_link": "#design-dtf",
         "button_2_label": "Build a Gang Sheet",
-        "button_2_link": "/collections/all",
+        "button_2_link": "#design-gang",
         "desktop_height": 540,
         "mobile_height": 340,
         "color_scheme": "scheme-1"
@@ -34,7 +34,7 @@
             "image": "DTFadvert.png",
             "title": "Upload your transfer",
             "text": "Custom sizes, ready next day",
-            "link": "/collections/all"
+            "link": "#design-dtf"
           }
         },
         "gang": {
@@ -43,7 +43,7 @@
             "image": "UploadGangsheet.png",
             "title": "Build a gang sheet",
             "text": "Fit more designs per sheet",
-            "link": "/collections/all"
+            "link": "#design-gang"
           }
         }
       },
@@ -296,8 +296,8 @@
     "design_studio": {
       "type": "product-designer",
       "settings": {
-        "heading": "Design your transfer",
-        "intro": "<p>Upload your artwork or add text, choose a size, and add it to your order.</p>",
+        "heading": "Design your print",
+        "intro": "<p>Choose a DTF transfer, gang sheet, or vinyl decal. Upload artwork or add text, then download a test print file.</p>",
         "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
         "canvas_bg": "#ffffff",
         "color_scheme": "scheme-1"
