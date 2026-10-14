@@ -24,7 +24,8 @@
 
   <div class="designer__layout">
     <div class="designer__stage">
-      <canvas data-designer-canvas width="520" height="650"></canvas>
+      <canvas data-designer-canvas width="360" height="392"></canvas>
+      <p class="designer__sheet-label" data-designer-sheet-label>22×24 in · Color vinyl</p>
     </div>
 
     <div class="designer__panel">
@@ -35,7 +36,11 @@
       <span id="design-gang"></span>
       <div class="designer__group">
         <span class="designer__label">1. Ink</span>
-        <select data-designer-kind class="designer__select">
+        <div class="designer__choices">
+          <button type="button" class="designer__choice is-selected" data-ink="color">Color</button>
+          <button type="button" class="designer__choice" data-ink="white">White</button>
+        </div>
+        <select data-designer-kind class="designer__select" hidden>
           <option value="color">Color vinyl</option>
           <option value="white">White vinyl</option>
         </select>
@@ -43,8 +48,9 @@
 
       <div class="designer__group">
         <span class="designer__label">2. Sheet size</span>
-        <select data-designer-size class="designer__select"></select>
-        <p class="designer__hint">Every sheet is 22 inches wide.</p>
+        <div class="designer__choices" data-designer-size-choices></div>
+        <select data-designer-size class="designer__select" hidden></select>
+        <p class="designer__hint">Every sheet is 22 inches wide. The whole sheet stays on screen.</p>
       </div>
 
       <div class="designer__group">
@@ -128,26 +134,67 @@
     const sizeSel = root.querySelector('[data-designer-size]');
     const kindSel = root.querySelector('[data-designer-kind]');
     const colorInput = root.querySelector('[data-designer-color]');
-    const MAXW = 520;
+    const sheetLabel = root.querySelector('[data-designer-sheet-label]');
     function fillSizes() {
       sizeSel.replaceChildren();
+      const box = root.querySelector('[data-designer-size-choices]');
+      box.replaceChildren();
       sizes.forEach((s, i) => {
         const o = document.createElement('option');
-        o.value = i; o.textContent = `${s.label} (${s.w}×${s.h} in)`;
+        o.value = i;
+        o.textContent = s.label;
         sizeSel.appendChild(o);
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'designer__choice';
+        b.textContent = s.label;
+        b.addEventListener('click', () => {
+          sizeSel.value = String(i);
+          applySize(i);
+        });
+        box.appendChild(b);
+      });
+    }
+    function markChoices() {
+      root.querySelectorAll('[data-ink]').forEach((b) => {
+        b.classList.toggle('is-selected', b.dataset.ink === kindSel.value);
+      });
+      root.querySelectorAll('[data-designer-size-choices] .designer__choice').forEach((b, i) => {
+        b.classList.toggle('is-selected', String(i) === String(sizeSel.value));
       });
     }
     function applySize(idx) {
       const s = sizes[idx] || sizes[0];
       const ink = inks[kindSel.value] || inks.color;
+      const stage = root.querySelector('.designer__stage');
+      const maxW = Math.max(220, stage.clientWidth - 28);
+      const maxH = Math.min(640, Math.round(window.innerHeight * 0.62));
       const ratio = s.h / s.w;
-      const w = Math.min(MAXW, root.querySelector('.designer__stage').clientWidth || MAXW);
+      let w = maxW;
+      let h = Math.round(w * ratio);
+      if (h > maxH) {
+        h = maxH;
+        w = Math.max(160, Math.round(h / ratio));
+      }
+      const prevW = canvas.getWidth();
       canvas.setWidth(w);
-      canvas.setHeight(Math.round(w * ratio));
+      canvas.setHeight(h);
+      if (prevW && prevW !== w) {
+        const scale = w / prevW;
+        canvas.getObjects().forEach((o) => {
+          o.scaleX *= scale;
+          o.scaleY *= scale;
+          o.left *= scale;
+          o.top *= scale;
+          o.setCoords();
+        });
+      }
       canvas.backgroundColor = ink.canvas;
       canvas.renderAll();
       canvas._psSize = s;
       canvas._psKind = kindSel.value;
+      if (sheetLabel) sheetLabel.textContent = `${s.w}×${s.h} in · ${kindSel.value === 'white' ? 'White' : 'Color'} vinyl`;
+      markChoices();
     }
     function setKind(kind) {
       kind = inks[kind] ? kind : 'color';
@@ -159,6 +206,9 @@
       applySize(keep);
     }
     kindSel.addEventListener('change', () => setKind(kindSel.value));
+    root.querySelectorAll('[data-ink]').forEach((b) => {
+      b.addEventListener('click', () => setKind(b.dataset.ink));
+    });
     sizeSel.addEventListener('change', () => applySize(+sizeSel.value));
     const hashKind = () => inkFromHash((location.hash || '').replace('#design-', ''));
     setKind(hashKind() || 'color');
@@ -275,14 +325,29 @@
   .designer__heading { text-align: center; margin: 0 0 8px; }
   .designer__intro { text-align: center; max-width: 60ch; margin: 0 auto clamp(20px, 3vw, 32px); opacity: .8; }
   .designer__layout { display: grid; gap: clamp(16px, 3vw, 32px); grid-template-columns: 1fr; align-items: start; }
-  @media (min-width: 850px) { .designer__layout { grid-template-columns: minmax(0,1fr) 300px; } }
+  @media (min-width: 850px) { .designer__layout { grid-template-columns: minmax(0,1fr) minmax(240px, 300px); } }
   .designer__stage {
     background: repeating-conic-gradient(#f3f3f5 0% 25%, #fff 0% 50%) 50% / 24px 24px;
-    border: 1px solid var(--color-border, #e3e3e6); border-radius: 14px; padding: 12px;
-    display: flex; justify-content: center;
+    border: 1px solid var(--color-border, #e3e3e6); border-radius: 14px; padding: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 420px; overflow: hidden;
   }
-  .designer__stage canvas { max-width: 100%; height: auto; box-shadow: 0 6px 20px rgba(0,0,0,.12); background: #fff; }
+  .designer__stage .canvas-container { max-width: 100%; }
+  .designer__stage canvas { box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+  .designer__sheet-label {
+    margin: 12px 0 0; font-family: var(--font-heading--family); font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
   .designer__panel { display: flex; flex-direction: column; gap: 18px; }
+  @media (min-width: 850px) {
+    .designer__panel { position: sticky; top: 96px; }
+  }
+  .designer__choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .designer__choice {
+    flex: 1; min-width: 72px; padding: 10px 8px; border: 2px solid #d9d9de; border-radius: 10px;
+    background: #fff; font-weight: 700; cursor: pointer;
+  }
+  .designer__choice.is-selected { border-color: #ff2d9b; background: #fff0f7; }
   .designer__group { display: flex; flex-direction: column; gap: 8px; }
   .designer__label { font-weight: 600; font-size: .85rem; letter-spacing: .03em; text-transform: uppercase; opacity: .7; }
   .designer__row { display: flex; gap: 8px; align-items: center; }
