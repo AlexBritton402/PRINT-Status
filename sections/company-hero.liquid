@@ -27,7 +27,10 @@
     assign short = c.handle
   endif
   assign host = shop.url | remove: 'https://' | remove: 'http://'
+  assign campaign = short | default: c.handle
 -%}
+
+{% render 'company-attribution' %}
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
@@ -70,11 +73,11 @@
       {%- if section.settings.show_short_link and short != blank -%}
         <div class="company-hero__share">
           <span class="company-hero__share-label">{{ section.settings.share_label | escape }}</span>
-          <span class="company-hero__share-url">{{ host }}/{{ short }}</span>
+          <span class="company-hero__share-url">{{ host }}/{{ short | escape }}</span>
           <button
             type="button"
             class="company-hero__copy"
-            data-copy-url="{{ shop.url }}/{{ short }}"
+            data-copy-url="{{ shop.url }}/{{ short | escape }}?utm_source=company&amp;utm_campaign={{ campaign | url_encode }}"
             data-copied-label="{{ section.settings.copied_label | escape }}"
           >
             {{- section.settings.copy_label | escape -}}

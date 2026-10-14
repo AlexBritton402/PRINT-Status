@@ -55,17 +55,44 @@
                 alt="{{ block.settings.title | escape }}"
                 loading="lazy"
               >
-            {%- endif -%}
-            {%- if block.settings.title != blank or block.settings.text != blank -%}
-              <div class="service-paths__text">
+              {%- if block.settings.title != blank or block.settings.text != blank -%}
+                <div class="service-paths__text">
+                  {%- if block.settings.title != blank -%}
+                    <span class="service-paths__title">{{ block.settings.title | escape }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.text != blank -%}
+                    <span class="service-paths__caption">{{ block.settings.text | escape }}</span>
+                  {%- endif -%}
+                  {%- if link != blank -%}
+                    <span class="service-paths__go">Start</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- else -%}
+              {%- liquid
+                assign accent = block.settings.accent_color | append: ''
+                assign panel_style = ''
+                if accent != blank
+                  assign panel_brightness = accent | color_brightness
+                  if panel_brightness > 150
+                    assign panel_ink = '#000000'
+                  else
+                    assign panel_ink = '#ffffff'
+                  endif
+                  assign panel_style = '--sp-panel: ' | append: accent | append: '; --sp-panel-ink: ' | append: panel_ink | append: ';'
+                endif
+              -%}
+              <div
+                class="service-paths__panel"
+                {% if panel_style != blank %}
+                  style="{{ panel_style | escape }}"
+                {% endif %}
+              >
                 {%- if block.settings.title != blank -%}
                   <span class="service-paths__title">{{ block.settings.title | escape }}</span>
                 {%- endif -%}
                 {%- if block.settings.text != blank -%}
                   <span class="service-paths__caption">{{ block.settings.text | escape }}</span>
-                {%- endif -%}
-                {%- if link != blank -%}
-                  <span class="service-paths__go">Start</span>
                 {%- endif -%}
               </div>
             {%- endif -%}
@@ -143,6 +170,28 @@
     object-fit: cover;
     object-position: center;
     display: block;
+  }
+
+  .service-paths__panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    aspect-ratio: 3 / 2;
+    padding: clamp(24px, 4vw, 40px) 22px;
+    text-align: center;
+    background: var(--sp-panel, color-mix(in srgb, var(--color-foreground) 12%, var(--color-background)));
+    color: var(--sp-panel-ink, var(--color-foreground));
+  }
+
+  .service-paths__panel .service-paths__title {
+    color: inherit;
+  }
+
+  .service-paths__panel .service-paths__caption {
+    color: color-mix(in srgb, currentColor 72%, transparent);
   }
 
   .service-paths__text {
@@ -247,6 +296,7 @@
           "id": "image",
           "label": "Image",
           "options": [
+            { "value": "", "label": "None (text card)" },
             { "value": "DTFadvert.png", "label": "DTF advert" },
             { "value": "UploadGangsheet.png", "label": "Upload gang sheet" },
             { "value": "ad.png", "label": "Made in LA (ad)" },
@@ -271,6 +321,12 @@
           "type": "url",
           "id": "link",
           "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Accent color",
+          "info": "Panel background when no image is set. Leave blank for a neutral panel."
         }
       ]
     }

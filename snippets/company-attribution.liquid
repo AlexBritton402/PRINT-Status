@@ -1,0 +1,42 @@
+{%- comment -%}
+  PRINT Status – company order attribution.
+  On a company collection, sets cookie ps_company and cart attribute "Referred by".
+  Renders nothing visible. No-ops when collection.handle is blank.
+{%- endcomment -%}
+
+{%- if collection.handle != blank -%}
+  <script>
+    (() => {
+      const handle = {{ collection.handle | json }};
+      if (!handle) return;
+
+      try {
+        document.cookie =
+          'ps_company=' +
+          encodeURIComponent(handle) +
+          '; Max-Age=2592000; Path=/; SameSite=Lax';
+      } catch (e) {}
+
+      try {
+        let sent = null;
+        try {
+          sent = sessionStorage.getItem('ps_company_sent');
+        } catch (e) {}
+        if (sent === handle) return;
+
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ attributes: { 'Referred by': handle } }),
+        })
+          .then((res) => {
+            if (!res.ok) return;
+            try {
+              sessionStorage.setItem('ps_company_sent', handle);
+            } catch (e) {}
+          })
+          .catch(() => {});
+      } catch (e) {}
+    })();
+  </script>
+{%- endif -%}

@@ -54,12 +54,23 @@
             "text": "Solid white for screen printers",
             "link": "#design-white"
           }
+        },
+        "organizations": {
+          "type": "service",
+          "settings": {
+            "image": "",
+            "title": "Shop Organizations",
+            "text": "Order your company's official gear",
+            "link": "/pages/organizations",
+            "accent_color": "#111111"
+          }
         }
       },
       "block_order": [
         "upload",
         "gang",
-        "white"
+        "white",
+        "organizations"
       ],
       "settings": {
         "heading": "What we print",
