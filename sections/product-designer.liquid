@@ -29,28 +29,36 @@
     </div>
 
     <div class="designer__panel">
-      <span id="design-color"></span>
+      <span id="design-build"></span>
+      <span id="design-upload"></span>
       <span id="design-white"></span>
+      <span id="design-color"></span>
       <span id="design-vinyl"></span>
       <span id="design-dtf"></span>
       <span id="design-gang"></span>
       <div class="designer__group">
-        <span class="designer__label">1. Ink</span>
-        <div class="designer__choices">
-          <button type="button" class="designer__choice is-selected" data-ink="color">Color</button>
-          <button type="button" class="designer__choice" data-ink="white">White</button>
+        <span class="designer__label">1. What you need</span>
+        <div class="designer__choices designer__choices--stack">
+          <button type="button" class="designer__choice is-selected" data-ink="build">Build a sheet</button>
+          <button type="button" class="designer__choice" data-ink="upload">Upload a finished sheet</button>
+          <button type="button" class="designer__choice" data-ink="white">White ink only</button>
         </div>
         <select data-designer-kind class="designer__select" hidden>
-          <option value="color">Color vinyl</option>
-          <option value="white">White vinyl</option>
+          <option value="build">Build a sheet</option>
+          <option value="upload">Upload a finished sheet</option>
+          <option value="white">White ink only</option>
         </select>
       </div>
 
       <div class="designer__group">
-        <span class="designer__label">2. Sheet size</span>
-        <div class="designer__choices" data-designer-size-choices></div>
-        <select data-designer-size class="designer__select" hidden></select>
-        <p class="designer__hint">Every sheet is 22 inches wide. The whole sheet stays on screen.</p>
+        <span class="designer__label">2. Sheet and timing</span>
+        <select data-designer-size class="designer__select"></select>
+        <div class="designer__choices">
+          <button type="button" class="designer__choice is-selected" data-turn="normal">Next day</button>
+          <button type="button" class="designer__choice" data-turn="rush">Rush, same day</button>
+        </div>
+        <p class="designer__price" data-designer-price></p>
+        <p class="designer__hint">Every sheet is 22 inches wide. Next day means order by 3 PM. Rush means order by noon, ready by 4 PM.</p>
       </div>
 
       <div class="designer__group">
@@ -80,8 +88,10 @@
         </div>
       </div>
 
-      <div class="designer__group designer__row">
-        <button type="button" class="button button-secondary designer__btn-sm" data-designer-delete>Delete selected</button>
+      <div class="designer__group designer__row designer__row--wrap">
+        <button type="button" class="button button-secondary designer__btn-sm" data-designer-duplicate>Duplicate</button>
+        <button type="button" class="button button-secondary designer__btn-sm" data-designer-arrange>Auto-arrange</button>
+        <button type="button" class="button button-secondary designer__btn-sm" data-designer-delete>Delete</button>
         <button type="button" class="button button-secondary designer__btn-sm" data-designer-clear>Clear</button>
       </div>
 
@@ -109,18 +119,29 @@
   const status = root.querySelector('[data-designer-status]');
   const say = (m) => { if (status) status.textContent = m; };
 
-  const parseSizes = (raw) => String(raw).split('\n').map(s => s.trim()).filter(Boolean).map(line => {
-    const [label, w, h] = line.split('|').map(x => (x || '').trim());
-    return { label: label || 'Custom', w: parseFloat(w) || 11, h: parseFloat(h) || 14 };
-  });
-  const sizes = parseSizes('22×24|22|24\n22×36|22|36\n22×60|22|60');
+  const money = (n) => `$${Number(n).toFixed(2)}`;
+  const sizes = [
+    { label: '22×12', w: 22, h: 12, build: [4.99, 5.99], upload: [4.99, 5.99], white: [4.99, 6.99] },
+    { label: '22×24', w: 22, h: 24, build: [9.99, 11.99], upload: [9.99, 11.99], white: [7.99, 11.99] },
+    { label: '22×36', w: 22, h: 36, build: [14.99, 17.99], upload: [14.99, 17.99], white: [11.99, 17.99] },
+    { label: '22×48', w: 22, h: 48, build: [19.99, 23.99], upload: [19.99, 27.99], white: [15.99, 23.99] },
+    { label: '22×60', w: 22, h: 60, build: [24.99, 29.99], upload: [24.99, 34.99], white: [19.99, 29.99] },
+    { label: '22×72', w: 22, h: 72, build: [29.99, 35.99], upload: [29.99, 35.99], white: [23.99, 35.99] },
+    { label: '22×90', w: 22, h: 90, build: [37.49, 44.99], upload: [37.49, 44.99], white: [29.99, 44.99] },
+    { label: '22×108', w: 22, h: 108, build: [44.99, 53.99], upload: [39.99, 55.99], white: [35.99, 53.99] },
+    { label: '22×120', w: 22, h: 120, build: [49.99, 59.99], upload: [42.99, 59.99], white: [39.99, 59.99] },
+    { label: '22×144', w: 22, h: 144, build: [59.99, 71.99], upload: [59.99, 71.99], white: [47.99, 71.99] },
+  ];
   const inks = {
-    color: { canvas: '#ffffff', text: '#111111' },
+    build: { canvas: '#ffffff', text: '#111111' },
+    upload: { canvas: '#ffffff', text: '#111111' },
     white: { canvas: '#141416', text: '#ffffff' },
   };
+  let turnaround = 'normal';
   const inkFromHash = (raw) => {
-    if (raw === 'white' || raw === 'gang') return 'white';
-    if (raw === 'color' || raw === 'vinyl' || raw === 'dtf') return 'color';
+    if (raw === 'white') return 'white';
+    if (raw === 'upload') return 'upload';
+    if (raw === 'build' || raw === 'color' || raw === 'vinyl' || raw === 'dtf' || raw === 'gang') return 'build';
     return '';
   };
 
@@ -135,37 +156,34 @@
     const kindSel = root.querySelector('[data-designer-kind]');
     const colorInput = root.querySelector('[data-designer-color]');
     const sheetLabel = root.querySelector('[data-designer-sheet-label]');
+    const priceEl = root.querySelector('[data-designer-price]');
+    const modeName = () => ({ build: 'Build a sheet', upload: 'Finished sheet', white: 'White ink' }[kindSel.value] || 'Build a sheet');
+    function priceFor(s) {
+      const table = s[kindSel.value] || s.build;
+      return table[turnaround === 'rush' ? 1 : 0];
+    }
     function fillSizes() {
+      const keep = sizeSel.value;
       sizeSel.replaceChildren();
-      const box = root.querySelector('[data-designer-size-choices]');
-      box.replaceChildren();
       sizes.forEach((s, i) => {
         const o = document.createElement('option');
         o.value = i;
-        o.textContent = s.label;
+        o.textContent = `${s.label} in · ${money(priceFor(s))}`;
         sizeSel.appendChild(o);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'designer__choice';
-        b.textContent = s.label;
-        b.addEventListener('click', () => {
-          sizeSel.value = String(i);
-          applySize(i);
-        });
-        box.appendChild(b);
       });
+      if (sizeSel.options[keep]) sizeSel.value = String(keep);
     }
     function markChoices() {
       root.querySelectorAll('[data-ink]').forEach((b) => {
         b.classList.toggle('is-selected', b.dataset.ink === kindSel.value);
       });
-      root.querySelectorAll('[data-designer-size-choices] .designer__choice').forEach((b, i) => {
-        b.classList.toggle('is-selected', String(i) === String(sizeSel.value));
+      root.querySelectorAll('[data-turn]').forEach((b) => {
+        b.classList.toggle('is-selected', b.dataset.turn === turnaround);
       });
     }
     function applySize(idx) {
       const s = sizes[idx] || sizes[0];
-      const ink = inks[kindSel.value] || inks.color;
+      const ink = inks[kindSel.value] || inks.build;
       const stage = root.querySelector('.designer__stage');
       const maxW = Math.max(220, stage.clientWidth - 28);
       const maxH = Math.min(640, Math.round(window.innerHeight * 0.62));
@@ -193,15 +211,16 @@
       canvas.renderAll();
       canvas._psSize = s;
       canvas._psKind = kindSel.value;
-      if (sheetLabel) sheetLabel.textContent = `${s.w}×${s.h} in · ${kindSel.value === 'white' ? 'White' : 'Color'} vinyl`;
+      if (sheetLabel) sheetLabel.textContent = `${s.label} in · ${modeName()}`;
+      if (priceEl) priceEl.textContent = `${money(priceFor(s))} · ${turnaround === 'rush' ? 'rush, same day' : 'next day'}`;
       markChoices();
     }
     function setKind(kind) {
-      kind = inks[kind] ? kind : 'color';
-      const keep = sizeSel.options.length ? (+sizeSel.value || 0) : 0;
+      kind = inks[kind] ? kind : 'build';
+      const keep = sizeSel.options.length ? (+sizeSel.value || 1) : 1;
       kindSel.value = kind;
       colorInput.value = inks[kind].text;
-      if (!sizeSel.options.length) fillSizes();
+      fillSizes();
       if (sizeSel.options[keep]) sizeSel.value = String(keep);
       applySize(keep);
     }
@@ -210,8 +229,15 @@
       b.addEventListener('click', () => setKind(b.dataset.ink));
     });
     sizeSel.addEventListener('change', () => applySize(+sizeSel.value));
+    root.querySelectorAll('[data-turn]').forEach((b) => {
+      b.addEventListener('click', () => {
+        turnaround = b.dataset.turn;
+        fillSizes();
+        applySize(+sizeSel.value || 0);
+      });
+    });
     const hashKind = () => inkFromHash((location.hash || '').replace('#design-', ''));
-    setKind(hashKind() || 'color');
+    setKind(hashKind() || 'build');
     window.addEventListener('hashchange', () => {
       const next = hashKind();
       if (next) setKind(next);
@@ -224,12 +250,19 @@
       const reader = new FileReader();
       reader.onload = (ev) => {
         fabric.Image.fromURL(ev.target.result, (img) => {
-          const scale = Math.min((canvas.getWidth() * 0.7) / img.width, (canvas.getHeight() * 0.7) / img.height, 1);
+          const s = canvas._psSize || sizes[1];
+          const fitSheet = kindSel.value === 'upload';
+          const targetIn = fitSheet ? s.w - 0.6 : Math.min(8, s.w * 0.45);
+          const targetPx = (targetIn / s.w) * canvas.getWidth();
+          const scale = Math.min(targetPx / img.width, (canvas.getHeight() * (fitSheet ? 0.92 : 0.7)) / img.height);
           img.set({ left: canvas.getWidth() / 2, top: canvas.getHeight() / 2, originX: 'center', originY: 'center' });
           img.scale(scale);
           canvas.add(img).setActiveObject(img);
           canvas.renderAll();
-          say('Artwork added.');
+          const inches = (img.getScaledWidth() / canvas.getWidth()) * s.w;
+          const dpi = Math.round(img.width / Math.max(inches, 0.1));
+          const quality = dpi >= 300 ? 'print-ready' : dpi >= 200 ? 'acceptable' : 'too soft for print';
+          say(`Artwork added, about ${dpi} DPI (${quality}).`);
         }, { crossOrigin: 'anonymous' });
       };
       reader.readAsDataURL(file);
@@ -269,6 +302,43 @@
     root.querySelector('[data-designer-clear]').addEventListener('click', () => {
       canvas.getObjects().slice().forEach(o => canvas.remove(o));
       canvas.renderAll(); say('Cleared.');
+    });
+    root.querySelector('[data-designer-duplicate]').addEventListener('click', () => {
+      const o = canvas.getActiveObject();
+      if (!o) { say('Select a design first.'); return; }
+      o.clone((clone) => {
+        clone.set({ left: (o.left || 0) + 18, top: (o.top || 0) + 18 });
+        canvas.add(clone).setActiveObject(clone);
+        canvas.renderAll();
+        say('Duplicated.');
+      });
+    });
+    root.querySelector('[data-designer-arrange]').addEventListener('click', () => {
+      const objs = canvas.getObjects();
+      if (!objs.length) { say('Add artwork first.'); return; }
+      const s = canvas._psSize || sizes[1];
+      const gap = canvas.getWidth() * (0.25 / s.w);
+      const margin = canvas.getWidth() * (0.3 / s.w);
+      let x = margin;
+      let y = margin;
+      let rowH = 0;
+      objs.forEach((o) => {
+        const w = o.getScaledWidth();
+        const h = o.getScaledHeight();
+        if (x + w > canvas.getWidth() - margin && x > margin) {
+          x = margin;
+          y += rowH + gap;
+          rowH = 0;
+        }
+        o.set({ left: x + w / 2, top: y + h / 2, originX: 'center', originY: 'center' });
+        o.setCoords();
+        x += w + gap;
+        rowH = Math.max(rowH, h);
+      });
+      canvas.renderAll();
+      say(y + rowH > canvas.getHeight() - margin
+        ? 'Some designs hang off the sheet. Choose a longer sheet or make them smaller.'
+        : 'Arranged on the sheet with a small gap.');
     });
 
     root.querySelector('[data-designer-download]').addEventListener('click', () => {
@@ -348,6 +418,11 @@
     background: #fff; font-weight: 700; cursor: pointer;
   }
   .designer__choice.is-selected { border-color: #ff2d9b; background: #fff0f7; }
+  .designer__choices--stack { flex-direction: column; }
+  .designer__choices--stack .designer__choice { width: 100%; text-align: left; }
+  .designer__price {
+    margin: 0; font-family: var(--font-heading--family); font-size: 1.35rem; font-weight: 700;
+  }
   .designer__group { display: flex; flex-direction: column; gap: 8px; }
   .designer__label { font-weight: 600; font-size: .85rem; letter-spacing: .03em; text-transform: uppercase; opacity: .7; }
   .designer__row { display: flex; gap: 8px; align-items: center; }

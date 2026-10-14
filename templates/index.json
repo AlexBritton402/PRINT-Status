@@ -16,10 +16,10 @@
         "overlay_opacity": 0,
         "heading": "",
         "subheading": "",
-        "button_1_label": "Color vinyl sheet",
-        "button_1_link": "#design-color",
-        "button_2_label": "White vinyl sheet",
-        "button_2_link": "#design-white",
+        "button_1_label": "Build a sheet",
+        "button_1_link": "#design-build",
+        "button_2_label": "Upload a finished sheet",
+        "button_2_link": "#design-upload",
         "desktop_height": 540,
         "mobile_height": 340,
         "color_scheme": "scheme-1"
@@ -32,29 +32,39 @@
           "type": "service",
           "settings": {
             "image": "DTFadvert.png",
-            "title": "Color vinyl sheet",
-            "text": "Full-color print on a 22 inch sheet",
-            "link": "#design-color"
+            "title": "Build a sheet",
+            "text": "Upload art, duplicate it, and we line it up",
+            "link": "#design-build"
           }
         },
         "gang": {
           "type": "service",
           "settings": {
             "image": "UploadGangsheet.png",
-            "title": "White vinyl sheet",
-            "text": "White ink for dark or clear vinyl",
+            "title": "Upload a finished sheet",
+            "text": "Already designed it? Send the whole sheet",
+            "link": "#design-upload"
+          }
+        },
+        "white": {
+          "type": "service",
+          "settings": {
+            "image": "ad.png",
+            "title": "White ink only",
+            "text": "Solid white for screen printers",
             "link": "#design-white"
           }
         }
       },
       "block_order": [
         "upload",
-        "gang"
+        "gang",
+        "white"
       ],
       "settings": {
         "heading": "What we print",
-        "subheading": "Custom vinyl sheets, printed in color or white.",
-        "columns": 2,
+        "subheading": "Build a gang sheet, upload a finished one, or print white ink only.",
+        "columns": 3,
         "color_scheme": "scheme-1"
       }
     },
@@ -296,8 +306,8 @@
     "design_studio": {
       "type": "product-designer",
       "settings": {
-        "heading": "Design your vinyl sheet",
-        "intro": "<p>Pick color or white ink, choose a 22 inch sheet, then upload artwork or add text.</p>",
+        "heading": "Build your sheet",
+        "intro": "<p>Choose build, upload, or white ink. Pick a 22 inch sheet and next-day or rush, then place your artwork.</p>",
         "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
         "canvas_bg": "#ffffff",
         "color_scheme": "scheme-1"
