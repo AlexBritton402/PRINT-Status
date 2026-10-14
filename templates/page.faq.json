@@ -1,1 +1,834 @@
-{"sections":{"main":{"type":"main-page","blocks":{"text_rc6E67":{"type":"text","name":"t:names.heading","settings":{"text":"<h2>Help Center<\/h2>","width":"100%","max_width":"none","alignment":"center","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}},"text_mptBwa":{"type":"text","name":"t:names.heading","settings":{"text":"<h4>DTF TRANSFER PRESSING INSTRUCTIONS<\/h4>","width":"100%","max_width":"none","alignment":"center","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}},"text_VfQkrp":{"type":"text","name":"t:names.text","settings":{"text":"<p>DTF Transfers can be peeled HOT OR COLD. Can be applied on to a variety of garments such as Cotton, Polyester, Poly Blend and much more.<\/p><p><strong>PRESSING INSTRUCTIONS (OUR RECOMMENDED SETTINGS):<\/strong><\/p><ol><li><strong>Turn on the heat press and set the heat to 275°F- 290°F at high pressure (75-90psi). Please calibrate your press to ensure proper temperature.<\/strong><\/li><li><strong>Press for 7-12 seconds. Please verify what time works best for your heat press.<\/strong><\/li><li><strong>While Instant Peel may be possible, our film is rated for Hot Peel (wait 3-5 seconds when the press pops open before peeling, best for solid artwork, we recommend cold peel for thinner lines and small details).<\/strong><\/li><li><strong>Repress with the same temp, pressure, and time using a finishing sheet.<\/strong><\/li><\/ol><p><strong>TIP: For Canvas material, change temp to 300F.<\/strong><\/p><h5><strong>For additional tips and instructions, reference the FAQ.<\/strong><\/h5><p><em>Disclaimer: Customers hold full copyright responsibility for all designs printed with us. Kindly ensure you have proper permission to use any copyrighted materials before submitting your artwork.<\/em><\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}}},"block_order":["text_rc6E67","text_mptBwa","text_VfQkrp"],"custom_css":[],"settings":{"content_direction":"column","gap":32,"color_scheme":"","padding-block-start":40,"padding-block-end":25}},"section_dJR3ae":{"type":"section","blocks":{"text_itdkKX":{"type":"text","name":"t:names.heading","settings":{"text":"<h2>Frequently asked questions<\/h2>","width":"fit-content","max_width":"narrow","alignment":"left","type_preset":"h3","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}},"text_WFUULV":{"type":"text","name":"t:names.heading","settings":{"text":"<h2>DIRECT TO FILM <\/h2>","width":"fit-content","max_width":"normal","alignment":"left","type_preset":"h4","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}},"accordion_fUkEnk":{"type":"accordion","name":"t:names.accordion","settings":{"icon":"caret","dividers":true,"type_preset":"h5","inherit_color_scheme":true,"color_scheme":"","border":"none","border_width":1,"border_opacity":100,"border_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{"accordion_row_tF8heA":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Do you color match?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_BYQMeG":{"type":"text","settings":{"text":"<p>Since most of our clients are seasoned printers, standard protocol usually involves no color matching on full-color printing as its mostly standard practice on single spot color images utilizing Pantone colors that are hand mixed. <\/p><p>We do have color charts we can provide if you wish to meet certain clients' needs. When it comes to standard CMYK printing, we are extremely confident in the colors our printers hit. At the same time, we do have a high standard and will always address issues if one arises.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_BYQMeG"]},"accordion_row_7rmrdE":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Do you automatically fix artwork that I upload?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_HN9dJT":{"type":"text","settings":{"text":"<p>Because we cater to professionals who print shirts for a living, the standard protocol is not to change anything without consent. With our gangsheet builder, we do provide the tools to erase backgrounds, halftone, or clean up semi-transparent pixels, which are usually 99% of any printing issues when it comes to DTF. If you wish for us to take a courtesy quality check, we would love to do so. If there are issues and we are given consent to make changes, we would not mind doing so. Just know that artwork changes may result in a change of turnaround time.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_HN9dJT"]},"accordion_row_TNAeEi":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Do you accept AI created artwork?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_fgEKHi":{"type":"text","settings":{"text":"<p>Yes, but it has its limits. Uploading original high-res logos or supporting high-res art will let you produce a print-ready 300dpi image. Using AI to generate images usually have a max resolution of 5-6 inches that scales at 300dpi. Use prompts with specific subject details, art style, aspect ratio, and technical keywords like \"ultra-detailed,\" and \"print-ready,\" often using a 1:1 or 2:3 ratio or specific inches. You will still have to upscale using an upscaling program or clean up semi-transparent pixels.<br\/><\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_fgEKHi"]},"accordion_row_zUJmEE":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"What is the best way to prepare my gangsheet?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_VcBzgM":{"type":"text","settings":{"text":"<p>Create a new 22-inch canvas, CMYK Mode, 300 dpi with transparent background and drag all artwork into that canvas. Based on the available template sizes, expand your way down to the size that best accommodates your artwork needs. Our preference is to save your art in PNG format. PNG supports transparent backgrounds and preserves detail\/color.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_VcBzgM"]},"accordion_row_mLhKwG":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Do you offer pre-cut transfers by size?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_MTB3TE":{"type":"text","settings":{"text":"<p>At this moment its not something we offer as we mostly cater to print brokers who order in gang sheets, opposed to single designs. While it's an option for the future, we wish to provide products that give you the best bang for your buck.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_MTB3TE"]},"accordion_row_cEH4R4":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Do you prefer I use your gang sheet builder or upload one I made on my own?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_G6Ey6g":{"type":"text","settings":{"text":"<p>The honest truth is, if you can build it yourself, upload your own gang sheet, but please keep art sizes to their defined sizes. Our builder has great tools, but if you have big gaps of transparency in your artwork where you can possibly sneak something small in the gaps, that would be our preference, as you get more bang for your buck. Art pieces submitted on our builder recognize areas as square areas, and if you wish to overlap designs, you will get warnings and may have overlooked areas you didn't intend to overlap.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_G6Ey6g"]},"accordion_row_CxQwtE":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"What size should my halftones be?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_jMQz6Q":{"type":"text","settings":{"text":"<p>Our best recommendation would be to use 30 lpi at 300dpi at 22.5 degree angle to keep at screen printing standards. Do not change the image size after you have halftoned your image as there will be unexpected results.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_jMQz6Q"]},"accordion_row_JyqirN":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Your gang builder says I have semi-transparent pixels but its originally a vector art. Should I have your builder fix the issue?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_CMDPtA":{"type":"text","settings":{"text":"<p>Our builder is very sensitive in that it recognizes anti-aliasing at very small levels. It should be fine to ignore any warnings as long as you didn't enlarge from a very small image to a much larger image.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_CMDPtA"]}},"block_order":["accordion_row_tF8heA","accordion_row_7rmrdE","accordion_row_TNAeEi","accordion_row_zUJmEE","accordion_row_mLhKwG","accordion_row_cEH4R4","accordion_row_CxQwtE","accordion_row_JyqirN"]},"text_XmGwzf":{"type":"text","name":"t:names.heading","disabled":true,"settings":{"text":"<h2>SHIPPING<\/h2>","width":"fit-content","max_width":"normal","alignment":"left","type_preset":"h4","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}}},"block_order":["text_itdkKX","text_WFUULV","accordion_fUkEnk","text_XmGwzf"],"name":"t:names.faq_section","settings":{"content_direction":"column","vertical_on_mobile":true,"horizontal_alignment":"flex-start","vertical_alignment":"center","align_baseline":false,"horizontal_alignment_flex_direction_column":"center","vertical_alignment_flex_direction_column":"center","gap":32,"section_width":"page-width","section_height":"","section_height_custom":50,"color_scheme":"","background_media":"none","video_position":"cover","background_image_position":"cover","border":"none","border_width":1,"border_opacity":100,"border_radius":0,"toggle_overlay":false,"overlay_color":"#00000026","overlay_style":"solid","gradient_direction":"to top","padding-block-start":48,"padding-block-end":48}},"section_CMX9F6":{"type":"section","blocks":{"text_7xK7ah":{"type":"text","name":"t:names.heading","settings":{"text":"<h2>GENERAL INFORMATION<\/h2>","width":"fit-content","max_width":"narrow","alignment":"left","type_preset":"h4","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":false,"background_color":"#00000026","corner_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{}},"accordion_YkwgRc":{"type":"accordion","name":"t:names.accordion","settings":{"icon":"caret","dividers":true,"type_preset":"h5","inherit_color_scheme":true,"color_scheme":"","border":"none","border_width":1,"border_opacity":100,"border_radius":0,"padding-block-start":0,"padding-block-end":0,"padding-inline-start":0,"padding-inline-end":0},"blocks":{"accordion_row_LrBerw":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"What is your turnaround time?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_pNnkm7":{"type":"text","settings":{"text":"<p>Most orders placed before 3pm Mon-Fri will be ready for pickup by 3pm the following business day. If shipping, delivery times may vary based on your location.<br\/><br\/>Once your order is ready for pickup or has shipped, you will receive an email with further information. <\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_pNnkm7"]},"accordion_row_AFFpwX":{"type":"_accordion-row","settings":{"heading":"What is the return policy?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_pLEiKW":{"type":"text","settings":{"text":"<p>Our goal is for every customer to be totally satisfied with their purchase. If this isn't the case, let us know and we'll do our best to work with you to make it right.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_pLEiKW"]},"accordion_row_M8BYVj":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"Where are your products manufactured?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_4hA7kp":{"type":"text","name":"t:names.text","settings":{"text":"<p>There are alot of online stores who have USA based store fronts but are just distribution centers for out-of-country operations that drop ship. <\/p><p>With PRINT STATUS, all prints are produced here in the Southbay. We also source all our supplies from vendors in the LA County region.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_4hA7kp"]},"accordion_row_TjdPny":{"type":"_accordion-row","name":"t:names.accordion_row","settings":{"heading":"How much does shipping cost?","open_by_default":false,"icon":"none","width":20},"blocks":{"text_pNfPKW":{"type":"text","name":"t:names.text","settings":{"text":"<p>Shipping is calculated based on your location and the items in your order. You will always know the shipping price before you purchase.<\/p>","width":"100%","max_width":"none","alignment":"left","type_preset":"rte","font":"var(--font-body--family)","font_size":"1rem","line_height":"normal","letter_spacing":"normal","case":"none","wrap":"pretty","color":"var(--color-foreground)","background":true,"background_color":"#00000026","corner_radius":20,"padding-block-start":15,"padding-block-end":15,"padding-inline-start":15,"padding-inline-end":15},"blocks":{}}},"block_order":["text_pNfPKW"]}},"block_order":["accordion_row_LrBerw","accordion_row_AFFpwX","accordion_row_M8BYVj","accordion_row_TjdPny"]}},"block_order":["text_7xK7ah","accordion_YkwgRc"],"name":"t:names.faq_section","settings":{"content_direction":"column","vertical_on_mobile":true,"horizontal_alignment":"flex-start","vertical_alignment":"center","align_baseline":false,"horizontal_alignment_flex_direction_column":"center","vertical_alignment_flex_direction_column":"center","gap":32,"section_width":"page-width","section_height":"","section_height_custom":50,"color_scheme":"","background_media":"none","video_position":"cover","background_image_position":"cover","border":"none","border_width":1,"border_opacity":100,"border_radius":0,"toggle_overlay":false,"overlay_color":"#00000026","overlay_style":"solid","gradient_direction":"to top","padding-block-start":48,"padding-block-end":48}}},"order":["main","section_dJR3ae","section_CMX9F6"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "text_rc6E67": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>Help Center</h2>",
+            "width": "100%",
+            "max_width": "none",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "text_mptBwa": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h4>DTF TRANSFER PRESSING INSTRUCTIONS</h4>",
+            "width": "100%",
+            "max_width": "none",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "text_VfQkrp": {
+          "type": "text",
+          "name": "t:names.text",
+          "settings": {
+            "text": "<p>DTF Transfers can be peeled HOT OR COLD. Can be applied on to a variety of garments such as Cotton, Polyester, Poly Blend and much more.</p><p><strong>PRESSING INSTRUCTIONS (OUR RECOMMENDED SETTINGS):</strong></p><ol><li><strong>Turn on the heat press and set the heat to 275°F- 290°F at high pressure (75-90psi). Please calibrate your press to ensure proper temperature.</strong></li><li><strong>Press for 7-12 seconds. Please verify what time works best for your heat press.</strong></li><li><strong>While Instant Peel may be possible, our film is rated for Hot Peel (wait 3-5 seconds when the press pops open before peeling, best for solid artwork, we recommend cold peel for thinner lines and small details).</strong></li><li><strong>Repress with the same temp, pressure, and time using a finishing sheet.</strong></li></ol><p><strong>TIP: For Canvas material, change temp to 300F.</strong></p><h5><strong>For additional tips and instructions, reference the FAQ.</strong></h5><p><em>Disclaimer: Customers hold full copyright responsibility for all designs printed with us. Kindly ensure you have proper permission to use any copyrighted materials before submitting your artwork.</em></p>",
+            "width": "100%",
+            "max_width": "none",
+            "alignment": "left",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_rc6E67",
+        "text_mptBwa",
+        "text_VfQkrp"
+      ],
+      "custom_css": [],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 25
+      }
+    },
+    "section_dJR3ae": {
+      "type": "section",
+      "blocks": {
+        "text_itdkKX": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>Frequently asked questions</h2>",
+            "width": "fit-content",
+            "max_width": "narrow",
+            "alignment": "left",
+            "type_preset": "h3",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "text_WFUULV": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>DIRECT TO FILM </h2>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "accordion_fUkEnk": {
+          "type": "accordion",
+          "name": "t:names.accordion",
+          "settings": {
+            "icon": "caret",
+            "dividers": true,
+            "type_preset": "h5",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "accordion_row_tF8heA": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Do you color match?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_BYQMeG": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Since most of our clients are seasoned printers, standard protocol usually involves no color matching on full-color printing as its mostly standard practice on single spot color images utilizing Pantone colors that are hand mixed. </p><p>We do have color charts we can provide if you wish to meet certain clients' needs. When it comes to standard CMYK printing, we are extremely confident in the colors our printers hit. At the same time, we do have a high standard and will always address issues if one arises.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_BYQMeG"
+              ]
+            },
+            "accordion_row_7rmrdE": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Do you automatically fix artwork that I upload?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_HN9dJT": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Because we cater to professionals who print shirts for a living, the standard protocol is not to change anything without consent. With our gangsheet builder, we do provide the tools to erase backgrounds, halftone, or clean up semi-transparent pixels, which are usually 99% of any printing issues when it comes to DTF. If you wish for us to take a courtesy quality check, we would love to do so. If there are issues and we are given consent to make changes, we would not mind doing so. Just know that artwork changes may result in a change of turnaround time.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_HN9dJT"
+              ]
+            },
+            "accordion_row_TNAeEi": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Do you accept AI created artwork?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_fgEKHi": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Yes, but it has its limits. Uploading original high-res logos or supporting high-res art will let you produce a print-ready 300dpi image. Using AI to generate images usually have a max resolution of 5-6 inches that scales at 300dpi. Use prompts with specific subject details, art style, aspect ratio, and technical keywords like \"ultra-detailed,\" and \"print-ready,\" often using a 1:1 or 2:3 ratio or specific inches. You will still have to upscale using an upscaling program or clean up semi-transparent pixels.<br/></p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_fgEKHi"
+              ]
+            },
+            "accordion_row_zUJmEE": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "What is the best way to prepare my gangsheet?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_VcBzgM": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Create a new 22-inch canvas, CMYK Mode, 300 dpi with transparent background and drag all artwork into that canvas. Based on the available template sizes, expand your way down to the size that best accommodates your artwork needs. Our preference is to save your art in PNG format. PNG supports transparent backgrounds and preserves detail/color.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_VcBzgM"
+              ]
+            },
+            "accordion_row_mLhKwG": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Do you offer pre-cut transfers by size?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_MTB3TE": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>At this moment its not something we offer as we mostly cater to print brokers who order in gang sheets, opposed to single designs. While it's an option for the future, we wish to provide products that give you the best bang for your buck.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_MTB3TE"
+              ]
+            },
+            "accordion_row_cEH4R4": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Do you prefer I use your gang sheet builder or upload one I made on my own?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_G6Ey6g": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>The honest truth is, if you can build it yourself, upload your own gang sheet, but please keep art sizes to their defined sizes. Our builder has great tools, but if you have big gaps of transparency in your artwork where you can possibly sneak something small in the gaps, that would be our preference, as you get more bang for your buck. Art pieces submitted on our builder recognize areas as square areas, and if you wish to overlap designs, you will get warnings and may have overlooked areas you didn't intend to overlap.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_G6Ey6g"
+              ]
+            },
+            "accordion_row_CxQwtE": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "What size should my halftones be?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_jMQz6Q": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Our best recommendation would be to use 30 lpi at 300dpi at 22.5 degree angle to keep at screen printing standards. Do not change the image size after you have halftoned your image as there will be unexpected results.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_jMQz6Q"
+              ]
+            },
+            "accordion_row_JyqirN": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Your gang builder says I have semi-transparent pixels but its originally a vector art. Should I have your builder fix the issue?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_CMDPtA": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Our builder is very sensitive in that it recognizes anti-aliasing at very small levels. It should be fine to ignore any warnings as long as you didn't enlarge from a very small image to a much larger image.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_CMDPtA"
+              ]
+            }
+          },
+          "block_order": [
+            "accordion_row_tF8heA",
+            "accordion_row_7rmrdE",
+            "accordion_row_TNAeEi",
+            "accordion_row_zUJmEE",
+            "accordion_row_mLhKwG",
+            "accordion_row_cEH4R4",
+            "accordion_row_CxQwtE",
+            "accordion_row_JyqirN"
+          ]
+        },
+        "text_XmGwzf": {
+          "type": "text",
+          "name": "t:names.heading",
+          "disabled": true,
+          "settings": {
+            "text": "<h2>SHIPPING</h2>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "text_itdkKX",
+        "text_WFUULV",
+        "accordion_fUkEnk",
+        "text_XmGwzf"
+      ],
+      "name": "t:names.faq_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 32,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "section_CMX9F6": {
+      "type": "section",
+      "blocks": {
+        "text_7xK7ah": {
+          "type": "text",
+          "name": "t:names.heading",
+          "settings": {
+            "text": "<h2>GENERAL INFORMATION</h2>",
+            "width": "fit-content",
+            "max_width": "narrow",
+            "alignment": "left",
+            "type_preset": "h4",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "accordion_YkwgRc": {
+          "type": "accordion",
+          "name": "t:names.accordion",
+          "settings": {
+            "icon": "caret",
+            "dividers": true,
+            "type_preset": "h5",
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "accordion_row_LrBerw": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "What is your turnaround time?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_pNnkm7": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Most orders placed before 3pm Mon-Fri will be ready for pickup by 3pm the following business day. If shipping, delivery times may vary based on your location.<br/><br/>Once your order is ready for pickup or has shipped, you will receive an email with further information. </p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_pNnkm7"
+              ]
+            },
+            "accordion_row_AFFpwX": {
+              "type": "_accordion-row",
+              "settings": {
+                "heading": "What is the return policy?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_pLEiKW": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<p>Our goal is for every customer to be totally satisfied with their purchase. If this isn't the case, let us know and we'll do our best to work with you to make it right.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_pLEiKW"
+              ]
+            },
+            "accordion_row_M8BYVj": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "Where are your products manufactured?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_4hA7kp": {
+                  "type": "text",
+                  "name": "t:names.text",
+                  "settings": {
+                    "text": "<p>There are alot of online stores who have USA based store fronts but are just distribution centers for out-of-country operations that drop ship. </p><p>With PRINT STATUS, all prints are produced here in the Southbay. We also source all our supplies from vendors in the LA County region.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_4hA7kp"
+              ]
+            },
+            "accordion_row_TjdPny": {
+              "type": "_accordion-row",
+              "name": "t:names.accordion_row",
+              "settings": {
+                "heading": "How much does shipping cost?",
+                "open_by_default": false,
+                "icon": "none",
+                "width": 20
+              },
+              "blocks": {
+                "text_pNfPKW": {
+                  "type": "text",
+                  "name": "t:names.text",
+                  "settings": {
+                    "text": "<p>Shipping is $7.99, or free UPS Ground over $99. Local pickup in Torrance is free. Order before 3 PM and it is ready by 3 PM the next business day.</p>",
+                    "width": "100%",
+                    "max_width": "none",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-body--family)",
+                    "font_size": "1rem",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "var(--color-foreground)",
+                    "background": true,
+                    "background_color": "#00000026",
+                    "corner_radius": 20,
+                    "padding-block-start": 15,
+                    "padding-block-end": 15,
+                    "padding-inline-start": 15,
+                    "padding-inline-end": 15
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_pNfPKW"
+              ]
+            }
+          },
+          "block_order": [
+            "accordion_row_LrBerw",
+            "accordion_row_AFFpwX",
+            "accordion_row_M8BYVj",
+            "accordion_row_TjdPny"
+          ]
+        }
+      },
+      "block_order": [
+        "text_7xK7ah",
+        "accordion_YkwgRc"
+      ],
+      "name": "t:names.faq_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 32,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    }
+  },
+  "order": [
+    "main",
+    "section_dJR3ae",
+    "section_CMX9F6"
+  ]
+}

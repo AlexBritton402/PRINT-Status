@@ -68,6 +68,7 @@
           Upload image
           <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-designer-upload hidden>
         </label>
+        <p class="designer__hint" data-designer-file-note hidden>22 inches wide. 300 dpi. PNG. Transparent background.</p>
       </div>
 
       <div class="designer__group">
@@ -152,6 +153,7 @@
     const whiteBox = root.querySelector('[data-designer-white]');
     const modeName = () => (kindSel.value === 'upload' ? 'Finished sheet' : 'Build a sheet');
     const modeNote = root.querySelector('[data-designer-mode-note]');
+    const fileNote = root.querySelector('[data-designer-file-note]');
     const modeNotes = {
       build: 'Upload separate pictures or add text, then use Auto-arrange.',
       upload: 'Upload one picture of the whole sheet. A new upload replaces the last one.',
@@ -236,6 +238,7 @@
       kindSel.value = kind;
       colorInput.value = whiteInk ? '#ffffff' : '#111111';
       if (modeNote) modeNote.textContent = modeNotes[kind] || modeNotes.build;
+      if (fileNote) fileNote.hidden = kind !== 'upload';
       fillSizes();
       if (sizeSel.options[keep]) sizeSel.value = String(keep);
       applySize(keep);

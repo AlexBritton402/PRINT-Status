@@ -46,27 +46,16 @@
             "text": "Already designed it? Send the whole sheet",
             "link": "#design-upload"
           }
-        },
-        "organizations": {
-          "type": "service",
-          "settings": {
-            "image": "",
-            "title": "Company stores",
-            "text": "Open your company's page",
-            "link": "/pages/organizations",
-            "accent_color": "#111111"
-          }
         }
       },
       "block_order": [
         "upload",
-        "gang",
-        "organizations"
+        "gang"
       ],
       "settings": {
         "heading": "What we print",
         "subheading": "Build a gang sheet, or upload one you already finished.",
-        "columns": 3,
+        "columns": 2,
         "color_scheme": "scheme-1"
       }
     },
