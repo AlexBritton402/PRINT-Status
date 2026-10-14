@@ -75,3 +75,38 @@ Good enough to launch and track the pilot.
 1. Admin: **pilot on native admin** now, or **build the Company Manager dashboard** (and embedded-app vs lab-hosted)?
 2. Domains: offer companies **vanity-domain redirects** (~$12/yr) or keep everyone on free `/acme` paths?
 3. Add the **"Shop Organizations" path** to the homepage + main menu now?
+
+---
+
+# CHOSEN MODEL: FREE (decided 2026-10-13)
+
+One Shopify store, one checkout, public link-based company stores on the main domain.
+No paid domains, no per-company Shopify stores, no backend required for the pilot.
+
+## Flow
+- Visitor lands on the **homepage** → can make a **general custom purchase** (Design Studio / DTF / gang sheets).
+- A visitor "tied to" a company uses that company's **link** or the **directory** → lands on the branded
+  **`/acme`** store and buys their products. **Public, no login/gating** (gating is only the separate realtor program).
+- **Same cart/checkout for both.** A person can buy general DTF + Acme gear in one order.
+
+## Three doors (all free)
+1. Direct link `printstatus.com/acme` (redirect → `/collections/acme`).
+2. Directory `/pages/organizations` (searchable).
+3. Homepage **"Shop Organizations"** card + main-menu item.
+
+## Traffic & order tracking (free, no accounts, no backend)
+- **Visits / sources / history:** Shopify's native **GA4** integration (Google & YouTube channel / Customer Events, set up in admin, free). Per-company visits read from GA4 **landing-page** reports (`/collections/acme`).
+- **Order attribution (the clean part):** a theme snippet on company pages (1) sets cookie **`ps_company=<handle>`** (30 days) and (2) writes cart attribute **`Referred by: <handle>`** via `/cart/update.js`. So **any** order that visitor places — even general products — is credited to the referring company (last-touch).
+- **Collection orders** also get the automatic **`company-<handle>` order tag** (Flow).
+- **Crisp sources:** the company "copy link" button emits `/acme?utm_campaign=<handle>`.
+
+## Theme vs. boss
+- **Theme (built/building):** store pages, directory, homepage path, the **attribution snippet**, UTM links. No Horizon core edits, no backend.
+- **Boss/admin (free):** native **GA4** on; **Orders** filtered by `Referred by` attribute + `company-` tag; **Shopify Analytics** for visits/history. That's the pilot's "separate admin that tracks orders, visits, history."
+- **Later:** unified **Company Manager dashboard** (Admin API + lab host).
+
+## §8 decisions — status
+1. Admin — pilot native (Shopify Analytics + GA4); dashboard later. ✔
+2. Domains — free `/acme` paths for all; vanity domains deferred. ✔
+3. Homepage path — add "Shop Organizations" card + menu. ✔ (in build)
+4. Pending: a **GA4 Measurement ID** from the boss to enable visit dashboards. Order attribution works without it.
