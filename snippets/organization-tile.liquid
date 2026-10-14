@@ -10,6 +10,7 @@
     assign brand = '#000000'
   endif
   assign logo = c.metafields.custom.company_logo.value
+  assign tagline = c.metafields.custom.tagline.value
   assign words = c.title | split: ' '
   assign initials = ''
   for w in words limit: 2
@@ -38,8 +39,9 @@
       </span>
     </span>
     <span class="org-tile__name">{{ c.title }}</span>
-    <span class="org-tile__count">
-      {%- if c.products_count == 1 -%}1 item{%- else -%}{{ c.products_count }} items{%- endif -%}
-    </span>
+    {%- if tagline != blank -%}
+      <span class="org-tile__tagline">{{ tagline }}</span>
+    {%- endif -%}
+    <span class="org-tile__visit">Visit store</span>
   </a>
 </li>
