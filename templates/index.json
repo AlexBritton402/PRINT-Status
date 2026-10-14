@@ -16,10 +16,10 @@
         "overlay_opacity": 0,
         "heading": "",
         "subheading": "",
-        "button_1_label": "Upload Your Transfer",
-        "button_1_link": "#design-dtf",
-        "button_2_label": "Build a Gang Sheet",
-        "button_2_link": "#design-gang",
+        "button_1_label": "Color vinyl sheet",
+        "button_1_link": "#design-color",
+        "button_2_label": "White vinyl sheet",
+        "button_2_link": "#design-white",
         "desktop_height": 540,
         "mobile_height": 340,
         "color_scheme": "scheme-1"
@@ -32,18 +32,18 @@
           "type": "service",
           "settings": {
             "image": "DTFadvert.png",
-            "title": "Upload your transfer",
-            "text": "Custom sizes, ready next day",
-            "link": "#design-dtf"
+            "title": "Color vinyl sheet",
+            "text": "Full-color print on a 22 inch sheet",
+            "link": "#design-color"
           }
         },
         "gang": {
           "type": "service",
           "settings": {
             "image": "UploadGangsheet.png",
-            "title": "Build a gang sheet",
-            "text": "Fit more designs per sheet",
-            "link": "#design-gang"
+            "title": "White vinyl sheet",
+            "text": "White ink for dark or clear vinyl",
+            "link": "#design-white"
           }
         }
       },
@@ -53,7 +53,7 @@
       ],
       "settings": {
         "heading": "What we print",
-        "subheading": "Custom DTF transfers and gang sheets, printed in-house and ready next day.",
+        "subheading": "Custom vinyl sheets, printed in color or white.",
         "columns": 2,
         "color_scheme": "scheme-1"
       }
@@ -82,7 +82,7 @@
           "settings": {
             "icon": "ruler",
             "title": "Any size, any quantity",
-            "text": "Custom DTF transfers and gang sheets, built to your size."
+            "text": "Custom vinyl sheets, built to your size."
           }
         }
       },
@@ -296,8 +296,8 @@
     "design_studio": {
       "type": "product-designer",
       "settings": {
-        "heading": "Design your print",
-        "intro": "<p>Choose a DTF transfer, gang sheet, or vinyl decal. Upload artwork or add text, then download a test print file.</p>",
+        "heading": "Design your vinyl sheet",
+        "intro": "<p>Pick color or white ink, choose a 22 inch sheet, then upload artwork or add text.</p>",
         "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
         "canvas_bg": "#ffffff",
         "color_scheme": "scheme-1"

@@ -12,8 +12,8 @@
     "designer": {
       "type": "product-designer",
       "settings": {
-        "heading": "Design your print",
-        "intro": "<p>Choose a DTF transfer, gang sheet, or vinyl decal. Upload artwork or add text, then download a test print file.</p>",
+        "heading": "Design your vinyl sheet",
+        "intro": "<p>Pick color or white ink, choose a 22 inch sheet, then upload artwork or add text.</p>",
         "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
         "canvas_bg": "#ffffff",
         "color_scheme": "scheme-1"
