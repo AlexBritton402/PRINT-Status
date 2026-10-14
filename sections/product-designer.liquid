@@ -1,7 +1,8 @@
 {%- comment -%}
   PRINT Status – sheet studio.
-  Three jobs, matching the shop: build a sheet, upload a finished sheet,
-  or white ink only. Every sheet is 22 inches wide.
+  Two jobs: build a sheet, or upload a finished sheet.
+  White ink is a setting on either job. The sheet total updates from the size,
+  the timing, and that setting. Every sheet is 22 inches wide.
   Library vendored at assets/fabric.min.js.
 {%- endcomment -%}
 
@@ -41,12 +42,14 @@
         <div class="designer__choices designer__choices--stack">
           <button type="button" class="designer__choice is-selected" data-ink="build">Build a sheet</button>
           <button type="button" class="designer__choice" data-ink="upload">Upload a finished sheet</button>
-          <button type="button" class="designer__choice" data-ink="white">White ink only</button>
         </div>
+        <label class="designer__toggle">
+          <input type="checkbox" data-designer-white>
+          White ink
+        </label>
         <select data-designer-kind class="designer__select" hidden>
           <option value="build">Build a sheet</option>
           <option value="upload">Upload a finished sheet</option>
-          <option value="white">White ink only</option>
         </select>
       </div>
 
@@ -58,6 +61,7 @@
           <button type="button" class="designer__choice" data-turn="rush">Rush, same day</button>
         </div>
         <p class="designer__price" data-designer-price></p>
+        <p class="designer__hint" data-designer-price-detail></p>
         <p class="designer__hint">Every sheet is 22 inches wide. Next day means order by 3 PM. Rush means order by noon, ready by 4 PM.</p>
         <p class="designer__hint" data-designer-mode-note>Upload separate pictures or add text, then use Auto-arrange.</p>
       </div>
@@ -133,16 +137,11 @@
     { label: '22×120', w: 22, h: 120, build: [49.99, 59.99], upload: [42.99, 59.99], white: [39.99, 59.99] },
     { label: '22×144', w: 22, h: 144, build: [59.99, 71.99], upload: [59.99, 71.99], white: [47.99, 71.99] },
   ];
-  const inks = {
-    build: { canvas: '#ffffff', text: '#111111' },
-    upload: { canvas: '#ffffff', text: '#111111' },
-    white: { canvas: '#141416', text: '#ffffff' },
-  };
   let turnaround = 'normal';
-  const inkFromHash = (raw) => {
-    if (raw === 'white') return 'white';
+  let whiteInk = false;
+  const hashJob = (raw) => {
     if (raw === 'upload') return 'upload';
-    if (raw === 'build' || raw === 'color' || raw === 'vinyl' || raw === 'dtf' || raw === 'gang') return 'build';
+    if (raw === 'white' || raw === 'build' || raw === 'color' || raw === 'vinyl' || raw === 'dtf' || raw === 'gang') return 'build';
     return '';
   };
 
@@ -158,28 +157,30 @@
     const colorInput = root.querySelector('[data-designer-color]');
     const sheetLabel = root.querySelector('[data-designer-sheet-label]');
     const priceEl = root.querySelector('[data-designer-price]');
-    const modeName = () => ({ build: 'Build a sheet', upload: 'Finished sheet', white: 'White ink' }[kindSel.value] || 'Build a sheet');
+    const priceDetail = root.querySelector('[data-designer-price-detail]');
+    const whiteBox = root.querySelector('[data-designer-white]');
+    const modeName = () => (kindSel.value === 'upload' ? 'Finished sheet' : 'Build a sheet');
     const modeNote = root.querySelector('[data-designer-mode-note]');
     const modeNotes = {
       build: 'Upload separate pictures or add text, then use Auto-arrange.',
       upload: 'Upload one picture of the whole sheet. A new upload replaces the last one.',
-      white: 'Solid white ink. Halftones and thin lines need to be in the file already. Lines should be at least 1.5 pt.',
     };
     function currentSizeIndex() {
       const n = Number(sizeSel.value);
       return Number.isInteger(n) && n >= 0 && n < sizes.length ? n : 1;
     }
     function priceFor(s) {
-      const table = s[kindSel.value] || s.build;
+      const table = whiteInk ? s.white : (s[kindSel.value] || s.build);
       return table[turnaround === 'rush' ? 1 : 0];
     }
     function fillSizes() {
       const keep = sizeSel.value;
+      if (sizeSel.options.length === sizes.length) return;
       sizeSel.replaceChildren();
       sizes.forEach((s, i) => {
         const o = document.createElement('option');
         o.value = i;
-        o.textContent = `${s.label} in · ${money(priceFor(s))}`;
+        o.textContent = `${s.label} in`;
         sizeSel.appendChild(o);
       });
       if (sizeSel.options[keep]) sizeSel.value = String(keep);
@@ -194,7 +195,7 @@
     }
     function applySize(idx) {
       const s = sizes[idx] || sizes[0];
-      const ink = inks[kindSel.value] || inks.build;
+      const sheet = whiteInk ? { canvas: '#141416', text: '#ffffff' } : { canvas: '#ffffff', text: '#111111' };
       const stage = root.querySelector('.designer__stage');
       const maxW = Math.max(220, stage.clientWidth - 28);
       const maxH = Math.min(640, Math.round(window.innerHeight * 0.62));
@@ -218,19 +219,21 @@
           o.setCoords();
         });
       }
-      canvas.backgroundColor = ink.canvas;
+      canvas.backgroundColor = sheet.canvas;
       canvas.renderAll();
       canvas._psSize = s;
       canvas._psKind = kindSel.value;
+      canvas._psWhite = whiteInk;
       if (sheetLabel) sheetLabel.textContent = `${s.label} in · ${modeName()}`;
-      if (priceEl) priceEl.textContent = `${money(priceFor(s))} · ${turnaround === 'rush' ? 'rush, same day' : 'next day'}`;
+      if (priceEl) priceEl.textContent = money(priceFor(s));
+      if (priceDetail) priceDetail.textContent = `${s.label} in · ${turnaround === 'rush' ? 'rush, same day' : 'next day'}`;
       markChoices();
     }
     function setKind(kind) {
-      kind = inks[kind] ? kind : 'build';
+      kind = kind === 'upload' ? 'upload' : 'build';
       const keep = sizeSel.options.length ? currentSizeIndex() : 1;
       kindSel.value = kind;
-      colorInput.value = inks[kind].text;
+      colorInput.value = whiteInk ? '#ffffff' : '#111111';
       if (modeNote) modeNote.textContent = modeNotes[kind] || modeNotes.build;
       fillSizes();
       if (sizeSel.options[keep]) sizeSel.value = String(keep);
@@ -249,16 +252,29 @@
     root.querySelectorAll('[data-turn]').forEach((b) => {
       b.addEventListener('click', () => {
         turnaround = b.dataset.turn;
-        fillSizes();
         applySize(currentSizeIndex());
       });
     });
-    const hashKind = () => inkFromHash((location.hash || '').replace('#design-', ''));
-    setKind(hashKind() || 'build');
-    window.addEventListener('hashchange', () => {
-      const next = hashKind();
-      if (next) setKind(next);
-    });
+    if (whiteBox) {
+      whiteBox.addEventListener('change', () => {
+        whiteInk = whiteBox.checked;
+        colorInput.value = whiteInk ? '#ffffff' : '#111111';
+        applySize(currentSizeIndex());
+      });
+    }
+    const applyHash = () => {
+      const raw = (location.hash || '').replace('#design-', '');
+      const next = hashJob(raw);
+      if (!next) return;
+      if (raw === 'white' && whiteBox) {
+        whiteInk = true;
+        whiteBox.checked = true;
+      }
+      setKind(next);
+    };
+    applyHash();
+    if (!hashJob((location.hash || '').replace('#design-', ''))) setKind('build');
+    window.addEventListener('hashchange', applyHash);
 
     // Upload artwork
     root.querySelector('[data-designer-upload]').addEventListener('change', (e) => {
@@ -286,8 +302,7 @@
           const shapeNote = fitSheet && Math.abs(imgRatio - sheetRatio) / sheetRatio > 0.15
             ? ' The picture shape does not match the sheet, so empty space is left around it.'
             : '';
-          const whiteNote = kindSel.value === 'white' ? ' White ink prints this as solid white.' : '';
-          say(`Artwork added, about ${dpi} DPI (${quality}).${shapeNote}${whiteNote}${alphaNote(img)}`);
+          say(`Artwork added, about ${dpi} DPI (${quality}).${shapeNote}${alphaNote(img)}`);
         }, { crossOrigin: 'anonymous' });
       };
       reader.readAsDataURL(file);
@@ -397,7 +412,7 @@
     root.querySelector('[data-designer-download]').addEventListener('click', () => {
       if (canvas.getObjects().length === 0) { say('Add artwork or text first.'); return; }
       const s = canvas._psSize || sizes[0];
-      const kind = canvas._psKind || 'build';
+      const kind = `${canvas._psKind || 'build'}${canvas._psWhite ? '-white' : ''}`;
       const targetW = Math.min(4096, Math.round(s.w * 150));
       const multiplier = Math.max(1, Math.min(8, targetW / canvas.getWidth()));
       let dataUrl;
@@ -433,6 +448,7 @@
         fd.append('quantity', '1');
         fd.append('properties[Size]', `${s.label} (${s.w}×${s.h} in)`);
         if (texts) fd.append('properties[Text]', texts);
+        fd.append('properties[White ink]', canvas._psWhite ? 'Yes' : 'No');
         fd.append('properties[Artwork]', file, 'custom-design.png');
         const res = await fetch('/cart/add.js', { method: 'POST', body: fd });
         if (!res.ok) throw new Error('cart ' + res.status);
@@ -484,6 +500,9 @@
   .designer__choice.is-selected { border-color: #ff2d9b; background: #fff0f7; }
   .designer__choices--stack { flex-direction: column; }
   .designer__choices--stack .designer__choice { width: 100%; text-align: left; }
+  .designer__toggle {
+    display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;
+  }
   .designer__price {
     margin: 0; font-family: var(--font-heading--family); font-size: 1.35rem; font-weight: 700;
   }

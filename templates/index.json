@@ -46,15 +46,6 @@
             "link": "#design-upload"
           }
         },
-        "white": {
-          "type": "service",
-          "settings": {
-            "image": "ad.png",
-            "title": "White ink only",
-            "text": "Solid white for screen printers",
-            "link": "#design-white"
-          }
-        },
         "organizations": {
           "type": "service",
           "settings": {
@@ -69,12 +60,11 @@
       "block_order": [
         "upload",
         "gang",
-        "white",
         "organizations"
       ],
       "settings": {
         "heading": "What we print",
-        "subheading": "Build a gang sheet, upload a finished one, or print white ink only.",
+        "subheading": "Build a gang sheet, or upload one you already finished.",
         "columns": 3,
         "color_scheme": "scheme-1"
       }
@@ -318,7 +308,7 @@
       "type": "product-designer",
       "settings": {
         "heading": "Build your sheet",
-        "intro": "<p>Choose build, upload, or white ink. Pick a 22 inch sheet and next-day or rush, then place your artwork.</p>",
+        "intro": "<p>Choose build or upload, then pick a sheet and timing. The price updates on its own. Turn on white ink if the print should be white.</p>",
         "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
         "canvas_bg": "#ffffff",
         "color_scheme": "scheme-1"
