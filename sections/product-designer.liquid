@@ -1,7 +1,7 @@
 {%- comment -%}
-  PRINT Status – vinyl sheet studio.
-  Customers print a sheet of vinyl: pick color or white ink, pick a sheet
-  size, upload artwork or add text, then download the print file.
+  PRINT Status – sheet studio.
+  Three jobs, matching the shop: build a sheet, upload a finished sheet,
+  or white ink only. Every sheet is 22 inches wide.
   Library vendored at assets/fabric.min.js.
 {%- endcomment -%}
 
@@ -25,7 +25,7 @@
   <div class="designer__layout">
     <div class="designer__stage">
       <canvas data-designer-canvas width="360" height="392"></canvas>
-      <p class="designer__sheet-label" data-designer-sheet-label>22×24 in · Color vinyl</p>
+      <p class="designer__sheet-label" data-designer-sheet-label>22×24 in · Build a sheet</p>
     </div>
 
     <div class="designer__panel">
@@ -59,6 +59,7 @@
         </div>
         <p class="designer__price" data-designer-price></p>
         <p class="designer__hint">Every sheet is 22 inches wide. Next day means order by 3 PM. Rush means order by noon, ready by 4 PM.</p>
+        <p class="designer__hint" data-designer-mode-note>Upload separate pictures or add text, then use Auto-arrange.</p>
       </div>
 
       <div class="designer__group">
@@ -96,13 +97,13 @@
       </div>
 
       <div class="designer__group">
-        <button type="button" class="button designer__download" data-designer-download>Download print file</button>
+        <button type="button" class="button designer__download" data-designer-download>Download layout</button>
         {%- if variant_id != blank -%}
           <button type="button" class="button designer__add" data-designer-add-cart data-variant="{{ variant_id }}">
             Add to cart
           </button>
         {%- else -%}
-          <p class="designer__hint">Download the sheet. Checkout turns on after this design is tied to a product.</p>
+          <p class="designer__hint">This download is a layout preview. Checkout uses your original artwork once the sheet is tied to a product.</p>
         {%- endif -%}
         <p class="designer__status" data-designer-status aria-live="polite"></p>
       </div>
@@ -158,6 +159,16 @@
     const sheetLabel = root.querySelector('[data-designer-sheet-label]');
     const priceEl = root.querySelector('[data-designer-price]');
     const modeName = () => ({ build: 'Build a sheet', upload: 'Finished sheet', white: 'White ink' }[kindSel.value] || 'Build a sheet');
+    const modeNote = root.querySelector('[data-designer-mode-note]');
+    const modeNotes = {
+      build: 'Upload separate pictures or add text, then use Auto-arrange.',
+      upload: 'Upload one picture of the whole sheet. A new upload replaces the last one.',
+      white: 'Solid white ink. Halftones and thin lines need to be in the file already. Lines should be at least 1.5 pt.',
+    };
+    function currentSizeIndex() {
+      const n = Number(sizeSel.value);
+      return Number.isInteger(n) && n >= 0 && n < sizes.length ? n : 1;
+    }
     function priceFor(s) {
       const table = s[kindSel.value] || s.build;
       return table[turnaround === 'rush' ? 1 : 0];
@@ -217,23 +228,29 @@
     }
     function setKind(kind) {
       kind = inks[kind] ? kind : 'build';
-      const keep = sizeSel.options.length ? (+sizeSel.value || 1) : 1;
+      const keep = sizeSel.options.length ? currentSizeIndex() : 1;
       kindSel.value = kind;
       colorInput.value = inks[kind].text;
+      if (modeNote) modeNote.textContent = modeNotes[kind] || modeNotes.build;
       fillSizes();
       if (sizeSel.options[keep]) sizeSel.value = String(keep);
       applySize(keep);
     }
     kindSel.addEventListener('change', () => setKind(kindSel.value));
     root.querySelectorAll('[data-ink]').forEach((b) => {
-      b.addEventListener('click', () => setKind(b.dataset.ink));
+      b.addEventListener('click', () => {
+        const kind = b.dataset.ink;
+        const nextHash = '#design-' + kind;
+        if (location.hash !== nextHash) history.replaceState(null, '', nextHash);
+        setKind(kind);
+      });
     });
-    sizeSel.addEventListener('change', () => applySize(+sizeSel.value));
+    sizeSel.addEventListener('change', () => applySize(currentSizeIndex()));
     root.querySelectorAll('[data-turn]').forEach((b) => {
       b.addEventListener('click', () => {
         turnaround = b.dataset.turn;
         fillSizes();
-        applySize(+sizeSel.value || 0);
+        applySize(currentSizeIndex());
       });
     });
     const hashKind = () => inkFromHash((location.hash || '').replace('#design-', ''));
@@ -246,12 +263,14 @@
     // Upload artwork
     root.querySelector('[data-designer-upload]').addEventListener('change', (e) => {
       const file = e.target.files && e.target.files[0];
+      e.target.value = '';
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         fabric.Image.fromURL(ev.target.result, (img) => {
           const s = canvas._psSize || sizes[1];
           const fitSheet = kindSel.value === 'upload';
+          if (fitSheet) canvas.getObjects().slice().forEach((o) => canvas.remove(o));
           const targetIn = fitSheet ? s.w - 0.6 : Math.min(8, s.w * 0.45);
           const targetPx = (targetIn / s.w) * canvas.getWidth();
           const scale = Math.min(targetPx / img.width, (canvas.getHeight() * (fitSheet ? 0.92 : 0.7)) / img.height);
@@ -261,12 +280,39 @@
           canvas.renderAll();
           const inches = (img.getScaledWidth() / canvas.getWidth()) * s.w;
           const dpi = Math.round(img.width / Math.max(inches, 0.1));
-          const quality = dpi >= 300 ? 'print-ready' : dpi >= 200 ? 'acceptable' : 'too soft for print';
-          say(`Artwork added, about ${dpi} DPI (${quality}).`);
+          const quality = dpi >= 300 ? 'print-ready' : dpi >= 250 ? 'acceptable' : 'too soft for print';
+          const imgRatio = img.width / Math.max(img.height, 1);
+          const sheetRatio = canvas.getWidth() / Math.max(canvas.getHeight(), 1);
+          const shapeNote = fitSheet && Math.abs(imgRatio - sheetRatio) / sheetRatio > 0.15
+            ? ' The picture shape does not match the sheet, so empty space is left around it.'
+            : '';
+          const whiteNote = kindSel.value === 'white' ? ' White ink prints this as solid white.' : '';
+          say(`Artwork added, about ${dpi} DPI (${quality}).${shapeNote}${whiteNote}${alphaNote(img)}`);
         }, { crossOrigin: 'anonymous' });
       };
       reader.readAsDataURL(file);
     });
+    function alphaNote(img) {
+      try {
+        const el = img.getElement ? img.getElement() : img._element;
+        if (!el || !el.width) return '';
+        const sample = document.createElement('canvas');
+        const w = Math.min(el.width, 80);
+        const h = Math.max(1, Math.round(el.height * (w / el.width)));
+        sample.width = w;
+        sample.height = h;
+        const ctx = sample.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(el, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let semi = 0;
+        for (let i = 3; i < data.length; i += 4) {
+          const a = data[i];
+          if (a >= 20 && a <= 230) semi += 1;
+        }
+        if (semi > 40) return ' See-through pixels will print unevenly.';
+      } catch (err) { /* a tainted image still places on the sheet */ }
+      return '';
+    }
 
     // Add text
     const textInput = root.querySelector('[data-designer-text]');
@@ -297,7 +343,10 @@
     });
     root.querySelector('[data-designer-delete]').addEventListener('click', () => {
       const o = canvas.getActiveObject();
-      if (o) { canvas.remove(o); canvas.renderAll(); }
+      if (!o) { say('Select a design first.'); return; }
+      canvas.remove(o);
+      canvas.renderAll();
+      say('Deleted.');
     });
     root.querySelector('[data-designer-clear]').addEventListener('click', () => {
       canvas.getObjects().slice().forEach(o => canvas.remove(o));
@@ -314,6 +363,10 @@
       });
     });
     root.querySelector('[data-designer-arrange]').addEventListener('click', () => {
+      if (kindSel.value === 'upload') {
+        say('A finished sheet is already one picture. Switch to Build a sheet to line up separate designs.');
+        return;
+      }
       const objs = canvas.getObjects();
       if (!objs.length) { say('Add artwork first.'); return; }
       const s = canvas._psSize || sizes[1];
@@ -344,15 +397,23 @@
     root.querySelector('[data-designer-download]').addEventListener('click', () => {
       if (canvas.getObjects().length === 0) { say('Add artwork or text first.'); return; }
       const s = canvas._psSize || sizes[0];
-      const kind = canvas._psKind || 'dtf';
-      const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 3 });
+      const kind = canvas._psKind || 'build';
+      const targetW = Math.min(4096, Math.round(s.w * 150));
+      const multiplier = Math.max(1, Math.min(8, targetW / canvas.getWidth()));
+      let dataUrl;
+      try {
+        dataUrl = canvas.toDataURL({ format: 'png', multiplier });
+      } catch (err) {
+        dataUrl = canvas.toDataURL({ format: 'png', multiplier: 2 });
+      }
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = `print-status-vinyl-${kind}-${s.w}x${s.h}.png`;
+      a.download = `print-status-${kind}-${s.w}x${s.h}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      say(`Downloaded a ${kind} vinyl sheet, ${s.w}×${s.h} in.`);
+      const outDpi = Math.round((canvas.getWidth() * multiplier) / s.w);
+      say(`Saved a layout preview of the ${s.label} in sheet, about ${outDpi} DPI. The press file comes from your original artwork when you order.`);
     });
 
     // Add to cart with the composed PNG attached as a file line-item property
@@ -383,7 +444,7 @@
       }
     });
 
-    window.addEventListener('resize', () => applySize(+sizeSel.value));
+    window.addEventListener('resize', () => applySize(currentSizeIndex()));
     say('Ready. Upload artwork or add text.');
   }
   start();
@@ -392,6 +453,9 @@
 
 {% stylesheet %}
   .designer { padding-block: clamp(28px, 5vw, 56px); }
+  #design-build, #design-upload, #design-white, #design-color, #design-vinyl, #design-dtf, #design-gang {
+    scroll-margin-top: 168px;
+  }
   .designer__heading { text-align: center; margin: 0 0 8px; }
   .designer__intro { text-align: center; max-width: 60ch; margin: 0 auto clamp(20px, 3vw, 32px); opacity: .8; }
   .designer__layout { display: grid; gap: clamp(16px, 3vw, 32px); grid-template-columns: 1fr; align-items: start; }
