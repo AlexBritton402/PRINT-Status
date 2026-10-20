@@ -3,3 +3,5 @@
 node_modules/
 .shopify/
 *.local.json
+company-admin/
+company-manager/
