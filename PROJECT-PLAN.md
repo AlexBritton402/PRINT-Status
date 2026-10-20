@@ -50,8 +50,12 @@ Last updated: 2026-10-20.
   Blocked on: gate 1 (custom fields, collections, Flow) + gate 2 (store identities).
 - **Phase 2 — Main site cleanup:** code ✅ (homepage leads with DTF, 2 CTAs, FAQ real). Remaining:
   main menu (admin), point CTAs at real products, re-enable featured row on a real collection (gate 1).
-- **Phase 3 — Realtor program:** theme templates (`collection.realtor`, `product.realtor`, tag-gating)
-  = **buildable now** (ungated code). Customer field, Forms signup, verification tagging, Flow = gate 1/3.
+- **Phase 3 — Realtor program:** theme templates ✅ done + endpoint-validated (2026-10-20):
+  `sections/realtor-gate.liquid` (tag-gates on `realtor-verified`, apply panel + CSS-hides catalog),
+  `templates/collection.realtor.json`, `templates/product.realtor.json`. Pushed to staging #189047013667.
+  Caveat: CSS-hide is pilot-grade, not real access control (HTML still in page; search/sitemap/API not
+  gated) — harden before realtor go-live. Remaining: customer field, Forms signup, verification tagging,
+  Flow, `/pages/realtor` content, a realtor collection to render-verify the gate = gate 1/3.
 - **Phase 4 — Third-party apps:** gate 4.
 - **Phase 5 — AI & discovery:** gate 4.
 - **Phase 6 — Go live:** repeat admin setup on live store, connect repo as unpublished theme,
