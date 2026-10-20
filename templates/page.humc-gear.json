@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "store": {
+      "type": "humc-store",
+      "settings": {
+        "heading": "HUMC Gear",
+        "logo": "humc-gear-logo.png",
+        "brand_color": "#0070b0",
+        "tagline": "Official HUMC gear — fulfillment by PRINT Status",
+        "intro": "<p>Welcome to the HUMC Gear store. Shop official gear, printed and fulfilled by PRINT Status.</p>",
+        "button_1_label": "Shop gear",
+        "button_1_link": "",
+        "color_scheme": "scheme-1"
+      }
+    }
+  },
+  "order": [
+    "store"
+  ]
+}
