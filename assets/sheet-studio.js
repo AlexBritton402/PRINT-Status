@@ -1,6 +1,7 @@
 (() => {
-  const ROOTS = document.querySelectorAll('[data-sheet-studio]');
-  if (!ROOTS.length) return;
+  function studioRoots() {
+    return document.querySelectorAll('[data-sheet-studio]');
+  }
 
   const MAX_BYTES = 18 * 1024 * 1024;
 
@@ -87,7 +88,8 @@
     }
   }
 
-  ROOTS.forEach((root) => {
+  function bindStudio(root) {
+    if (!root || root.dataset.sheetBound === '1') return;
     let variants = [];
     try {
       variants = JSON.parse(root.dataset.variants || '[]');
@@ -116,6 +118,7 @@
     let pieceNames = [];
     let busy = false;
     const jobKind = root.dataset.job === 'Upload' ? 'Upload' : 'Create';
+    const pendingFiles = [];
 
     function currentVariant() {
       return findVariant(variants, variantIdFromPage(root));
@@ -440,8 +443,6 @@
       });
     });
 
-    const pendingFiles = [];
-
     function ingestFiles(files) {
       const list = Array.from(files || []);
       if (!list.length) return;
@@ -556,5 +557,77 @@
     window.addEventListener('resize', () => {
       if (dialog && dialog.open) applySheetSize();
     });
-  });
+
+    root._sheetApi = {
+      dialog,
+      open: openStudio,
+      close: closeStudio,
+      ingest: ingestFiles,
+      add: () => addToCart(false),
+      checkout: () => addToCart(true),
+    };
+    root.dataset.sheetBound = '1';
+  }
+
+  function bootStudios() {
+    studioRoots().forEach(bindStudio);
+  }
+
+  function liveApi(el) {
+    const root = el && el.closest && el.closest('[data-sheet-studio]');
+    if (!root) return null;
+    const stale = !root._sheetApi || !root._sheetApi.dialog || !document.contains(root._sheetApi.dialog);
+    if (stale) {
+      root.dataset.sheetBound = '';
+      bindStudio(root);
+    }
+    return root._sheetApi || null;
+  }
+
+  bootStudios();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootStudios);
+  }
+  document.addEventListener('shopify:section:load', bootStudios);
+  document.addEventListener('shopify:section:reorder', bootStudios);
+  [200, 800, 1600].forEach((ms) => window.setTimeout(bootStudios, ms));
+
+  document.addEventListener('click', (event) => {
+    const t = event.target;
+    if (!t || !t.closest) return;
+    const createBtn = t.closest('[data-sheet-open="create"]');
+    const addBtn = t.closest('[data-sheet-add]');
+    const checkoutBtn = t.closest('[data-sheet-checkout]');
+    const closeBtn = t.closest('[data-sheet-close]');
+    const api = liveApi(createBtn || addBtn || checkoutBtn || closeBtn);
+    if (!api) return;
+    if (createBtn) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      api.open();
+    } else if (addBtn) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      api.add();
+    } else if (checkoutBtn) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      api.checkout();
+    } else if (closeBtn) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      api.close();
+    }
+  }, true);
+
+  document.addEventListener('change', (event) => {
+    const input = event.target;
+    if (!input || !input.matches || !input.matches('[data-sheet-file]')) return;
+    const api = liveApi(input);
+    if (!api) return;
+    const files = Array.from(input.files || []);
+    input.value = '';
+    api.ingest(files);
+    event.stopImmediatePropagation();
+  }, true);
 })();

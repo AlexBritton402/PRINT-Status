@@ -588,21 +588,9 @@
         .then(function (map) {
           var title = root.getAttribute('data-product-title') || '';
           var sid = root.getAttribute('data-source-id') || '';
-          var entry = map[sid];
-          var foundId = sid;
-          if (!entry) {
-            Object.keys(map).some(function (id) {
-              if (map[id].title === title) {
-                entry = map[id];
-                foundId = id;
-                return true;
-              }
-              return false;
-            });
-          }
           previewMap = map;
+          var entry = lookupPreview(sid, title);
           if (entry) {
-            entry.id = entry.id || foundId;
             renderSwatches(entry);
           } else {
             var colorSet = root.querySelector('[data-color-set]');
