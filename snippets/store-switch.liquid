@@ -1,0 +1,26 @@
+{%- comment -%}
+  Temporary jump between PRINT Status and HUMC Gear.
+  Remove when private links / QR are enough.
+  @param {string} target - humc or print
+{%- endcomment -%}
+
+{%- liquid
+  assign preview = ''
+  if theme.id == 189047013667
+    assign preview = '?preview_theme_id=189047013667'
+  endif
+-%}
+
+{%- if target == 'print' -%}
+  <a
+    class="store-switch"
+    href="/{{ preview }}"
+    style="position:fixed;top:10px;left:10px;z-index:10000;display:inline-flex;align-items:center;min-height:36px;padding:8px 12px;border:2px solid #121212;background:#f7f7f5;color:#121212;font-family:Montserrat,Helvetica,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;line-height:1;"
+  >Go to PRINT Status</a>
+{%- else -%}
+  <a
+    class="store-switch"
+    href="{{ pages['humc-gear'].url | default: '/pages/humc-gear' }}{{ preview }}"
+    style="position:fixed;top:10px;left:10px;z-index:10000;display:inline-flex;align-items:center;min-height:36px;padding:8px 12px;border:2px solid #121212;background:#f7f7f5;color:#121212;font-family:Montserrat,Helvetica,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;line-height:1;"
+  >Go to HUMC Gear</a>
+{%- endif -%}

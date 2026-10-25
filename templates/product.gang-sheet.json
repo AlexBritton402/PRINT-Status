@@ -187,26 +187,23 @@
               },
               "blocks": {}
             },
-            "kixxl_gangify_upload_button_KfhLK4": {
-              "type": "shopify://apps/kixxl/blocks/gangify_upload_button/cdfbfad9-7b2b-47ff-a143-b116e7f6339b",
+            "sheet_studio_KfhLK4": {
+              "type": "sheet-studio",
               "settings": {
-                "product": "{{product}}",
-                "text": "Create a Gang Sheet",
-                "colour": "#808080",
-                "cssClass": "",
-                "inlineStyle": "",
-                "textUpload": "Upload a Gang Sheet",
-                "colourUpload": "#008656",
-                "cssClassUpload": "",
-                "inlineStyleUpload": ""
+                "text_create": "Create a Gang Sheet",
+                "colour_create": "#808080",
+                "text_upload": "Upload a Gang Sheet",
+                "colour_upload": "#008656",
+                "padding-block-start": 8,
+                "padding-block-end": 8
               }
             },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
               "settings": {
-                "stacking": true,
+                "stacking": false,
                 "show_pickup_availability": false,
-                "gift_card_form": true,
+                "gift_card_form": false,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -215,12 +212,14 @@
               "blocks": {
                 "quantity": {
                   "type": "quantity",
+                  "disabled": true,
                   "static": true,
                   "settings": {},
                   "blocks": {}
                 },
                 "add-to-cart": {
                   "type": "add-to-cart",
+                  "disabled": true,
                   "static": true,
                   "settings": {
                     "style_class": "button"
@@ -229,6 +228,7 @@
                 },
                 "accelerated-checkout": {
                   "type": "accelerated-checkout",
+                  "disabled": true,
                   "static": true,
                   "settings": {},
                   "blocks": {}
@@ -267,7 +267,7 @@
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
-            "kixxl_gangify_upload_button_KfhLK4",
+            "sheet_studio_KfhLK4",
             "buy_buttons_eYQEYi",
             "text_aEtTtq"
           ]
@@ -279,7 +279,7 @@
         "equal_columns": false,
         "limit_details_width": false,
         "gap": 20,
-        "enable_sticky_add_to_cart": true,
+        "enable_sticky_add_to_cart": false,
         "color_scheme": "",
         "padding-block-start": 0,
         "padding-block-end": 0
@@ -288,6 +288,32 @@
     "product_recommendations_qggXJq": {
       "type": "product-recommendations",
       "blocks": {
+        "text_6yCena": {
+          "type": "text",
+          "name": "t:names.text",
+          "settings": {
+            "text": "<h4>PRODUCTION & TURNAROUND TIME</h4><p>Files submitted by<strong> 3:00 PM</strong> will be printed the <strong>next business day</strong> and ready by <strong>3:00 PM </strong>for pickup or shipping<strong>. ALL TIMES LISTED ARE PST.</strong></p><p><strong>Weekend printing is not available</strong> at this time.</p>",
+            "width": "100%",
+            "max_width": "none",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": true,
+            "background_color": "#00000026",
+            "corner_radius": 20,
+            "padding-block-start": 25,
+            "padding-block-end": 25,
+            "padding-inline-start": 25,
+            "padding-inline-end": 25
+          },
+          "blocks": {}
+        },
         "text_cbcgyb": {
           "type": "text",
           "name": "t:names.header",
@@ -404,17 +430,18 @@
         }
       },
       "block_order": [
+        "text_6yCena",
         "text_cbcgyb"
       ],
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
-        "recommendation_type": "related",
+        "recommendation_type": "complementary",
         "layout_type": "grid",
         "carousel_on_mobile": false,
         "max_products": 4,
         "columns": 4,
-        "mobile_columns": "2",
+        "mobile_columns": "1",
         "columns_gap": 12,
         "rows_gap": 24,
         "icons_style": "arrow",

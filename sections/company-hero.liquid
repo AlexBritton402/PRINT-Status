@@ -30,6 +30,7 @@
   assign campaign = short | default: c.handle
 -%}
 
+{% render 'noindex' %}
 {% render 'company-attribution' %}
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>

@@ -1,0 +1,29 @@
+{%- comment -%}
+  Temporary header jump. Used on PRINT Status via header-group.
+{%- endcomment -%}
+
+{% render 'store-switch', target: section.settings.target %}
+
+{% schema %}
+{
+  "name": "Store switch",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "select",
+      "id": "target",
+      "label": "Goes to",
+      "options": [
+        { "value": "humc", "label": "HUMC Gear" },
+        { "value": "print", "label": "PRINT Status" }
+      ],
+      "default": "humc"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Store switch"
+    }
+  ]
+}
+{% endschema %}

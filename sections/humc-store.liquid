@@ -1,126 +1,323 @@
 {%- comment -%}
-  PRINT Status – HUMC Gear store page (self-contained, no collection/metafields needed).
-  A separate branded store landing in the sandbox. Brand baked as defaults; editable in the
-  theme editor. Does not touch the main PRINT Status store.
+  HUMC Gear home. Theme assets only; no live call to the old HUMC store.
+  (image-banner + image-with-text + featured-collection + contact form).
 {%- endcomment -%}
 
 {%- liquid
-  assign brand = section.settings.brand_color | default: '#0070b0'
-  assign ink = brand | color_brightness
-  if ink > 130
-    assign on_brand = '#111111'
-  else
-    assign on_brand = '#ffffff'
-  endif
+  assign store = collections['humc-gear']
+  assign shop_link = section.settings.shop_link | default: store.url | default: '/collections/humc-gear'
+  assign hero_image = section.settings.hero_image | default: 'humc-bg-home.png'
+  assign polo_image = section.settings.polo_image | default: 'humc-custompolo.jpg'
+  assign sleeve_image = section.settings.sleeve_image | default: 'humc-long-sleeve.png'
 -%}
 
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div class="section color-{{ section.settings.color_scheme }} section--full-width humc">
-  <div class="humc__hero" style="background: {{ brand }}; color: {{ on_brand }};">
-    <div class="humc__hero-inner">
-      {%- if section.settings.logo != blank -%}
-        <img
-          class="humc__logo"
-          src="{{ section.settings.logo | asset_url }}"
-          alt="{{ section.settings.heading | default: 'HUMC Gear' | escape }}"
-          width="800"
-          height="145"
-          loading="eager">
-      {%- else -%}
-        <h1 class="humc__wordmark">{{ section.settings.heading | default: 'HUMC Gear' | escape }}</h1>
-      {%- endif -%}
-
-      {%- if section.settings.tagline != blank -%}
-        <p class="humc__tagline">{{ section.settings.tagline | escape }}</p>
-      {%- endif -%}
-
-      {%- liquid
-        assign b1l = section.settings.button_1_label | strip
-        assign b2l = section.settings.button_2_label | strip
-        assign show1 = false
-        assign show2 = false
-        if b1l != blank and section.settings.button_1_link != blank
-          assign show1 = true
-        endif
-        if b2l != blank and section.settings.button_2_link != blank
-          assign show2 = true
-        endif
-      -%}
-      {%- if show1 or show2 -%}
-        <div class="humc__cta">
-          {%- if show1 -%}
-            <a class="button humc__button" style="background: {{ on_brand }}; color: {{ brand }};" href="{{ section.settings.button_1_link }}">{{ b1l | escape }}</a>
-          {%- endif -%}
-          {%- if show2 -%}
-            <a class="button humc__button humc__button--ghost" style="border-color: {{ on_brand }}; color: {{ on_brand }};" href="{{ section.settings.button_2_link }}">{{ b2l | escape }}</a>
-          {%- endif -%}
-        </div>
+<div class="humc-home">
+  <section class="humc-hero">
+    <img
+      class="humc-hero__img"
+      src="{{ hero_image | asset_url }}"
+      alt=""
+      width="2000"
+      height="685"
+      loading="eager"
+    >
+    <div class="humc-hero__shade"></div>
+    <div class="humc-hero__copy">
+      <h1>{{ section.settings.hero_heading | escape }}</h1>
+      {%- if section.settings.shop_label != blank -%}
+        <a class="humc-btn" href="{{ shop_link }}">{{ section.settings.shop_label | escape }}</a>
       {%- endif -%}
     </div>
-  </div>
+  </section>
 
-  {%- if section.settings.intro != blank -%}
-    <div class="humc__intro">{{ section.settings.intro }}</div>
-  {%- endif -%}
+  <section class="humc-split">
+    <div class="humc-split__media">
+      <img
+        src="{{ polo_image | asset_url }}"
+        alt="{{ section.settings.polo_alt | escape }}"
+        width="640"
+        height="635"
+        loading="lazy"
+      >
+    </div>
+    <div class="humc-split__text">
+      {%- if section.settings.polo_heading != blank -%}
+        <h2>{{ section.settings.polo_heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.polo_text != blank -%}
+        <p>{{ section.settings.polo_text | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.polo_button != blank -%}
+        <a class="humc-btn" href="{{ section.settings.polo_link | default: shop_link }}">{{ section.settings.polo_button | escape }}</a>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <section class="humc-split humc-split--flip">
+    <div class="humc-split__text">
+      {%- if section.settings.sleeve_heading != blank -%}
+        <h2>{{ section.settings.sleeve_heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.sleeve_text != blank -%}
+        <p>{{ section.settings.sleeve_text | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.sleeve_button != blank -%}
+        <a class="humc-btn" href="{{ shop_link }}">{{ section.settings.sleeve_button | escape }}</a>
+      {%- endif -%}
+    </div>
+    <div class="humc-split__media">
+      <img
+        src="{{ sleeve_image | asset_url }}"
+        alt="{{ section.settings.sleeve_alt | escape }}"
+        width="467"
+        height="426"
+        loading="lazy"
+      >
+    </div>
+  </section>
+
+  <section class="humc-featured" id="humc-products">
+    <div class="humc-featured__head">
+      <h2>{{ section.settings.featured_heading | escape }}</h2>
+      {%- if store != blank and store.products_count > 0 -%}
+        <a class="humc-btn" href="{{ store.url }}">{{ section.settings.view_all | default: 'View all' | escape }}</a>
+      {%- endif -%}
+    </div>
+    {%- if store != blank and store.products_count > 0 -%}
+      <ul class="humc-grid" role="list">
+        {%- for product in store.products limit: 4 -%}
+          <li>
+            <a class="humc-card" href="{{ product.url }}">
+              <span class="humc-card__photo">
+                {%- if product.featured_image -%}
+                  {{
+                    product.featured_image
+                    | image_url: width: 800
+                    | image_tag: loading: 'lazy', widths: '200, 400, 800', sizes: '(min-width: 750px) 25vw, 90vw', alt: product.title
+                  }}
+                {%- elsif product.title contains 'OTTO' or product.title contains 'Trucker' -%}
+                  <img
+                    src="{{ 'humc-m-19193876-148992677.jpg' | asset_url }}"
+                    alt="{{ product.title | escape }}"
+                    width="800"
+                    height="800"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  <span class="humc-card__empty">Photo coming soon</span>
+                {%- endif -%}
+                {%- unless product.available -%}
+                  <span class="humc-card__sold">Sold out</span>
+                {%- endunless -%}
+              </span>
+              <span class="humc-card__title">{{ product.title | escape }}</span>
+              <span class="humc-card__price">{{ product.price | money }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="humc-empty">Featured products will show here once HUMC gear is added to this store.</p>
+    {%- endif -%}
+  </section>
+
+  <section class="humc-updates" id="humc-updates">
+    <h2>{{ section.settings.updates_heading | escape }}</h2>
+    {% form 'contact', class: 'humc-updates__form' %}
+      {{ form.errors | default_errors }}
+      {%- if form.posted_successfully? -%}
+        <p>Thanks. We will send HUMC Gear updates to that email.</p>
+      {%- else -%}
+        <label class="visually-hidden" for="humc-update-email">Email</label>
+        <input
+          id="humc-update-email"
+          type="email"
+          name="contact[email]"
+          placeholder="Email"
+          required
+          autocomplete="email"
+        >
+        <input type="hidden" name="contact[body]" value="HUMC Gear product updates">
+        <button class="humc-btn" type="submit">{{ section.settings.updates_button | default: 'Sign up' | escape }}</button>
+      {%- endif -%}
+    {% endform %}
+  </section>
 </div>
 
 {% stylesheet %}
-  .humc__hero {
-    padding: clamp(40px, 7vw, 96px) var(--page-margin);
+  .humc-home {
+    color: #380000;
+    background: #fff;
+  }
+  .humc-hero {
+    position: relative;
+    min-height: clamp(280px, 42vw, 520px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    color: #f5f5f5;
+  }
+  .humc-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .humc-hero__shade {
+    position: absolute;
+    inset: 0;
+    background: #121212;
+    opacity: 0.3;
+  }
+  .humc-hero__copy {
+    position: relative;
+    z-index: 1;
+    width: min(920px, 100%);
+    padding: clamp(28px, 6vw, 72px) var(--page-margin);
     text-align: center;
   }
-  .humc__hero-inner {
+  .humc-hero__copy h1 {
+    margin: 0 0 20px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1.15;
+    color: #fff;
+  }
+  .humc-btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border: 1px solid currentColor;
+    border-radius: 0;
+    background: #095aa6;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .humc-hero .humc-btn {
+    background: #f5f5f5;
+    color: #252525;
+    border-color: #f5f5f5;
+  }
+  .humc-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
     max-width: var(--page-width);
     margin-inline: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    padding: clamp(36px, 6vw, 72px) var(--page-margin);
   }
-  .humc__logo {
-    width: min(460px, 80vw);
+  @media screen and (min-width: 750px) {
+    .humc-split { grid-template-columns: 1fr 1fr; }
+  }
+  .humc-split__media img {
+    width: 100%;
     height: auto;
-    /* logo is dark-on-transparent; keep it on a light plate for contrast on the brand band */
-    background: #ffffff;
-    padding: 18px 24px;
-    border-radius: 14px;
+    display: block;
+    background: #f5f5f5;
   }
-  .humc__wordmark {
-    margin: 0;
+  .humc-split__text h2 {
+    margin: 0 0 10px;
     font-family: var(--font-heading--family);
-    font-weight: 800;
-    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: lowercase;
     line-height: 1;
   }
-  .humc__tagline {
-    margin: 0;
-    font-size: clamp(1rem, 2.2vw, 1.375rem);
-    font-weight: 600;
-    opacity: 0.95;
+  .humc-split__text p {
+    margin: 0 0 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .humc__cta {
+  .humc-featured,
+  .humc-updates {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding: clamp(36px, 6vw, 80px) var(--page-margin);
+  }
+  .humc-featured__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .humc-featured__head h2,
+  .humc-updates h2 {
+    margin: 0 0 16px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+  }
+  .humc-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px 16px;
+  }
+  @media screen and (min-width: 750px) {
+    .humc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .humc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .humc-card__photo {
+    position: relative;
+    display: block;
+  }
+  .humc-card img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #f5f5f5;
+  }
+  .humc-card__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    background: #f5f5f5;
+    color: #580202;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .humc-card__sold {
+    position: absolute;
+    inset: auto 8px 8px auto;
+    padding: 4px 8px;
+    background: #121212;
+    color: #f5f5f5;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .humc-empty {
+    margin: 0;
+  }
+  .humc-updates {
+    text-align: center;
+  }
+  .humc-updates__form {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
     justify-content: center;
-    margin-top: 6px;
+    gap: 10px;
   }
-  .humc__button {
-    font-family: var(--font-heading--family);
-    font-weight: 700;
+  .humc-updates__form input[type='email'] {
+    min-width: min(280px, 80vw);
+    padding: 12px 14px;
+    border: 1px solid #095aa6;
+    border-radius: 0;
   }
-  .humc__button--ghost {
-    background: transparent !important;
-    border: 2px solid;
-  }
-  .humc__intro {
-    max-width: var(--page-width);
-    margin: clamp(28px, 4vw, 48px) auto;
-    padding-inline: var(--page-margin);
-    text-align: center;
-    font-size: 1.0625rem;
-  }
-  .humc__intro :is(p) { margin: 0 auto; max-width: 70ch; }
 {% endstylesheet %}
 
 {% schema %}
@@ -130,64 +327,125 @@
   "settings": [
     {
       "type": "text",
-      "id": "heading",
-      "label": "Store name (used if no logo)",
-      "default": "HUMC Gear"
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "Your Exclusive Provider of Harbor-UCLA and LA COUNTY Gear"
     },
     {
       "type": "text",
-      "id": "logo",
-      "label": "Bundled logo asset filename",
-      "default": "humc-gear-logo.png"
-    },
-    {
-      "type": "color",
-      "id": "brand_color",
-      "label": "Brand color",
-      "default": "#0070b0"
+      "id": "hero_image",
+      "label": "Hero image asset",
+      "default": "humc-bg-home.png"
     },
     {
       "type": "text",
-      "id": "tagline",
-      "label": "Tagline",
-      "default": "Official HUMC gear — fulfillment by PRINT Status"
+      "id": "shop_label",
+      "label": "Shop button",
+      "default": "Shop now"
     },
     {
-      "type": "richtext",
-      "id": "intro",
-      "label": "Intro paragraph",
-      "default": "<p>Welcome to the HUMC Gear store. Shop official gear, printed and fulfilled by PRINT Status.</p>"
+      "type": "url",
+      "id": "shop_link",
+      "label": "Shop link"
     },
     {
       "type": "header",
-      "content": "Buttons"
+      "content": "Polo row"
     },
     {
       "type": "text",
-      "id": "button_1_label",
-      "label": "Button 1 label",
-      "default": "Shop gear"
-    },
-    {
-      "type": "url",
-      "id": "button_1_link",
-      "label": "Button 1 link"
+      "id": "polo_image",
+      "label": "Polo image asset",
+      "default": "humc-custompolo.jpg"
     },
     {
       "type": "text",
-      "id": "button_2_label",
-      "label": "Button 2 label"
+      "id": "polo_alt",
+      "label": "Polo alt text",
+      "default": "Custom Harbor-UCLA polo"
+    },
+    {
+      "type": "text",
+      "id": "polo_heading",
+      "label": "Polo heading"
+    },
+    {
+      "type": "text",
+      "id": "polo_text",
+      "label": "Polo text"
+    },
+    {
+      "type": "text",
+      "id": "polo_button",
+      "label": "Polo button",
+      "default": "Learn more"
     },
     {
       "type": "url",
-      "id": "button_2_link",
-      "label": "Button 2 link"
+      "id": "polo_link",
+      "label": "Polo button link"
     },
     {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
+      "type": "header",
+      "content": "Long sleeve row"
+    },
+    {
+      "type": "text",
+      "id": "sleeve_image",
+      "label": "Long sleeve image asset",
+      "default": "humc-long-sleeve.png"
+    },
+    {
+      "type": "text",
+      "id": "sleeve_alt",
+      "label": "Long sleeve alt text",
+      "default": "Custom long sleeve"
+    },
+    {
+      "type": "text",
+      "id": "sleeve_heading",
+      "label": "Long sleeve heading",
+      "default": "customize"
+    },
+    {
+      "type": "text",
+      "id": "sleeve_text",
+      "label": "Long sleeve text",
+      "default": "FOR YOUR DEPARTMENT"
+    },
+    {
+      "type": "text",
+      "id": "sleeve_button",
+      "label": "Long sleeve button",
+      "default": "Shop now"
+    },
+    {
+      "type": "header",
+      "content": "Featured and updates"
+    },
+    {
+      "type": "text",
+      "id": "featured_heading",
+      "label": "Featured heading",
+      "default": "Featured products"
+    },
+    {
+      "type": "text",
+      "id": "view_all",
+      "label": "View all label",
+      "default": "View all"
+    },
+    {
+      "type": "text",
+      "id": "updates_heading",
+      "label": "Updates heading",
+      "default": "Want updates on new products?"
+    },
+    {
+      "type": "text",
+      "id": "updates_button",
+      "label": "Updates button",
+      "default": "Sign up"
     }
   ],
   "presets": [

@@ -1,0 +1,25 @@
+{% doc %}
+  HUMC-only head tags. Does not append the PRINT Status shop name.
+{% enddoc %}
+
+{%- liquid
+  assign humc_title = 'HUMC Gear'
+  if template.name == 'product' and product
+    assign humc_title = product.title
+  elsif template.name == 'collection' and collection
+    assign humc_title = collection.title
+  elsif template.name == 'page' and page
+    assign humc_title = page.title
+  endif
+-%}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{{ humc_title }}</title>
+<meta property="og:site_name" content="HUMC Gear">
+<meta property="og:title" content="{{ humc_title }}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ humc_title }}">
+<link rel="canonical" href="{{ request.origin }}{{ request.path }}">

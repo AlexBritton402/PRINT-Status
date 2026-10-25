@@ -12,6 +12,7 @@
   endif
 -%}
 
+{% render 'noindex' %}
 {%- unless verified -%}
   <div class="section-background color-{{ section.settings.color_scheme }}"></div>
   <div class="section color-{{ section.settings.color_scheme }} section--page-width">

@@ -22,13 +22,15 @@
       assign handle = tag | remove_first: 'company-' | strip | downcase
       if handle != blank
         assign col = collections[handle]
-        if col.id != blank and col.template_suffix == 'company'
-          assign needle = '|' | append: handle | append: '|'
-          unless seen contains needle
-            assign seen = seen | append: handle | append: '|'
-            assign tag_count = tag_count | plus: 1
-            assign chosen_handle = handle
-          endunless
+        if col.id != blank
+          if col.template_suffix == 'company' or col.template_suffix == 'humc'
+            assign needle = '|' | append: handle | append: '|'
+            unless seen contains needle
+              assign seen = seen | append: handle | append: '|'
+              assign tag_count = tag_count | plus: 1
+              assign chosen_handle = handle
+            endunless
+          endif
         endif
       endif
     endif
@@ -40,7 +42,7 @@
   elsif tag_count == 0
     assign fallback_count = 0
     for col in product_resource.collections
-      if col.template_suffix == 'company'
+      if col.template_suffix == 'company' or col.template_suffix == 'humc'
         assign fallback_count = fallback_count | plus: 1
         assign c = col
       endif
@@ -56,6 +58,7 @@
   endif
 -%}
 
+{% render 'noindex' %}
 {%- if c.id != blank -%}
   <a
     class="company-store-link spacing-style"

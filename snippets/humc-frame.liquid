@@ -1,0 +1,114 @@
+{% doc %}
+  HUMC Gear chrome. Matches the old store header: official wordmark + navy bar.
+  @param {string} part - header or footer
+{% enddoc %}
+
+{%- liquid
+  assign home = pages['humc-gear'].url | default: '/pages/humc-gear'
+  assign shop = collections['humc-gear'].url | default: '/collections/humc-gear'
+-%}
+
+{%- if part == 'header' -%}
+  {% render 'store-switch', target: 'print' %}
+  <div class="humc-announce">WE ARE BACK AT THE HOSPITAL 9/3 TODAY!</div>
+  <header class="humc-frame">
+    <div class="humc-frame__bar">
+      <a class="humc-frame__logo" href="{{ home }}">
+        <img
+          src="{{ 'humc-logo.png' | asset_url }}"
+          alt="HUMC Gear"
+          width="800"
+          height="145"
+          loading="eager"
+        >
+      </a>
+    </div>
+    <nav class="humc-frame__nav" aria-label="HUMC Gear">
+      <a href="{{ home }}">Home</a>
+      <a href="{{ shop }}">Products</a>
+    </nav>
+  </header>
+{%- endif -%}
+
+{%- if part == 'footer' -%}
+  <footer class="humc-frame__foot">
+    <nav aria-label="HUMC Gear footer">
+      <a href="{{ home }}">Home</a>
+      <a href="{{ shop }}">Products</a>
+    </nav>
+  </footer>
+{%- endif -%}
+
+{% stylesheet %}
+  .humc-body {
+    background: #fff;
+    color: #121212;
+    font-family: Karla, Helvetica, sans-serif;
+  }
+  .humc-body h1,
+  .humc-body h2,
+  .humc-body h3 {
+    font-family: Montserrat, Helvetica, Arial, sans-serif;
+  }
+  .humc-announce {
+    background: #fff;
+    color: #380000;
+    text-align: center;
+    padding: 10px var(--page-margin);
+    border-bottom: 1px solid #eee;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .humc-frame__bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: 14px var(--page-margin) 10px;
+  }
+  .humc-frame__logo img {
+    display: block;
+    width: min(280px, 72vw);
+    height: auto;
+  }
+  .humc-frame__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+    min-height: 60px;
+    background: #095aa6;
+    color: #fff;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+  }
+  .humc-frame__nav a,
+  .humc-frame__foot a {
+    color: #fff;
+    text-decoration: none;
+  }
+  .humc-frame__nav a:hover,
+  .humc-frame__foot a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .humc-frame__foot {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    padding: 36px var(--page-margin);
+    background: #095aa6;
+    color: #fff;
+  }
+  .humc-frame__foot nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+  }
+  #PBarNextFrame {
+    display: none !important;
+  }
+{% endstylesheet %}

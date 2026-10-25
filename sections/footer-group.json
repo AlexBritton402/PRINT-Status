@@ -58,7 +58,7 @@
               "type": "text",
               "name": "t:names.text",
               "settings": {
-                "text": "<p><strong>Next-day DTF transfers and gang sheets.</strong></p><p>Made in the South Bay, California.</p><p>21814 1/2 South Vermont Avenue, Torrance, CA 90502</p>",
+                "text": "<p>21814 1/2 South Vermont Avenue, Torrance, CA 90502</p>",
                 "width": "fit-content",
                 "max_width": "normal",
                 "alignment": "left",
@@ -127,7 +127,7 @@
             "text_LWt8Pz": {
               "type": "text",
               "settings": {
-                "text": "<h2>Get updates</h2>",
+                "text": "<h2>Join our email list</h2>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -152,7 +152,7 @@
             "text_f9CFLH": {
               "type": "text",
               "settings": {
-                "text": "<p>Shop news and new transfer drops. No spam.</p>",
+                "text": "<p>Get exclusive deals and early access to new products.</p>",
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",

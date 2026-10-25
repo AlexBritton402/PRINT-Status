@@ -224,18 +224,15 @@
               },
               "block_order": []
             },
-            "kixxl_gangify_upload_button_96LqLM": {
-              "type": "shopify://apps/kixxl/blocks/gangify_upload_button/cdfbfad9-7b2b-47ff-a143-b116e7f6339b",
+            "sheet_studio_96LqLM": {
+              "type": "sheet-studio",
               "settings": {
-                "product": "{{ closest.product }}",
-                "text": "Create a Gang Sheet",
-                "colour": "#808080",
-                "cssClass": "",
-                "inlineStyle": "",
-                "textUpload": "UPLOAD A GANG SHEET",
-                "colourUpload": "#808080",
-                "cssClassUpload": "",
-                "inlineStyleUpload": ""
+                "text_create": "Create a Gang Sheet",
+                "colour_create": "#808080",
+                "text_upload": "UPLOAD A GANG SHEET",
+                "colour_upload": "#808080",
+                "padding-block-start": 8,
+                "padding-block-end": 8
               }
             },
             "text_aEtTtq": {
@@ -271,7 +268,7 @@
             "divider_VJhene",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
-            "kixxl_gangify_upload_button_96LqLM",
+            "sheet_studio_96LqLM",
             "text_aEtTtq"
           ]
         }
@@ -439,7 +436,7 @@
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
-        "recommendation_type": "related",
+        "recommendation_type": "complementary",
         "layout_type": "grid",
         "carousel_on_mobile": false,
         "max_products": 4,

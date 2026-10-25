@@ -1,0 +1,266 @@
+{%- comment -%}
+  HUMC Products page. Layout follows humcgear.com/shop: category
+  sidebar + square photo cards. Products already in the humc-gear
+  collection. Does not invent SKUs.
+{%- endcomment -%}
+
+{%- liquid
+  assign store = collection
+  if store == blank
+    assign store = collections['humc-gear']
+  endif
+
+  assign preview_q = ''
+  if theme.id == 189047013667
+    assign preview_q = 'preview_theme_id=189047013667'
+  endif
+-%}
+
+{%- capture shop_base -%}
+  {{ store.url | default: '/collections/humc-gear' }}
+{%- endcapture -%}
+{%- assign shop_base = shop_base | strip -%}
+
+<div class="humc-catalog" data-humc-catalog>
+  <nav class="humc-catalog__crumb" aria-label="Breadcrumb">
+    <a href="{{ pages['humc-gear'].url | default: '/pages/humc-gear' }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}">Home</a>
+    <span>›</span>
+    <span>Products</span>
+  </nav>
+
+  <div class="humc-catalog__layout">
+    <aside class="humc-catalog__cats" aria-label="Categories">
+      <a href="{{ shop_base }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}" data-cat="all">View all</a>
+      <a href="{{ shop_base }}?cat=value{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="value">VALUE BUY</a>
+      <a href="{{ shop_base }}?cat=outerwear{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="outerwear">Outerwear</a>
+      <a href="{{ shop_base }}?cat=tees{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="tees">Tees</a>
+      <a href="{{ shop_base }}?cat=polos{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="polos">Polos</a>
+      <a href="{{ shop_base }}?cat=scrubs{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="scrubs">Scrubs</a>
+      <a href="{{ shop_base }}?cat=headwear{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="headwear">Headwear</a>
+      <a href="{{ shop_base }}?cat=bags{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="bags">Bags</a>
+      <a href="{{ shop_base }}?cat=drinkware{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="drinkware">Drinkware</a>
+    </aside>
+
+    <div class="humc-catalog__main">
+      <p class="humc-catalog__count" data-count></p>
+      <ul class="humc-catalog__grid" role="list">
+        {%- if store != blank -%}
+          {%- for product in store.products -%}
+            {%- unless product.published_at -%}
+              {%- continue -%}
+            {%- endunless -%}
+            {%- assign type_l = product.type | downcase -%}
+            {%- assign groups = 'all' -%}
+            {%- if product.title contains 'Heavyweight' -%}
+              {%- assign groups = groups | append: ' value' -%}
+            {%- endif -%}
+            {%- if type_l == 'tee' -%}
+              {%- assign groups = groups | append: ' tees' -%}
+            {%- elsif type_l == 'outerwear' -%}
+              {%- assign groups = groups | append: ' outerwear' -%}
+            {%- elsif type_l == 'headwear' -%}
+              {%- assign groups = groups | append: ' headwear' -%}
+            {%- elsif type_l == 'bag' -%}
+              {%- assign groups = groups | append: ' bags' -%}
+            {%- elsif type_l == 'drinkware' -%}
+              {%- assign groups = groups | append: ' drinkware' -%}
+            {%- endif -%}
+            <li data-groups="{{ groups | strip }}">
+              <a class="humc-catalog__card" href="{{ product.url }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}">
+                <span class="humc-catalog__photo">
+                  {%- if product.featured_image -%}
+                    {{
+                      product.featured_image
+                      | image_url: width: 800
+                      | image_tag: loading: 'lazy', widths: '200, 400, 800', sizes: '(min-width: 990px) 20vw, 45vw', alt: product.title
+                    }}
+                  {%- elsif product.title contains 'OTTO' or product.title contains 'Trucker' -%}
+                    <img
+                      src="{{ 'humc-m-19193876-148992677.jpg' | asset_url }}"
+                      alt="{{ product.title | escape }}"
+                      width="800"
+                      height="800"
+                      loading="lazy"
+                    >
+                  {%- else -%}
+                    <span class="humc-catalog__empty">Photo coming soon</span>
+                  {%- endif -%}
+                  {%- unless product.available -%}
+                    <span class="humc-catalog__sold">Sold out</span>
+                  {%- endunless -%}
+                </span>
+                <span class="humc-catalog__title">{{ product.title | escape }}</span>
+                <span class="humc-catalog__price">{{ product.price | money }}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (!root || !root.hasAttribute('data-humc-catalog')) return;
+    var cat = new URLSearchParams(window.location.search).get('cat') || 'all';
+    var items = root.querySelectorAll('[data-groups]');
+    var shown = 0;
+    items.forEach(function (item) {
+      var groups = ' ' + (item.getAttribute('data-groups') || '') + ' ';
+      var on = cat === 'all' || groups.indexOf(' ' + cat + ' ') !== -1;
+      item.hidden = !on;
+      if (on) shown += 1;
+    });
+    var count = root.querySelector('[data-count]');
+    if (count) {
+      count.textContent = shown ? 'Items 1 to ' + shown + ' of ' + shown : 'No products listed for sale.';
+    }
+    root.querySelectorAll('.humc-catalog__cats a').forEach(function (link) {
+      var on = link.getAttribute('data-cat') === cat;
+      if (on) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .humc-catalog {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: 18px var(--page-margin) 72px;
+    font-family: Karla, Helvetica, sans-serif;
+  }
+
+  .humc-catalog__crumb {
+    display: flex;
+    gap: 8px;
+    margin-block-end: 18px;
+    font-size: 0.8rem;
+  }
+
+  .humc-catalog__crumb a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .humc-catalog__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .humc-catalog__layout {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: 36px;
+    }
+  }
+
+  .humc-catalog__cats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.95rem;
+  }
+
+  .humc-catalog__cats a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .humc-catalog__cats a[aria-current='page'] {
+    font-weight: 700;
+  }
+
+  .humc-catalog__count {
+    margin: 0 0 18px;
+    text-align: right;
+    font-size: 0.85rem;
+  }
+
+  .humc-catalog__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 16px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .humc-catalog__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .humc-catalog__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .humc-catalog__photo {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    background: #fff;
+  }
+
+  .humc-catalog__sold {
+    position: absolute;
+    inset: auto 8px 8px auto;
+    padding: 4px 8px;
+    background: #121212;
+    color: #f5f5f5;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .humc-catalog__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #f5f5f5;
+    color: #580202;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .humc-catalog__photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .humc-catalog__title,
+  .humc-catalog__price {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  .humc-catalog__price {
+    font-weight: 600;
+  }
+
+  .humc-catalog [hidden] {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "HUMC catalog",
+  "tag": "section",
+  "settings": []
+}
+{% endschema %}

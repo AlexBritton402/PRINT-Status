@@ -1,0 +1,253 @@
+{%- comment -%}
+  Shared HUMC catalog settings. Rendered from layout/humc so every HUMC
+  page and the admin page read the same colors, logos, and hidden handles.
+  The storefront cannot create Shopify products; that stays in Admin.
+{%- endcomment -%}
+
+{%- liquid
+  assign colors = section.settings.colors | default: 'Black, Navy, White, Sport Grey, Charcoal, Maroon, Cardinal, Forest Green, Royal, Heather Navy, New Navy, Natural, Light Heather Grey, Heathered Charcoal, Heathered Navy, Jet Black'
+  assign logos = section.settings.logos | default: 'Standard HUMC, Single-color HUMC, LA County'
+  assign hidden = section.settings.hidden_handles
+  assign access = section.settings.access_code | strip
+  assign is_admin = false
+  if template.name == 'page' and template.suffix == 'store-admin'
+    assign is_admin = true
+  endif
+  assign unlocked = false
+  if request.design_mode or access == blank
+    assign unlocked = true
+  endif
+  assign humc = collections['humc-gear']
+  assign print_home = routes.root_url
+-%}
+
+<script type="application/json" id="store-catalog-config">
+  {
+    "colors": {{ colors | split: ',' | json }},
+    "logos": {{ logos | split: ',' | json }},
+    "hidden": {{ hidden | newline_to_br | split: '<br />' | json }}
+  }
+</script>
+
+{%- unless is_admin -%}
+  <style>
+    {%- assign hide_list = hidden | newline_to_br | split: '<br />' -%}
+    {%- for handle in hide_list -%}
+      {%- assign h = handle | strip -%}
+      {%- if h != blank -%}
+        a[href*="/products/{{ h }}"] { display: none !important; }
+      {%- endif -%}
+    {%- endfor -%}
+  </style>
+{%- endunless -%}
+
+{%- if is_admin -%}
+  <div
+    class="store-admin section section--page-width"
+    data-store-admin
+    data-unlocked="{% if unlocked %}true{% else %}false{% endif %}"
+    data-access="{{ access | escape }}"
+  >
+    <h1>Store admin</h1>
+    <p class="store-admin__lead">Tune HUMC Gear and PRINT Status from one place. Color, logo, and hide lists save in the theme editor. Add or remove the Shopify product itself in Admin → Products — this page does not invent stock.</p>
+
+    {%- unless unlocked -%}
+      <form class="store-admin__gate" data-admin-gate>
+        <label for="StoreAdminKey">Access code</label>
+        <input id="StoreAdminKey" type="password" name="key" autocomplete="current-password">
+        <button class="button" type="submit">Open</button>
+      </form>
+    {%- endunless -%}
+
+    <div data-admin-body {% unless unlocked %}hidden{% endunless %}>
+      <section class="store-admin__card">
+        <h2>HUMC colors</h2>
+        <p>Each product shows every mill color it already has. This list is a note for the shop — it does not hide mill colors on the storefront.</p>
+        <p class="store-admin__chips">
+          {%- assign color_list = colors | split: ',' -%}
+          {%- for color in color_list -%}
+            <span>{{ color | strip | escape }}</span>
+          {%- endfor -%}
+        </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>HUMC logos</h2>
+        <p>Storefront Set Image uses Standard HUMC, Single-color HUMC, and LA County. The photo updates when that listing is already in the shop.</p>
+        <p class="store-admin__chips">
+          {%- assign logo_list = logos | split: ',' -%}
+          {%- for logo in logo_list -%}
+            <span>{{ logo | strip | escape }}</span>
+          {%- endfor -%}
+        </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>Hidden HUMC products</h2>
+        <pre class="store-admin__pre">{{ hidden | strip | escape | default: '(none)' }}</pre>
+        <p class="store-admin__hint">One handle per line. Hides those cards on HUMC pages.</p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>HUMC products in the collection</h2>
+        <ul class="store-admin__list">
+          {%- for product in humc.products -%}
+            <li>
+              <a href="{{ product.url }}">{{ product.title | escape }}</a>
+              <span>{{ product.handle }} · {{ product.price | money }}</span>
+            </li>
+          {%- else -%}
+            <li>No products in <code>humc-gear</code>.</li>
+          {%- endfor -%}
+        </ul>
+        <p class="store-admin__hint">Create, hide, or delete the product in Shopify Admin. Tag <code>company-humc-gear</code>, set the HUMC product template, and add it to the humc-gear collection.</p>
+        <p>
+          <a class="button" href="https://admin.shopify.com/store/print-status-k68snhof/products">Shopify products</a>
+          <a class="button button-secondary" href="https://admin.shopify.com/store/print-status-k68snhof/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Edit HUMC catalog</a>
+        </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>PRINT Status home</h2>
+        <p>Hero, service cards, and promise row are homepage sections. Open the theme editor on the home page to change copy and images. That does not touch HUMC.</p>
+        <p>
+          <a class="button" href="{{ print_home }}">View PRINT Status home</a>
+          <a class="button button-secondary" href="https://admin.shopify.com/store/print-status-k68snhof/themes/189047013667/editor?previewPath=%2F">Edit PRINT Status home</a>
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.querySelector('[data-store-admin]');
+      if (!root) return;
+      var gate = root.querySelector('[data-admin-gate]');
+      var body = root.querySelector('[data-admin-body]');
+      var needed = root.getAttribute('data-access') || '';
+      if (!needed || root.getAttribute('data-unlocked') === 'true') return;
+
+      function unlock() {
+        if (gate) gate.hidden = true;
+        if (body) body.hidden = false;
+        try { sessionStorage.setItem('store-admin-ok', '1'); } catch (err) {}
+      }
+
+      try {
+        if (sessionStorage.getItem('store-admin-ok') === '1') {
+          unlock();
+          return;
+        }
+      } catch (err) {}
+
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('key') === needed) {
+        unlock();
+        return;
+      }
+
+      if (gate) {
+        gate.addEventListener('submit', function (event) {
+          event.preventDefault();
+          var input = gate.querySelector('input[name="key"]');
+          if (input && input.value === needed) unlock();
+        });
+      }
+    })();
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  .store-admin {
+    padding-block: 2rem;
+    max-width: 46rem;
+  }
+  .store-admin h1,
+  .store-admin h2 {
+    margin: 0 0 0.6rem;
+  }
+  .store-admin__lead,
+  .store-admin__hint {
+    margin: 0 0 1.2rem;
+    line-height: 1.45;
+  }
+  .store-admin__hint {
+    opacity: 0.7;
+    font-size: 0.875rem;
+  }
+  .store-admin__card {
+    margin-block: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #e6e6e6;
+  }
+  .store-admin__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .store-admin__chips span {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid #d6d6d6;
+    font-size: 0.8rem;
+  }
+  .store-admin__list {
+    margin: 0 0 1rem;
+    padding-left: 1.1rem;
+  }
+  .store-admin__list li {
+    margin: 0.4rem 0;
+  }
+  .store-admin__list span {
+    display: block;
+    opacity: 0.7;
+    font-size: 0.8rem;
+  }
+  .store-admin__pre {
+    white-space: pre-wrap;
+    background: #f5f5f5;
+    padding: 0.75rem;
+  }
+  .store-admin__gate {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 18rem;
+  }
+  .store-admin__gate[hidden] {
+    display: none;
+  }
+  .store-admin .button-secondary {
+    margin-inline-start: 0.4rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "HUMC catalog",
+  "settings": [
+    {
+      "type": "text",
+      "id": "access_code",
+      "label": "Admin access code",
+      "info": "Required to see the admin page on the storefront. Leave blank only while editing in the theme editor."
+    },
+    {
+      "type": "textarea",
+      "id": "colors",
+      "label": "Enabled HUMC colors",
+      "default": "Black, Navy, White, Sport Grey, Charcoal, Maroon, Cardinal, Forest Green, Royal, Heather Navy, New Navy, Natural, Light Heather Grey, Heathered Charcoal, Heathered Navy, Jet Black"
+    },
+    {
+      "type": "textarea",
+      "id": "logos",
+      "label": "Enabled HUMC logos",
+      "default": "Standard HUMC, Single-color HUMC, LA County"
+    },
+    {
+      "type": "textarea",
+      "id": "hidden_handles",
+      "label": "Hidden HUMC product handles",
+      "info": "One handle per line. Hides those cards on HUMC pages."
+    }
+  ]
+}
+{% endschema %}

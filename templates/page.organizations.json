@@ -10,14 +10,12 @@
 {
   "sections": {
     "directory": {
-      "type": "organization-directory",
+      "type": "private-store-notice",
       "settings": {
-        "heading": "Supported stores",
-        "intro": "<p>Choose a company. Each store has its own page, colors, and products.</p>",
-        "show_search": true,
-        "search_placeholder": "Search stores",
-        "columns": 4,
-        "empty_text": "Supported stores will show up here.",
+        "heading": "This store is private",
+        "body": "<p>Company stores are not listed on the public shop. Open the private link you were given.</p>",
+        "button_label": "PRINT Status home",
+        "button_link": "/",
         "color_scheme": "scheme-1"
       }
     }

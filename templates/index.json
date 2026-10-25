@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "dtf_hero": {
       "type": "dtf-hero",
@@ -16,11 +17,11 @@
         "overlay_opacity": 0,
         "heading": "",
         "subheading": "",
-        "offer": "Next-day sheets. Pickup in Torrance by 3 PM. From $4.99.",
-        "button_1_label": "Build a sheet",
-        "button_1_link": "#design-build",
-        "button_2_label": "Upload a finished sheet",
-        "button_2_link": "#design-upload",
+        "offer": "",
+        "button_1_label": "",
+        "button_1_link": "",
+        "button_2_label": "",
+        "button_2_link": "",
         "desktop_height": 540,
         "mobile_height": 340,
         "color_scheme": "scheme-1"
@@ -35,7 +36,7 @@
             "image": "DTFadvert.png",
             "title": "Build a sheet",
             "text": "Upload art, duplicate it, and we line it up",
-            "link": "#design-build"
+            "link": "/products/dtf-transfers-build-your-own-gang-sheet"
           }
         },
         "gang": {
@@ -44,7 +45,7 @@
             "image": "UploadGangsheet.png",
             "title": "Upload a finished sheet",
             "text": "Already designed it? Send the whole sheet",
-            "link": "#design-upload"
+            "link": "/products/dtf-transfers-build-your-own-gang-sheet"
           }
         }
       },
@@ -52,6 +53,7 @@
         "upload",
         "gang"
       ],
+      "disabled": true,
       "settings": {
         "heading": "What we print",
         "subheading": "Build a gang sheet, or upload one you already finished.",
@@ -92,6 +94,7 @@
         "pickup",
         "any_size"
       ],
+      "disabled": true,
       "settings": {
         "heading": "",
         "columns": 3,
@@ -100,7 +103,6 @@
     },
     "product_list_fa6P9H": {
       "type": "product-list",
-      "disabled": true,
       "blocks": {
         "static-header": {
           "type": "_product-list-content",
@@ -275,11 +277,11 @@
       },
       "name": "Featured collection",
       "settings": {
-        "collection": "all",
+        "collection": "print-status",
         "layout_type": "grid",
         "carousel_on_mobile": false,
-        "max_products": 4,
-        "columns": 4,
+        "max_products": 3,
+        "columns": 3,
         "mobile_columns": "1",
         "mobile_card_size": "60cqw",
         "columns_gap": 20,
@@ -293,23 +295,12 @@
         "padding-block-start": 34,
         "padding-block-end": 48
       }
-    },
-    "design_studio": {
-      "type": "product-designer",
-      "settings": {
-        "heading": "Build your sheet",
-        "intro": "<p>Choose build or upload, then pick a sheet and timing. The price updates on its own. Turn on white ink if the print should be white.</p>",
-        "sizes": "Small|4|4\nMedium|8|10\nLarge|11|17\nGang sheet|22|24",
-        "canvas_bg": "#ffffff",
-        "color_scheme": "scheme-1"
-      }
     }
   },
   "order": [
     "dtf_hero",
     "services",
     "home_promise",
-    "product_list_fa6P9H",
-    "design_studio"
+    "product_list_fa6P9H"
   ]
 }

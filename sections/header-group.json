@@ -126,9 +126,16 @@
         "enable_transparent_header_collection": false,
         "collection_color_scheme": "default"
       }
+    },
+    "store_switch": {
+      "type": "store-switch",
+      "settings": {
+        "target": "humc"
+      }
     }
   },
   "order": [
+    "store_switch",
     "header_announcements_9jGBFp",
     "header_section"
   ]

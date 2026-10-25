@@ -1,0 +1,887 @@
+{%- comment -%}
+  HUMC Gear purchase options. Color mockups are theme assets (humc-m-*.jpg).
+  Inputs attach to Horizon buy-buttons with the HTML form= attribute.
+  Line item properties land on the order.
+{%- endcomment -%}
+
+{%- liquid
+  assign product_resource = closest.product
+  assign title = product_resource.title | default: ''
+  assign title_l = title | downcase
+  assign form_id = 'BuyButtons-ProductForm-' | append: section.id
+  assign handle_tail = product_resource.handle | split: '-' | last
+
+  assign needs_size = true
+  if title_l contains 'hat' or title_l contains 'bag' or title_l contains 'tumbler' or title_l contains 'tote' or title_l contains 'cap'
+    assign needs_size = false
+  endif
+
+  assign default_logo = 'As shown'
+  if title contains 'Single Color'
+    assign default_logo = 'Single-color HUMC'
+  elsif title contains 'Standard HUMC'
+    assign default_logo = 'Standard HUMC'
+  elsif title contains 'LA County'
+    assign default_logo = 'LA County'
+  endif
+
+  assign default_front = true
+  assign default_back = false
+  assign default_left = false
+  assign default_right = false
+  if title_l contains 'front and back'
+    assign default_back = true
+  endif
+  if title_l contains 'sleeve'
+    assign default_left = true
+  endif
+
+  assign sizes = 'S,M,L,XL,2XL,3XL,4XL,5XL' | split: ','
+
+  assign family_phrase = ''
+  if title_l contains 'heavyweight tee'
+    assign family_phrase = 'heavyweight tee'
+  elsif title_l contains 'drop shoulder'
+    assign family_phrase = 'drop shoulder hoodie'
+  elsif title_l contains 'sustainable'
+    assign family_phrase = 'sustainable full zip hoodie'
+  elsif title_l contains 'full zip hoodie'
+    assign family_phrase = 'full zip hoodie'
+  elsif title_l contains '1/4 zip'
+    assign family_phrase = '1/4 zip fleece'
+  elsif title_l contains 'fleece crew'
+    assign family_phrase = 'fleece crew'
+  elsif title_l contains 'women' and title_l contains 'soft blend'
+    assign family_phrase = 'soft blend tee'
+  elsif title_l contains 'soft blend tee'
+    assign family_phrase = 'unisex soft blend tee'
+  elsif title_l contains 'trucker' or title_l contains 'snapback'
+    assign family_phrase = 'trucker hat'
+  elsif title_l contains 'canvas bag' or title_l contains 'jumbo'
+    assign family_phrase = 'jumbo canvas bag'
+  elsif title_l contains 'tumbler'
+    assign family_phrase = 'tumbler'
+  endif
+
+  assign humc_col = collections['humc-gear']
+  assign preview_q = ''
+  if theme.id == 189047013667
+    assign preview_q = '?preview_theme_id=189047013667'
+  endif
+-%}
+
+{%- unless title_l contains 'personalization' -%}
+<div
+  class="humc-customize spacing-style"
+  data-humc-customize
+  data-form-id="{{ form_id }}"
+  data-needs-size="{% if needs_size %}true{% else %}false{% endif %}"
+  data-product-title="{{ title | escape }}"
+  data-logo-name="{{ default_logo | escape }}"
+  data-source-id="{{ handle_tail | escape }}"
+  data-preview-map="{{ 'humc-preview.json' | asset_url }}"
+  data-asset-base="{{ 'humc-preview.json' | asset_url | split: 'humc-preview.json' | first }}"
+  style="{% render 'spacing-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  <fieldset class="humc-customize__set" data-color-set>
+    <legend>Color</legend>
+    <p class="humc-customize__color-name" data-color-name></p>
+    <div class="humc-customize__swatches" data-swatches role="list"></div>
+    <input type="hidden" name="properties[Color]" form="{{ form_id }}" value="">
+  </fieldset>
+
+  {%- if needs_size -%}
+    <fieldset class="humc-customize__set">
+      <legend>Size</legend>
+      <div class="humc-customize__chips" role="list">
+        {%- for size in sizes -%}
+          <button
+            type="button"
+            class="humc-customize__chip"
+            data-field="size"
+            data-value="{{ size | escape }}"
+            aria-pressed="false"
+          >
+            {{ size | escape }}
+          </button>
+        {%- endfor -%}
+      </div>
+      <input type="hidden" name="properties[Size]" form="{{ form_id }}" value="">
+    </fieldset>
+  {%- else -%}
+    <input type="hidden" name="properties[Size]" form="{{ form_id }}" value="One size">
+  {%- endif -%}
+
+  <fieldset class="humc-customize__set" data-logo-set>
+    <legend>Set Image</legend>
+    <div class="humc-customize__logos" data-logos>
+      {%- assign mark_list = 'Standard HUMC,Single-color HUMC,LA County' | split: ',' -%}
+      {%- for mark_raw in mark_list -%}
+        {%- assign mark = mark_raw | strip -%}
+        {%- assign pick_title = title -%}
+        {%- assign pick_variant = product_resource.selected_or_first_available_variant.id -%}
+        {%- assign pick_tail = handle_tail -%}
+        {%- assign pick_found = false -%}
+        {%- if mark == default_logo -%}
+          {%- assign pick_found = true -%}
+        {%- endif -%}
+        {%- if family_phrase != blank and humc_col -%}
+          {%- for sibling in humc_col.products -%}
+            {%- assign sib_l = sibling.title | downcase -%}
+            {%- assign same_family = false -%}
+            {%- if sib_l contains family_phrase -%}
+              {%- assign same_family = true -%}
+            {%- endif -%}
+            {%- if title_l contains 'women' -%}
+              {%- unless sib_l contains 'women' -%}
+                {%- assign same_family = false -%}
+              {%- endunless -%}
+            {%- elsif sib_l contains 'women' -%}
+              {%- assign same_family = false -%}
+            {%- endif -%}
+            {%- if same_family -%}
+              {%- assign sib_logo = '' -%}
+              {%- if sibling.title contains 'Single Color' -%}
+                {%- assign sib_logo = 'Single-color HUMC' -%}
+              {%- elsif sibling.title contains 'Standard HUMC' -%}
+                {%- assign sib_logo = 'Standard HUMC' -%}
+              {%- elsif sibling.title contains 'LA County' -%}
+                {%- assign sib_logo = 'LA County' -%}
+              {%- endif -%}
+              {%- if sib_logo == mark -%}
+                {%- assign pick_title = sibling.title -%}
+                {%- assign pick_variant = sibling.selected_or_first_available_variant.id -%}
+                {%- assign pick_tail = sibling.handle | split: '-' | last -%}
+                {%- assign pick_found = true -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+        <button
+          type="button"
+          class="humc-customize__logo{% if mark == default_logo %} is-on{% endif %}"
+          data-field="logo"
+          data-value="{{ mark | escape }}"
+          data-title="{{ pick_title | escape }}"
+          data-source-id="{{ pick_tail | escape }}"
+          data-variant="{{ pick_variant }}"
+          data-has-photo="{% if pick_found %}true{% else %}false{% endif %}"
+          aria-pressed="{% if mark == default_logo %}true{% else %}false{% endif %}"
+        >
+          {{ mark | escape }}
+        </button>
+      {%- endfor -%}
+    </div>
+    <p class="humc-customize__hint">Choose the mark. The photo updates when that listing is already in the shop.</p>
+    <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
+  </fieldset>
+
+  <fieldset class="humc-customize__set">
+    <legend>Extra product options</legend>
+    <div class="humc-customize__chips" role="list">
+      <button type="button" class="humc-customize__chip{% if default_front %} is-on{% endif %}" data-place="Front" aria-pressed="{% if default_front %}true{% else %}false{% endif %}">Front</button>
+      <button type="button" class="humc-customize__chip{% if default_back %} is-on{% endif %}" data-place="Back" aria-pressed="{% if default_back %}true{% else %}false{% endif %}">Add back print</button>
+      {%- if needs_size -%}
+        <button type="button" class="humc-customize__chip{% if default_left %} is-on{% endif %}" data-place="Left sleeve" aria-pressed="{% if default_left %}true{% else %}false{% endif %}">Add left sleeve print</button>
+        <button type="button" class="humc-customize__chip{% if default_right %} is-on{% endif %}" data-place="Right sleeve" aria-pressed="{% if default_right %}true{% else %}false{% endif %}">Add right sleeve print</button>
+      {%- endif -%}
+    </div>
+    <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="">
+    <p class="humc-customize__hint">Listing price is the garment as shown. Extra locations are confirmed by the shop before print.</p>
+  </fieldset>
+
+  <p class="humc-customize__summary" data-summary></p>
+  <p class="humc-customize__error" data-error hidden></p>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (!root || !root.hasAttribute('data-humc-customize')) return;
+
+    var formId = root.getAttribute('data-form-id');
+    var needsSize = root.getAttribute('data-needs-size') === 'true';
+    var colorInput = root.querySelector('input[name="properties[Color]"]');
+    var sizeInput = root.querySelector('input[name="properties[Size]"]');
+    var logoInput = root.querySelector('input[name="properties[Logo]"]');
+    var placeInput = root.querySelector('input[name="properties[Print locations]"]');
+    var summary = root.querySelector('[data-summary]');
+    var errorEl = root.querySelector('[data-error]');
+    var swatchBox = root.querySelector('[data-swatches]');
+    var colorNameEl = root.querySelector('[data-color-name]');
+    var logoName = root.getAttribute('data-logo-name') || 'As shown';
+    var preview = null;
+    var previewMap = {};
+    var currentAngle = 'Front';
+    var currentColorId = '';
+
+    function setPressed(buttons, value) {
+      buttons.forEach(function (btn) {
+        var on = btn.getAttribute('data-value') === value;
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+
+    function places() {
+      return Array.prototype.map
+        .call(root.querySelectorAll('[data-place].is-on'), function (btn) {
+          return btn.getAttribute('data-place');
+        })
+        .filter(Boolean);
+    }
+
+    function syncPlaces() {
+      if (placeInput) placeInput.value = places().join(', ');
+    }
+
+    function viewNames() {
+      var names = ['Front'];
+      if (preview && preview.views && preview.views.Back) names.push('Back');
+      return names;
+    }
+
+    function lookupPreview(sourceId, title) {
+      var entry = sourceId && previewMap[sourceId];
+      if (entry) {
+        entry.id = entry.id || sourceId;
+        return entry;
+      }
+      var found = null;
+      Object.keys(previewMap).some(function (id) {
+        if (previewMap[id].title === title) {
+          found = previewMap[id];
+          found.id = found.id || id;
+          return true;
+        }
+        return false;
+      });
+      if (found) return found;
+      var t = String(title || '');
+      var familyId = '';
+      if (/1\/4 zip/i.test(t)) familyId = '18991186';
+      else if (/trucker|otto|snapback/i.test(t)) familyId = '19193876';
+      else if (/canvas bag|jumbo/i.test(t)) familyId = '18416451';
+      if (familyId && previewMap[familyId]) {
+        found = previewMap[familyId];
+        found.id = found.id || familyId;
+      }
+      return found;
+    }
+
+    function setVariant(variant) {
+      if (!variant) return;
+      var form = document.getElementById(formId);
+      var idInput = form && form.querySelector('input[name="id"]');
+      if (idInput) idInput.value = variant;
+    }
+
+    function photoUrl(colorId, angle) {
+      if (!preview || !preview.id || !colorId) return '';
+      var base = root.getAttribute('data-asset-base') || '';
+      var suffix = !angle || angle === 'Front' ? '' : '-' + angle.toLowerCase();
+      return base + 'humc-m-' + preview.id + '-' + colorId + suffix + '.jpg';
+    }
+
+    function demoEls() {
+      return {
+        root: document.querySelector('[data-humc-demo]'),
+        photo: document.querySelector('[data-humc-demo-photo]'),
+        caption: document.querySelector('[data-humc-demo-caption]'),
+        views: document.querySelector('[data-humc-turn]')
+      };
+    }
+
+    function setGallery(url) {
+      if (!url) return;
+      var demo = demoEls();
+      function apply(img) {
+        if (!img) return;
+        img.alt = [logoName, currentAngle, colorInput && colorInput.value].filter(Boolean).join(', ');
+        img.style.opacity = '1';
+        if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+      }
+      apply(demo.photo);
+      document.querySelectorAll('.product-media__image').forEach(function (img) {
+        img.setAttribute('src', url);
+        img.removeAttribute('srcset');
+        img.removeAttribute('srcSet');
+      });
+    }
+
+    function paintPhoto() {
+      setGallery(photoUrl(currentColorId, currentAngle));
+      var demo = demoEls();
+      if (demo.caption) {
+        demo.caption.textContent = [colorInput && colorInput.value, logoName, currentAngle]
+          .filter(Boolean)
+          .join(' · ');
+      }
+      document.querySelectorAll('[data-humc-turn] [data-field="view"]').forEach(function (btn) {
+        var on = btn.getAttribute('data-value') === currentAngle;
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+
+    function mountDemo() {
+      var gallery =
+        document.querySelector('media-gallery') ||
+        document.querySelector('.product-media-container') ||
+        document.querySelector('.product-media');
+      if (!gallery) return;
+      var host = gallery.parentNode;
+      if (!host) return;
+      document.body.classList.add('has-humc-demo');
+      var demo = document.querySelector('[data-humc-demo]');
+      if (!demo) {
+        demo = document.createElement('div');
+        demo.className = 'humc-demo';
+        demo.setAttribute('data-humc-demo', '');
+        demo.innerHTML =
+          '<div class="humc-demo__stage" data-humc-stage>' +
+          '<img data-humc-demo-photo alt="">' +
+          '</div>' +
+          '<p class="humc-demo__caption" data-humc-demo-caption></p>' +
+          '<div class="humc-demo__views" data-humc-turn></div>';
+        host.insertBefore(demo, gallery);
+      }
+      renderViews();
+    }
+
+    function refresh() {
+      syncPlaces();
+      var bits = [];
+      if (colorInput && colorInput.value) bits.push(colorInput.value);
+      if (sizeInput && sizeInput.value) bits.push(sizeInput.value);
+      if (logoInput && logoInput.value) bits.push(logoInput.value);
+      if (placeInput && placeInput.value) bits.push(placeInput.value);
+      if (summary) summary.textContent = bits.length ? bits.join(' · ') : '';
+    }
+
+    function showError(msg) {
+      if (!errorEl) return;
+      errorEl.hidden = !msg;
+      errorEl.textContent = msg || '';
+    }
+
+    function hasColorChoices() {
+      return Boolean(swatchBox && swatchBox.querySelector('[data-field="color"]'));
+    }
+
+    function isReady() {
+      if (hasColorChoices() && colorInput && !colorInput.value) return 'Pick a garment color.';
+      if (!hasColorChoices() && colorInput && !colorInput.value) {
+        selectColor('As shown', '');
+      }
+      if (needsSize && sizeInput && !sizeInput.value) return 'Pick a size.';
+      if (!places().length) return 'Pick at least one print location.';
+      return '';
+    }
+
+    function selectColor(name, colorId) {
+      currentColorId = colorId || '';
+      if (colorInput) colorInput.value = name || '';
+      if (colorNameEl) colorNameEl.textContent = name || '';
+      root.querySelectorAll('[data-field="color"]').forEach(function (btn) {
+        var on = btn.getAttribute('data-value') === name;
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      renderViews();
+      paintPhoto();
+      showError('');
+      refresh();
+    }
+
+    function selectView(angle) {
+      var names = viewNames();
+      if (names.indexOf(angle) === -1) return;
+      currentAngle = angle;
+      paintPhoto();
+    }
+
+    function selectLogo(btn) {
+      var name = btn.getAttribute('data-value') || '';
+      var title = btn.getAttribute('data-title') || '';
+      var sourceId = btn.getAttribute('data-source-id') || '';
+      var hasPhoto = btn.getAttribute('data-has-photo') !== 'false';
+      logoName = name;
+      if (logoInput) logoInput.value = name;
+      root.querySelectorAll('[data-field="logo"]').forEach(function (el) {
+        var on = el === btn;
+        el.classList.toggle('is-on', on);
+        el.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      if (hasPhoto) setVariant(btn.getAttribute('data-variant'));
+      var entry = hasPhoto ? lookupPreview(sourceId, title) : null;
+      if (entry) {
+        renderSwatches(entry, colorInput && colorInput.value);
+      } else {
+        paintPhoto();
+        refresh();
+      }
+    }
+
+    function renderViews() {
+      var bar = document.querySelector('[data-humc-turn]');
+      if (!bar) return;
+      var names = viewNames();
+      bar.innerHTML = '';
+      names.forEach(function (name) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'humc-demo__view';
+        btn.setAttribute('data-field', 'view');
+        btn.setAttribute('data-value', name);
+        btn.setAttribute('aria-pressed', name === currentAngle ? 'true' : 'false');
+        var thumb = document.createElement('img');
+        thumb.alt = name;
+        thumb.src = photoUrl(currentColorId, name);
+        var label = document.createElement('span');
+        label.textContent = name;
+        btn.appendChild(thumb);
+        btn.appendChild(label);
+        bar.appendChild(btn);
+      });
+    }
+
+    function renderSwatches(entry, keepColor) {
+      preview = entry;
+      if (!swatchBox || !entry || !entry.colors) return;
+      var colors = entry.colors.slice();
+      var seen = {};
+      colors = colors.filter(function (color) {
+        var key = String(color.id);
+        if (seen[key]) return false;
+        seen[key] = true;
+        return true;
+      });
+      swatchBox.innerHTML = '';
+      colors.forEach(function (color) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'humc-customize__swatch';
+        btn.setAttribute('data-field', 'color');
+        btn.setAttribute('data-value', color.name);
+        btn.setAttribute('data-color-id', String(color.id));
+        btn.setAttribute('title', color.name);
+        btn.setAttribute('aria-label', color.name);
+        btn.setAttribute('aria-pressed', 'false');
+        btn.style.setProperty('--swatch', color.hex || '#ccc');
+        if (/white|ash|natural|cornsilk|ice grey|light pink|yellow/i.test(color.name)) {
+          btn.classList.add('is-light');
+        }
+        swatchBox.appendChild(btn);
+      });
+      if (!document.querySelector('[data-humc-demo]')) mountDemo();
+      else renderViews();
+      var chosen =
+        (keepColor && colors.find(function (c) { return c.name === keepColor; })) ||
+        colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
+        colors.find(function (c) { return c.name === 'Black'; }) ||
+        colors[0];
+      if (chosen) selectColor(chosen.name, chosen.id);
+    }
+
+    root.addEventListener('click', function (event) {
+      var colorBtn = event.target.closest('[data-field="color"]');
+      if (colorBtn && root.contains(colorBtn)) {
+        selectColor(colorBtn.getAttribute('data-value'), colorBtn.getAttribute('data-color-id'));
+        return;
+      }
+
+      var viewBtn = event.target.closest('[data-field="view"]');
+      if (viewBtn && root.contains(viewBtn)) {
+        selectView(viewBtn.getAttribute('data-value'));
+        return;
+      }
+
+      var sizeBtn = event.target.closest('[data-field="size"]');
+      if (sizeBtn && root.contains(sizeBtn)) {
+        if (sizeInput) sizeInput.value = sizeBtn.getAttribute('data-value') || '';
+        setPressed(root.querySelectorAll('[data-field="size"]'), sizeInput.value);
+        showError('');
+        refresh();
+        return;
+      }
+
+      var logoBtn = event.target.closest('[data-field="logo"]');
+      if (logoBtn && root.contains(logoBtn)) {
+        selectLogo(logoBtn);
+        return;
+      }
+
+      var placeBtn = event.target.closest('[data-place]');
+      if (placeBtn && root.contains(placeBtn)) {
+        var turningOff = placeBtn.classList.contains('is-on') && places().length === 1;
+        if (!turningOff) {
+          placeBtn.classList.toggle('is-on');
+          placeBtn.setAttribute('aria-pressed', placeBtn.classList.contains('is-on') ? 'true' : 'false');
+        }
+        showError('');
+        refresh();
+      }
+    });
+
+    function blockIfIncomplete(event) {
+      var form = event.target;
+      if (form && form.id !== formId) {
+        var btn = event.target.closest ? event.target.closest('[name="add"]') : null;
+        if (!btn) return;
+        form = document.getElementById(formId);
+        if (!form) return;
+        var belongs = btn.form === form || btn.getAttribute('form') === formId || form.contains(btn);
+        if (!belongs) return;
+      } else if (!form || form.id !== formId) {
+        return;
+      }
+      var msg = isReady();
+      if (msg) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        showError(msg);
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+    }
+
+    document.addEventListener('submit', blockIfIncomplete, true);
+    document.addEventListener(
+      'click',
+      function (event) {
+        var btn = event.target.closest('[name="add"]');
+        if (!btn) return;
+        var form = document.getElementById(formId);
+        if (!form) return;
+        var belongs = btn.form === form || btn.getAttribute('form') === formId || form.contains(btn);
+        if (!belongs) return;
+        var msg = isReady();
+        if (msg) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          showError(msg);
+          root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return;
+        }
+      },
+      true
+    );
+
+    document.addEventListener('click', function (event) {
+      var bar = event.target.closest('[data-humc-turn]');
+      if (!bar) return;
+      var viewBtn = event.target.closest('[data-field="view"]');
+      if (viewBtn) selectView(viewBtn.getAttribute('data-value'));
+    });
+
+    syncPlaces();
+    refresh();
+
+    var mapUrl = root.getAttribute('data-preview-map');
+    if (mapUrl) {
+      fetch(mapUrl)
+        .then(function (res) { return res.json(); })
+        .then(function (map) {
+          var title = root.getAttribute('data-product-title') || '';
+          var sid = root.getAttribute('data-source-id') || '';
+          var entry = map[sid];
+          var foundId = sid;
+          if (!entry) {
+            Object.keys(map).some(function (id) {
+              if (map[id].title === title) {
+                entry = map[id];
+                foundId = id;
+                return true;
+              }
+              return false;
+            });
+          }
+          previewMap = map;
+          if (entry) {
+            entry.id = entry.id || foundId;
+            renderSwatches(entry);
+          } else {
+            var colorSet = root.querySelector('[data-color-set]');
+            if (colorSet) colorSet.hidden = true;
+            selectColor('As shown', '');
+          }
+        })
+        .catch(function () {
+          selectColor('As shown', '');
+        });
+    }
+  })();
+</script>
+{%- endunless -%}
+
+{% stylesheet %}
+  .humc-customize {
+    display: grid;
+    gap: 1.1rem;
+    width: 100%;
+  }
+
+  .humc-customize__hint,
+  .humc-customize__summary,
+  .humc-customize__color-name {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .humc-customize__hint {
+    opacity: 0.7;
+  }
+
+  .humc-customize__color-name {
+    min-height: 1.2em;
+    margin-block-end: 0.45rem;
+  }
+
+  .humc-customize__summary {
+    font-weight: 600;
+  }
+
+  .humc-customize__error {
+    margin: 0;
+    color: #8b1e2d;
+    font-size: 0.875rem;
+  }
+
+  .humc-customize__set {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+
+  .humc-customize__set legend {
+    padding: 0;
+    margin-block-end: 0.45rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .humc-customize__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+
+  .humc-customize__swatch {
+    appearance: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0;
+    margin: 0;
+    border: 1px solid rgb(0 0 0 / 0.28);
+    border-radius: 50%;
+    background: var(--swatch, #ccc);
+    cursor: pointer;
+  }
+
+  .humc-customize__swatch.is-light {
+    border-color: rgb(0 0 0 / 0.4);
+  }
+
+  .humc-customize__swatch.is-on {
+    outline: 2px solid #121212;
+    outline-offset: 2px;
+  }
+
+  .humc-customize__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .humc-customize__chip {
+    appearance: none;
+    margin: 0;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .humc-customize__chip.is-on {
+    border-color: #121212;
+    background: #121212;
+    color: #fff;
+  }
+
+  .humc-customize__logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .humc-customize__logo {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .humc-customize__logo img {
+    display: block;
+    height: 16px;
+    width: auto;
+  }
+
+  .humc-customize__logo.is-on {
+    border-color: #121212;
+    background: #121212;
+    color: #fff;
+  }
+
+  .humc-customize__chip,
+  .humc-customize__swatch,
+  .humc-customize__logo,
+  .humc-demo__view {
+    transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 140ms ease, border-color 140ms ease;
+  }
+
+  .humc-customize__chip:active,
+  .humc-customize__swatch:active,
+  .humc-customize__logo:active,
+  .humc-demo__view:active {
+    transform: scale(0.97);
+  }
+
+  .humc-body.has-humc-demo media-gallery,
+  .humc-body.has-humc-demo .product-media-container,
+  .humc-body.has-humc-demo .product-media {
+    display: none !important;
+  }
+
+  .humc-demo {
+    max-width: 600px;
+  }
+
+  .humc-demo__stage {
+    background: #fff;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .humc-demo__stage img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .humc-demo__caption {
+    margin: 0.55rem 0 0.7rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+
+  .humc-demo__views {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .humc-demo__view {
+    appearance: none;
+    width: 4.6rem;
+    margin: 0;
+    padding: 0.3rem;
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .humc-demo__view img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #f3f3f3;
+    margin-block-end: 0.25rem;
+  }
+
+  .humc-demo__view.is-on {
+    border-color: #121212;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .humc-customize__chip,
+    .humc-customize__swatch,
+    .humc-customize__logo,
+    .humc-demo__view,
+    .humc-demo__stage img {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "HUMC customize",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "HUMC customize",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

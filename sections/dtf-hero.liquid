@@ -91,15 +91,25 @@
   .dtf-hero__media {
     position: relative;
     width: 100%;
+    height: var(--dtf-hero-h, 540px);
     display: grid;
+    overflow: hidden;
     background: #0b0b0d;
   }
 
   .dtf-hero__img {
     grid-area: 1 / 1;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     display: block;
+  }
+
+  @media (max-width: 749px) {
+    .dtf-hero__media {
+      height: var(--dtf-hero-h-mobile, 340px);
+    }
   }
 
   .dtf-hero__scrim {
