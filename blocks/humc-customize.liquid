@@ -517,7 +517,7 @@
         else selectView('Front');
       } else {
         var rest = places();
-        selectView(placeToAngle(rest[0] || 'Front'));
+        selectView(placeToAngle(rest[rest.length - 1] || 'Front'));
       }
       showError('');
       refresh();
