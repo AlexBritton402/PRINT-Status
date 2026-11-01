@@ -444,7 +444,11 @@
       stage.setAttribute('data-angle', currentAngle);
       var layer = stage.querySelector('[data-humc-logo-layer]');
       if (!overlayUrl) {
-        if (layer) layer.hidden = true;
+        if (layer) {
+          layer.hidden = true;
+          layer.removeAttribute('src');
+          layer.style.display = 'none';
+        }
         return;
       }
       if (!layer) {
@@ -454,6 +458,7 @@
         stage.appendChild(layer);
       }
       layer.hidden = false;
+      layer.style.display = '';
       if (layer.getAttribute('src') !== overlayUrl) layer.setAttribute('src', overlayUrl);
     }
 
@@ -1131,10 +1136,10 @@
   }
 
   .humc-demo__stage[data-angle='Front'] [data-humc-logo-cover] {
-    top: 23.5%;
-    left: 57.5%;
-    width: 11%;
-    height: 11%;
+    top: 21%;
+    left: 55%;
+    width: 16%;
+    height: 16%;
   }
 
   .humc-demo__stage[data-angle='Back'] [data-humc-logo-layer] {
@@ -1145,37 +1150,37 @@
   }
 
   .humc-demo__stage[data-angle='Back'] [data-humc-logo-cover] {
-    top: 27%;
+    top: 26%;
     left: 50%;
-    width: 12%;
-    height: 12%;
+    width: 14%;
+    height: 14%;
     transform: translateX(-50%);
   }
 
   .humc-demo__stage[data-angle='Left'] [data-humc-logo-layer] {
-    top: 30%;
-    left: 58%;
+    top: 31%;
+    left: 47%;
     width: 8%;
   }
 
   .humc-demo__stage[data-angle='Left'] [data-humc-logo-cover] {
     top: 29%;
-    left: 56.5%;
-    width: 11%;
-    height: 11%;
+    left: 45%;
+    width: 12%;
+    height: 12%;
   }
 
   .humc-demo__stage[data-angle='Right'] [data-humc-logo-layer] {
-    top: 29.5%;
-    left: 33%;
+    top: 29%;
+    left: 32.5%;
     width: 8%;
   }
 
   .humc-demo__stage[data-angle='Right'] [data-humc-logo-cover] {
-    top: 28.5%;
-    left: 31.5%;
-    width: 11%;
-    height: 11%;
+    top: 25.5%;
+    left: 28.5%;
+    width: 16%;
+    height: 16%;
   }
 
   .humc-demo__stage[data-family='trucker hat'] [data-humc-logo-layer],
