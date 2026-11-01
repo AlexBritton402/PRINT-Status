@@ -364,19 +364,29 @@
     function setGallery(url) {
       if (!url) return;
       var demo = demoEls();
-      function apply(img) {
-        if (!img) return;
-        img.alt = [logoName, currentAngle, colorInput && colorInput.value].filter(Boolean).join(', ');
-        img.style.opacity = '1';
-        if (img.getAttribute('src') !== url) img.setAttribute('src', url);
-      }
-      apply(demo.photo);
-      document.querySelectorAll('.product-media__image').forEach(function (img) {
-        img.setAttribute('src', url);
-        img.removeAttribute('srcset');
-        img.removeAttribute('srcSet');
-      });
-      applyOverlay(overlayUrl);
+      var img = demo.photo;
+      var probe = new Image();
+      probe.onload = function () {
+        if (img) {
+          img.alt = [logoName, currentAngle, colorInput && colorInput.value].filter(Boolean).join(', ');
+          img.style.opacity = '1';
+          if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+        }
+        document.querySelectorAll('.product-media__image').forEach(function (shopImg) {
+          shopImg.setAttribute('src', url);
+          shopImg.removeAttribute('srcset');
+          shopImg.removeAttribute('srcSet');
+        });
+        applyOverlay(overlayUrl);
+      };
+      probe.onerror = function () {
+        if (currentAngle !== 'Front') {
+          currentAngle = 'Front';
+          paintPhoto();
+          renderViews();
+        }
+      };
+      probe.src = url;
     }
 
     function paintPhoto() {
@@ -507,18 +517,28 @@
       var names = viewNames();
       bar.innerHTML = '';
       names.forEach(function (name) {
+        var url = photoUrl(currentColorId, name);
+        if (!url) return;
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'humc-demo__view';
+        btn.hidden = name !== 'Front';
         btn.setAttribute('data-field', 'view');
         btn.setAttribute('data-value', name);
         btn.setAttribute('aria-pressed', name === currentAngle ? 'true' : 'false');
         var thumb = document.createElement('img');
         thumb.alt = name;
-        thumb.src = photoUrl(currentColorId, name);
-        thumb.addEventListener('error', function () {
-          thumb.remove();
+        thumb.addEventListener('load', function () {
+          btn.hidden = false;
         });
+        thumb.addEventListener('error', function () {
+          btn.remove();
+          if (currentAngle === name && name !== 'Front') {
+            currentAngle = 'Front';
+            paintPhoto();
+          }
+        });
+        thumb.src = url;
         var label = document.createElement('span');
         label.textContent = name;
         btn.appendChild(thumb);
@@ -944,6 +964,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.45rem;
+  }
+
+  .humc-demo__view[hidden] {
+    display: none;
   }
 
   .humc-demo__view {
