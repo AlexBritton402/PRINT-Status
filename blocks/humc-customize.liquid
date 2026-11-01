@@ -77,8 +77,10 @@
   data-form-id="{{ form_id }}"
   data-needs-size="{% if needs_size %}true{% else %}false{% endif %}"
   data-product-title="{{ title | escape }}"
+  data-product-handle="{{ product_resource.handle | escape }}"
   data-logo-name="{{ default_logo | escape }}"
   data-source-id="{{ handle_tail | escape }}"
+  data-family="{{ family_phrase | escape }}"
   data-preview-map="{{ 'humc-preview.json' | asset_url }}"
   data-asset-base="{{ 'humc-preview.json' | asset_url | split: 'humc-preview.json' | first }}"
   style="{% render 'spacing-style', settings: block.settings %}"
@@ -159,13 +161,36 @@
             {%- endif -%}
           {%- endfor -%}
         {%- endif -%}
+        {%- assign logo_sid = pick_tail -%}
+        {%- if family_phrase == '1/4 zip fleece' -%}
+          {%- if mark == 'Standard HUMC' -%}
+            {%- assign logo_sid = '18991186' -%}
+          {%- elsif mark == 'Single-color HUMC' -%}
+            {%- assign logo_sid = '18867111' -%}
+          {%- elsif mark == 'LA County' -%}
+            {%- assign logo_sid = '18993506' -%}
+          {%- endif -%}
+          {%- assign pick_found = true -%}
+        {%- elsif family_phrase == 'trucker hat' -%}
+          {%- assign logo_sid = '19193876' -%}
+          {%- assign pick_found = true -%}
+        {%- elsif family_phrase == 'jumbo canvas bag' -%}
+          {%- if mark == 'Standard HUMC' -%}
+            {%- assign logo_sid = '18416451' -%}
+          {%- elsif mark == 'Single-color HUMC' -%}
+            {%- assign logo_sid = '18417261' -%}
+          {%- elsif mark == 'LA County' -%}
+            {%- assign logo_sid = '18753436' -%}
+          {%- endif -%}
+          {%- assign pick_found = true -%}
+        {%- endif -%}
         <button
           type="button"
           class="humc-customize__logo{% if mark == default_logo %} is-on{% endif %}"
           data-field="logo"
           data-value="{{ mark | escape }}"
           data-title="{{ pick_title | escape }}"
-          data-source-id="{{ pick_tail | escape }}"
+          data-source-id="{{ logo_sid | escape }}"
           data-variant="{{ pick_variant }}"
           data-has-photo="{% if pick_found %}true{% else %}false{% endif %}"
           aria-pressed="{% if mark == default_logo %}true{% else %}false{% endif %}"
@@ -174,7 +199,7 @@
         </button>
       {%- endfor -%}
     </div>
-    <p class="humc-customize__hint">Choose the mark. The photo updates when that listing is already in the shop.</p>
+    <p class="humc-customize__hint">Choose the mark. The photo updates now. A new mark added on Store desk appears here without new stock photos.</p>
     <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
   </fieldset>
 
@@ -216,6 +241,25 @@
     var previewMap = {};
     var currentAngle = 'Front';
     var currentColorId = '';
+    var catalog = { marks: [], extraColors: [] };
+    var overlayUrl = '';
+
+    function readCatalog() {
+      var el = document.getElementById('store-catalog-config');
+      if (!el) return;
+      try {
+        var data = JSON.parse(el.textContent);
+        catalog.marks = data.marks || [];
+        catalog.extraColors = data.extraColors || [];
+      } catch (err) {}
+    }
+
+    function markApplies(mark) {
+      var handles = String((mark && mark.handles) || '').trim();
+      if (!handles) return true;
+      var handle = root.getAttribute('data-product-handle') || '';
+      return handles.split(/[\s,]+/).indexOf(handle) !== -1;
+    }
 
     function setPressed(buttons, value) {
       buttons.forEach(function (btn) {
@@ -294,6 +338,25 @@
       };
     }
 
+    function applyOverlay(url) {
+      overlayUrl = url || '';
+      var stage = document.querySelector('[data-humc-stage]');
+      if (!stage) return;
+      var layer = stage.querySelector('[data-humc-logo-layer]');
+      if (!overlayUrl) {
+        if (layer) layer.hidden = true;
+        return;
+      }
+      if (!layer) {
+        layer = document.createElement('img');
+        layer.setAttribute('data-humc-logo-layer', '');
+        layer.alt = '';
+        stage.appendChild(layer);
+      }
+      layer.hidden = false;
+      if (layer.getAttribute('src') !== overlayUrl) layer.setAttribute('src', overlayUrl);
+    }
+
     function setGallery(url) {
       if (!url) return;
       var demo = demoEls();
@@ -309,6 +372,7 @@
         img.removeAttribute('srcset');
         img.removeAttribute('srcSet');
       });
+      applyOverlay(overlayUrl);
     }
 
     function paintPhoto() {
@@ -341,8 +405,11 @@
         demo.className = 'humc-demo';
         demo.setAttribute('data-humc-demo', '');
         demo.innerHTML =
-          '<div class="humc-demo__stage" data-humc-stage>' +
+          '<div class="humc-demo__stage" data-humc-stage data-family="' +
+          (root.getAttribute('data-family') || '') +
+          '">' +
           '<img data-humc-demo-photo alt="">' +
+          '<img data-humc-logo-layer hidden alt="">' +
           '</div>' +
           '<p class="humc-demo__caption" data-humc-demo-caption></p>' +
           '<div class="humc-demo__views" data-humc-turn></div>';
@@ -405,8 +472,9 @@
 
     function selectLogo(btn) {
       var name = btn.getAttribute('data-value') || '';
-      var title = btn.getAttribute('data-title') || '';
+      var title = btn.getAttribute('data-title') || root.getAttribute('data-product-title') || '';
       var sourceId = btn.getAttribute('data-source-id') || '';
+      var overlay = btn.getAttribute('data-overlay') || '';
       var hasPhoto = btn.getAttribute('data-has-photo') !== 'false';
       logoName = name;
       if (logoInput) logoInput.value = name;
@@ -416,7 +484,8 @@
         el.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       if (hasPhoto) setVariant(btn.getAttribute('data-variant'));
-      var entry = hasPhoto ? lookupPreview(sourceId, title) : null;
+      applyOverlay(overlay);
+      var entry = lookupPreview(sourceId, title);
       if (entry) {
         renderSwatches(entry, colorInput && colorInput.value);
       } else {
@@ -452,9 +521,20 @@
       preview = entry;
       if (!swatchBox || !entry || !entry.colors) return;
       var colors = entry.colors.slice();
+      extraColorsForProduct().forEach(function (extra) {
+        var match = colors.find(function (color) {
+          return color.name.toLowerCase() === String(extra.name || '').toLowerCase();
+        });
+        if (match) return;
+        colors.push({
+          id: extra.id || '',
+          name: extra.name,
+          hex: extra.hex || '#ccc'
+        });
+      });
       var seen = {};
       colors = colors.filter(function (color) {
-        var key = String(color.id);
+        var key = String(color.name || color.id);
         if (seen[key]) return false;
         seen[key] = true;
         return true;
@@ -579,6 +659,41 @@
       if (viewBtn) selectView(viewBtn.getAttribute('data-value'));
     });
 
+    function extraColorsForProduct() {
+      return (catalog.extraColors || []).filter(function (color) {
+        return color && color.name && markApplies(color);
+      });
+    }
+
+    function addCatalogMarks() {
+      var box = root.querySelector('[data-logos]');
+      if (!box) return;
+      (catalog.marks || []).forEach(function (mark) {
+        if (!mark || !mark.name || !markApplies(mark)) return;
+        if (box.querySelector('[data-field="logo"][data-value="' + mark.name + '"]')) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'humc-customize__logo';
+        btn.setAttribute('data-field', 'logo');
+        btn.setAttribute('data-value', mark.name);
+        btn.setAttribute('data-title', root.getAttribute('data-product-title') || '');
+        btn.setAttribute('data-source-id', root.getAttribute('data-source-id') || '');
+        btn.setAttribute('data-has-photo', mark.image ? 'true' : 'false');
+        btn.setAttribute('data-overlay', mark.image || '');
+        btn.setAttribute('aria-pressed', 'false');
+        if (mark.image) {
+          var img = document.createElement('img');
+          img.src = mark.image;
+          img.alt = '';
+          btn.appendChild(img);
+        }
+        btn.appendChild(document.createTextNode(mark.name));
+        box.appendChild(btn);
+      });
+    }
+
+    readCatalog();
+    addCatalogMarks();
     syncPlaces();
     refresh();
 
@@ -773,6 +888,7 @@
   }
 
   .humc-demo__stage {
+    position: relative;
     background: #fff;
     aspect-ratio: 1;
     display: flex;
@@ -787,6 +903,22 @@
     object-fit: contain;
     pointer-events: none;
     transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .humc-demo__stage [data-humc-logo-layer] {
+    position: absolute;
+    top: 26%;
+    left: 50%;
+    width: 22%;
+    height: auto;
+    transform: translateX(-50%);
+    object-fit: contain;
+  }
+
+  .humc-demo__stage[data-family='trucker hat'] [data-humc-logo-layer],
+  .humc-demo__stage[data-family='jumbo canvas bag'] [data-humc-logo-layer] {
+    top: 34%;
+    width: 28%;
   }
 
   .humc-demo__caption {

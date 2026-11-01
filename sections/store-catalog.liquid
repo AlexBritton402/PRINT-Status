@@ -36,7 +36,35 @@
   {
     "colors": {{ colors | split: ',' | json }},
     "logos": {{ logos | split: ',' | json }},
-    "hidden": {{ hidden | newline_to_br | split: '<br />' | json }}
+    "hidden": {{ hidden | newline_to_br | split: '<br />' | json }},
+    "marks": [
+      {%- assign mark_first = true -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'logo_mark' and block.settings.name != blank -%}
+          {%- unless mark_first -%},{%- endunless -%}
+          {%- assign mark_first = false -%}
+          {
+            "name": {{ block.settings.name | json }},
+            "image": {% if block.settings.image != blank %}{{ block.settings.image | image_url: width: 1200 | json }}{% else %}null{% endif %},
+            "handles": {{ block.settings.handles | json }}
+          }
+        {%- endif -%}
+      {%- endfor -%}
+    ],
+    "extraColors": [
+      {%- assign color_first = true -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'extra_color' and block.settings.name != blank -%}
+          {%- unless color_first -%},{%- endunless -%}
+          {%- assign color_first = false -%}
+          {
+            "name": {{ block.settings.name | json }},
+            "hex": {{ block.settings.hex | default: '#cccccc' | json }},
+            "handles": {{ block.settings.handles | json }}
+          }
+        {%- endif -%}
+      {%- endfor -%}
+    ]
   }
 </script>
 <script type="application/json" id="store-ops-events-raw">{{ section.settings.calendar | json }}</script>
@@ -211,6 +239,65 @@
           <a class="button" href="{{ print_home }}">View PRINT Status home</a>
           <a class="button button-secondary" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2F">Edit PRINT Status home</a>
         </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>Add a logo or a color</h2>
+        <p>One mark or color here updates the live customizer. You do not need a new stock photo on every product. Existing Standard HUMC, Single-color HUMC, and LA County already swap the garment photo. A new logo is one PNG laid on the current color. A new color is a swatch on the products you list.</p>
+        <p class="store-admin__hint">Theme Access cannot save an upload from this page. Add the file in Theme editor → HUMC catalog → Add block. Use <strong>HUMC logo</strong> or <strong>HUMC color</strong>. Leave product handles blank for every HUMC item, or list handles such as <code>1-4-zip-fleece-customizable</code>.</p>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Add logo or color</a>
+        </p>
+        <h3>Logos on the customizer</h3>
+        <ul class="store-admin__list">
+          <li>
+            Standard HUMC
+            <span>Built in. Zip, bag, and hat photos update when this mark is picked.</span>
+          </li>
+          <li>
+            Single-color HUMC
+            <span>Built in. Zip and bag photos update. Hat uses the overlay if you add a PNG.</span>
+          </li>
+          <li>
+            LA County
+            <span>Built in. Zip, bag, and hat photos update.</span>
+          </li>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'logo_mark' and block.settings.name != blank -%}
+              <li>
+                {{ block.settings.name | escape }}
+                <span>
+                  {%- if block.settings.image != blank -%}
+                    Overlay on
+                  {%- else -%}
+                    Name only on
+                  {%- endif -%}
+                  {%- if block.settings.handles != blank -%}
+                    {{ block.settings.handles | escape }}
+                  {%- else -%}
+                    all HUMC products
+                  {%- endif -%}
+                </span>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+        <h3>Extra colors</h3>
+        <ul class="store-admin__list">
+          {%- assign extra_color_count = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'extra_color' and block.settings.name != blank -%}
+              {%- assign extra_color_count = extra_color_count | plus: 1 -%}
+              <li>
+                {{ block.settings.name | escape }}
+                <span>{{ block.settings.hex | escape }} · {% if block.settings.handles != blank %}{{ block.settings.handles | escape }}{% else %}all HUMC products{% endif %}</span>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if extra_color_count == 0 -%}
+            <li>None yet. Mill colors already on a garment still come from that product’s photo set.</li>
+          {%- endif -%}
+        </ul>
       </section>
 
       <section class="store-admin__card">
@@ -476,6 +563,10 @@
   .store-admin h3 {
     margin: 0 0 0.6rem;
   }
+  .store-admin h3 {
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
   .store-admin__lead,
   .store-admin__hint {
     margin: 0 0 1.2rem;
@@ -669,6 +760,56 @@
       "id": "hidden_handles",
       "label": "Hidden HUMC product handles",
       "info": "One handle per line. Hides those cards on HUMC pages."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_mark",
+      "name": "HUMC logo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Logo name",
+          "info": "Shows on the product page and on the order line."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo file",
+          "info": "One PNG or JPG. Laid on the current garment color. No new stock photo per product."
+        },
+        {
+          "type": "textarea",
+          "id": "handles",
+          "label": "Product handles",
+          "info": "Blank = every HUMC product. Or one handle per line, e.g. 1-4-zip-fleece-customizable"
+        }
+      ]
+    },
+    {
+      "type": "extra_color",
+      "name": "HUMC color",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Color name"
+        },
+        {
+          "type": "color",
+          "id": "hex",
+          "label": "Swatch",
+          "default": "#1C4289",
+          "info": "Swatch color. If this name already has a mockup, that photo is used."
+        },
+        {
+          "type": "textarea",
+          "id": "handles",
+          "label": "Product handles",
+          "info": "Blank = every HUMC product. Or list only the items that should get this color."
+        }
+      ]
     }
   ]
 }
