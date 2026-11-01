@@ -200,8 +200,20 @@
           {{ mark | escape }}
         </button>
       {%- endfor -%}
+      <button
+        type="button"
+        class="humc-customize__logo{% if default_logo == 'As shown' or default_logo == 'No logo' %} is-on{% endif %}"
+        data-field="logo"
+        data-value="No logo"
+        data-title="{{ title | escape }}"
+        data-source-id="{{ handle_tail | escape }}"
+        data-has-photo="false"
+        aria-pressed="{% if default_logo == 'As shown' or default_logo == 'No logo' %}true{% else %}false{% endif %}"
+      >
+        No logo
+      </button>
     </div>
-    <p class="humc-customize__hint">Choose the mark. The photo updates now. A new mark added on Store desk appears here without new stock photos.</p>
+    <p class="humc-customize__hint">Tap a mark to put it on the garment. Tap it again, or No logo, to take it off.</p>
     <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
   </fieldset>
 
@@ -209,14 +221,14 @@
     <legend>Extra product options</legend>
     <div class="humc-customize__chips" role="list">
       <button type="button" class="humc-customize__chip{% if default_front %} is-on{% endif %}" data-place="Front" aria-pressed="{% if default_front %}true{% else %}false{% endif %}">Front</button>
-      <button type="button" class="humc-customize__chip{% if default_back %} is-on{% endif %}" data-place="Back" aria-pressed="{% if default_back %}true{% else %}false{% endif %}">Add back print</button>
+      <button type="button" class="humc-customize__chip{% if default_back %} is-on{% endif %}" data-place="Back" aria-pressed="{% if default_back %}true{% else %}false{% endif %}">Back</button>
       {%- if needs_size -%}
-        <button type="button" class="humc-customize__chip{% if default_left %} is-on{% endif %}" data-place="Left sleeve" aria-pressed="{% if default_left %}true{% else %}false{% endif %}">Add left sleeve print</button>
-        <button type="button" class="humc-customize__chip{% if default_right %} is-on{% endif %}" data-place="Right sleeve" aria-pressed="{% if default_right %}true{% else %}false{% endif %}">Add right sleeve print</button>
+        <button type="button" class="humc-customize__chip{% if default_left %} is-on{% endif %}" data-place="Left sleeve" aria-pressed="{% if default_left %}true{% else %}false{% endif %}">Left sleeve</button>
+        <button type="button" class="humc-customize__chip{% if default_right %} is-on{% endif %}" data-place="Right sleeve" aria-pressed="{% if default_right %}true{% else %}false{% endif %}">Right sleeve</button>
       {%- endif -%}
     </div>
     <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="">
-    <p class="humc-customize__hint">Listing price is the garment as shown. Extra locations are confirmed by the shop before print.</p>
+    <p class="humc-customize__hint">Tap a side to add or remove a print. The photo turns to that side. Tap again to remove it.</p>
   </fieldset>
 
   <p class="humc-customize__summary" data-summary></p>
@@ -487,8 +499,49 @@
       paintPhoto();
     }
 
+    function placeToAngle(place) {
+      if (place === 'Back') return 'Back';
+      if (place === 'Left sleeve') return 'Left';
+      if (place === 'Right sleeve') return 'Right';
+      return 'Front';
+    }
+
+    function togglePlace(btn) {
+      var wasOn = btn.classList.contains('is-on');
+      btn.classList.toggle('is-on', !wasOn);
+      btn.setAttribute('aria-pressed', wasOn ? 'false' : 'true');
+      var place = btn.getAttribute('data-place') || 'Front';
+      if (!wasOn) {
+        var angle = placeToAngle(place);
+        if (viewNames().indexOf(angle) !== -1) selectView(angle);
+        else selectView('Front');
+      } else {
+        var rest = places();
+        selectView(placeToAngle(rest[0] || 'Front'));
+      }
+      showError('');
+      refresh();
+    }
+
+    function clearLogo() {
+      logoName = 'No logo';
+      if (logoInput) logoInput.value = 'No logo';
+      root.querySelectorAll('[data-field="logo"]').forEach(function (el) {
+        var on = el.getAttribute('data-value') === 'No logo';
+        el.classList.toggle('is-on', on);
+        el.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      applyOverlay('');
+      paintPhoto();
+      refresh();
+    }
+
     function selectLogo(btn) {
       var name = btn.getAttribute('data-value') || '';
+      if (name === 'No logo' || (logoInput && logoInput.value === name)) {
+        clearLogo();
+        return;
+      }
       var title = btn.getAttribute('data-title') || root.getAttribute('data-product-title') || '';
       var sourceId = btn.getAttribute('data-source-id') || '';
       var overlay = btn.getAttribute('data-overlay') || '';
@@ -596,20 +649,21 @@
       if (chosen) selectColor(chosen.name, chosen.id);
     }
 
-    root.addEventListener('click', function (event) {
-      var colorBtn = event.target.closest('[data-field="color"]');
+    document.addEventListener('click', function (event) {
+      if (!root.isConnected) return;
+      var t = event.target;
+      if (!t || !t.closest) return;
+      var colorBtn = t.closest('[data-field="color"]');
       if (colorBtn && root.contains(colorBtn)) {
         selectColor(colorBtn.getAttribute('data-value'), colorBtn.getAttribute('data-color-id'));
         return;
       }
-
-      var viewBtn = event.target.closest('[data-field="view"]');
-      if (viewBtn && root.contains(viewBtn)) {
+      var viewBtn = t.closest('[data-humc-turn] [data-field="view"]') || t.closest('[data-field="view"]');
+      if (viewBtn && (root.contains(viewBtn) || viewBtn.closest('[data-humc-turn]'))) {
         selectView(viewBtn.getAttribute('data-value'));
         return;
       }
-
-      var sizeBtn = event.target.closest('[data-field="size"]');
+      var sizeBtn = t.closest('[data-field="size"]');
       if (sizeBtn && root.contains(sizeBtn)) {
         if (sizeInput) sizeInput.value = sizeBtn.getAttribute('data-value') || '';
         setPressed(root.querySelectorAll('[data-field="size"]'), sizeInput.value);
@@ -617,24 +671,16 @@
         refresh();
         return;
       }
-
-      var logoBtn = event.target.closest('[data-field="logo"]');
+      var logoBtn = t.closest('[data-field="logo"]');
       if (logoBtn && root.contains(logoBtn)) {
         selectLogo(logoBtn);
         return;
       }
-
-      var placeBtn = event.target.closest('[data-place]');
+      var placeBtn = t.closest('[data-place]');
       if (placeBtn && root.contains(placeBtn)) {
-        var turningOff = placeBtn.classList.contains('is-on') && places().length === 1;
-        if (!turningOff) {
-          placeBtn.classList.toggle('is-on');
-          placeBtn.setAttribute('aria-pressed', placeBtn.classList.contains('is-on') ? 'true' : 'false');
-        }
-        showError('');
-        refresh();
+        togglePlace(placeBtn);
       }
-    });
+    }, true);
 
     function blockIfIncomplete(event) {
       var form = event.target;
@@ -681,13 +727,6 @@
       },
       true
     );
-
-    document.addEventListener('click', function (event) {
-      var bar = event.target.closest('[data-humc-turn]');
-      if (!bar) return;
-      var viewBtn = event.target.closest('[data-field="view"]');
-      if (viewBtn) selectView(viewBtn.getAttribute('data-value'));
-    });
 
     function extraColorsForProduct() {
       return (catalog.extraColors || []).filter(function (color) {
