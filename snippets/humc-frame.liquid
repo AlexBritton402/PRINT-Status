@@ -10,7 +10,8 @@
 
 {%- if part == 'header' -%}
   {% render 'store-switch', target: 'print' %}
-  <div class="humc-announce">WE ARE BACK AT THE HOSPITAL 9/3 TODAY!</div>
+  {% render 'store-attribution', store: 'humc' %}
+  <div class="humc-announce" data-humc-announce>Harbor-UCLA hospital shop</div>
   <header class="humc-frame">
     <div class="humc-frame__bar">
       <a class="humc-frame__logo" href="{{ home }}">

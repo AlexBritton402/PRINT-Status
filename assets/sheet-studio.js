@@ -330,6 +330,7 @@
         const fd = new FormData();
         fd.append('id', normalizeId(variant.id));
         fd.append('quantity', '1');
+        fd.append('properties[Store]', 'PRINT Status');
         fd.append('properties[Job]', jobKind);
         fd.append('properties[Layout]', finishedSheet ? 'Finished sheet' : 'Packed logos');
         fd.append('properties[Sheet]', `${size.label} in`);

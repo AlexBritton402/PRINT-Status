@@ -1,0 +1,33 @@
+{%- comment -%}
+  Marks the cart so the order Additional details show which storefront
+  the buyer was on. PRINT Status and HUMC Gear share one checkout.
+  @param {string} store - print or humc
+{%- endcomment -%}
+
+{%- liquid
+  assign store_name = 'PRINT Status'
+  if store == 'humc'
+    assign store_name = 'HUMC Gear'
+  endif
+-%}
+
+<script>
+  (() => {
+    const name = {{ store_name | json }};
+    try {
+      if (sessionStorage.getItem('ps_store_sent') === name) return;
+    } catch (e) {}
+    fetch('/cart/update.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attributes: { Store: name } }),
+    })
+      .then((res) => {
+        if (!res.ok) return;
+        try {
+          sessionStorage.setItem('ps_store_sent', name);
+        } catch (e) {}
+      })
+      .catch(() => {});
+  })();
+</script>

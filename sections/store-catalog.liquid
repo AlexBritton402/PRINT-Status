@@ -1,7 +1,8 @@
 {%- comment -%}
-  Shared HUMC catalog settings. Rendered from layout/humc so every HUMC
-  page and the admin page read the same colors, logos, and hidden handles.
-  The storefront cannot create Shopify products; that stays in Admin.
+  Shared HUMC catalog settings plus the owner desk on /pages/store-admin.
+  Rendered from layout/humc so every HUMC page and the admin page share
+  one calendar, color list, and hide list. Theme files cannot list paid
+  orders; Shopify Admin and customer accounts keep history.
 {%- endcomment -%}
 
 {%- liquid
@@ -9,6 +10,7 @@
   assign logos = section.settings.logos | default: 'Standard HUMC, Single-color HUMC, LA County'
   assign hidden = section.settings.hidden_handles
   assign access = section.settings.access_code | strip
+  assign standing = section.settings.standing_notes
   assign is_admin = false
   if template.name == 'page' and template.suffix == 'store-admin'
     assign is_admin = true
@@ -19,6 +21,15 @@
   endif
   assign humc = collections['humc-gear']
   assign print_home = routes.root_url
+  assign catalog_all = collections['all']
+  assign admin_handle = shop.permanent_domain | remove: '.myshopify.com'
+  assign admin_url = 'https://admin.shopify.com/store/' | append: admin_handle
+  assign today_iso = 'now' | date: '%Y-%m-%d'
+  assign today_label = 'now' | date: '%A, %B %d, %Y'
+  assign humc_ids = '|'
+  for product in humc.products
+    assign humc_ids = humc_ids | append: product.id | append: '|'
+  endfor
 -%}
 
 <script type="application/json" id="store-catalog-config">
@@ -26,6 +37,13 @@
     "colors": {{ colors | split: ',' | json }},
     "logos": {{ logos | split: ',' | json }},
     "hidden": {{ hidden | newline_to_br | split: '<br />' | json }}
+  }
+</script>
+<script type="application/json" id="store-ops-events-raw">{{ section.settings.calendar | json }}</script>
+<script type="application/json" id="store-ops-meta">
+  {
+    "today": {{ today_iso | json }},
+    "adminOrders": {{ admin_url | append: '/orders' | json }}
   }
 </script>
 
@@ -47,9 +65,14 @@
     data-store-admin
     data-unlocked="{% if unlocked %}true{% else %}false{% endif %}"
     data-access="{{ access | escape }}"
+    data-admin-orders="{{ admin_url }}/orders"
   >
-    <h1>Store admin</h1>
-    <p class="store-admin__lead">Tune HUMC Gear and PRINT Status from one place. Color, logo, and hide lists save in the theme editor. Add or remove the Shopify product itself in Admin → Products — this page does not invent stock.</p>
+    <h1>Store desk</h1>
+    <p class="store-admin__lead">{{ today_label }}. One Shopify store, two storefronts. Paid orders, accounts, and history live in Shopify Admin. This desk tells you what landed on each order and what is on the calendar.</p>
+
+    {%- if access == blank -%}
+      <p class="store-admin__warn">Set an access code in Theme editor → HUMC catalog so this desk is not public on the storefront.</p>
+    {%- endif -%}
 
     {%- unless unlocked -%}
       <form class="store-admin__gate" data-admin-gate>
@@ -60,6 +83,136 @@
     {%- endunless -%}
 
     <div data-admin-body {% unless unlocked %}hidden{% endunless %}>
+      <section class="store-admin__card">
+        <h2>Today and upcoming</h2>
+        <ol class="store-admin__upcoming" data-upcoming>
+          <li>No dated shop events yet. Add hospital, pickup, and press days in the calendar below.</li>
+        </ol>
+        {%- if standing != blank -%}
+          <p class="store-admin__hint">{{ standing | escape | newline_to_br }}</p>
+        {%- endif -%}
+      </section>
+
+      <section class="store-admin__card">
+        <h2>Orders</h2>
+        <p>Every PRINT Status sheet and HUMC Gear item lands on the same order list. The cart attribute <strong>Store</strong> and the line property <strong>Store</strong> say which storefront the buyer used. Confirmation emails go to the checkout address; that email is the customer account.</p>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ admin_url }}/orders">All orders</a>
+          <a class="button button-secondary" href="{{ admin_url }}/orders?fulfillment_status=unfulfilled">Unfulfilled</a>
+          <a class="button button-secondary" href="{{ admin_url }}/orders?status=open">Open</a>
+          <a class="button button-secondary" href="{{ admin_url }}/orders?financial_status=paid">Paid</a>
+        </p>
+        <form class="store-admin__lookup" data-order-search>
+          <label for="StoreOrderQuery">Find an order</label>
+          <div class="store-admin__lookup-row">
+            <input
+              id="StoreOrderQuery"
+              name="q"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Confirmation # or email"
+            >
+            <button class="button" type="submit">Open in Admin</button>
+          </div>
+          <p class="store-admin__hint">Paste #HK87XQK5R, L5GU6WL5H, or checkout.test@example.com. Opens Shopify Orders search. Theme Access cannot show the live list here.</p>
+        </form>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>What shows on the order</h2>
+        <p>Open the order in Admin. Additional details has Store. Each line has the fields below plus artwork on gang sheets.</p>
+        <table class="store-admin__table">
+          <thead>
+            <tr>
+              <th>Storefront</th>
+              <th>On the line</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PRINT Status</td>
+              <td>Store, Job, Layout, Sheet, Turnaround, Files, Artwork</td>
+            </tr>
+            <tr>
+              <td>HUMC Gear</td>
+              <td>Store, Color, Size, Logo, Print locations</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="store-admin__hint">One cart can hold both. Fulfill the sheet and the garment as separate lines on the same order.</p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>Accounts and history</h2>
+        <p>Customer accounts are {% if shop.customer_accounts_enabled %}on{% else %}off — turn them on in Admin{% endif %}. A buyer who uses Account on PRINT Status or HUMC Gear sees their own order history and details on Shopify’s account pages. The same login covers both storefronts.</p>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ admin_url }}/customers">Customers</a>
+          <a class="button button-secondary" href="{{ admin_url }}/settings/customer_accounts">Account settings</a>
+          {%- if shop.customer_accounts_enabled -%}
+            <a class="button button-secondary" href="{{ routes.account_url }}">Customer Account page</a>
+          {%- endif -%}
+        </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>Shop calendar</h2>
+        <p>Hospital days, pickups, press days, and rush cutoffs. Dates here update the HUMC header banner when a hospital or pickup day is today or next.</p>
+        <div class="store-admin__cal-nav">
+          <button type="button" class="button button-secondary" data-cal-prev>Previous</button>
+          <h3 class="store-admin__cal-title" data-cal-title></h3>
+          <button type="button" class="button button-secondary" data-cal-next>Next</button>
+        </div>
+        <div class="store-admin__cal" data-calendar></div>
+        <p class="store-admin__hint">Theme editor → HUMC catalog → Shop calendar. One line each: <code>YYYY-MM-DD | hospital | Harbor-UCLA pickup | notes</code>. Kinds: hospital, pickup, print, rush, other.</p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>HUMC products</h2>
+        <ul class="store-admin__list">
+          {%- for product in humc.products -%}
+            <li>
+              <a href="{{ product.url }}">{{ product.title | escape }}</a>
+              <span>{{ product.handle }} · {{ product.price | money }}</span>
+            </li>
+          {%- else -%}
+            <li>No products in <code>humc-gear</code>.</li>
+          {%- endfor -%}
+        </ul>
+        <p class="store-admin__hint">Create or hide the product in Shopify Admin. Tag <code>company-humc-gear</code>, set the HUMC product template, and add it to the humc-gear collection.</p>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ admin_url }}/products">Shopify products</a>
+          <a class="button button-secondary" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Edit catalog and calendar</a>
+        </p>
+      </section>
+
+      <section class="store-admin__card">
+        <h2>PRINT Status products</h2>
+        <ul class="store-admin__list">
+          {%- assign print_count = 0 -%}
+          {%- for product in catalog_all.products -%}
+            {%- assign pid = '|' | append: product.id | append: '|' -%}
+            {%- unless humc_ids contains pid -%}
+              {%- assign print_count = print_count | plus: 1 -%}
+              <li>
+                <a href="{{ product.url }}">{{ product.title | escape }}</a>
+                <span>{{ product.handle }} · {{ product.price | money }}</span>
+              </li>
+            {%- endunless -%}
+          {%- endfor -%}
+          {%- if print_count == 0 -%}
+            <li>
+              <a href="{{ print_home }}">PRINT Status home</a>
+              <span>No extra catalog products found besides HUMC.</span>
+            </li>
+          {%- endif -%}
+        </ul>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ print_home }}">View PRINT Status home</a>
+          <a class="button button-secondary" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2F">Edit PRINT Status home</a>
+        </p>
+      </section>
+
       <section class="store-admin__card">
         <h2>HUMC colors</h2>
         <p>Each product shows every mill color it already has. This list is a note for the shop — it does not hide mill colors on the storefront.</p>
@@ -89,86 +242,94 @@
       </section>
 
       <section class="store-admin__card">
-        <h2>HUMC products in the collection</h2>
-        <ul class="store-admin__list">
-          {%- for product in humc.products -%}
-            <li>
-              <a href="{{ product.url }}">{{ product.title | escape }}</a>
-              <span>{{ product.handle }} · {{ product.price | money }}</span>
-            </li>
-          {%- else -%}
-            <li>No products in <code>humc-gear</code>.</li>
-          {%- endfor -%}
-        </ul>
-        <p class="store-admin__hint">Create, hide, or delete the product in Shopify Admin. Tag <code>company-humc-gear</code>, set the HUMC product template, and add it to the humc-gear collection.</p>
-        <p>
-          <a class="button" href="https://admin.shopify.com/store/print-status-k68snhof/products">Shopify products</a>
-          <a class="button button-secondary" href="https://admin.shopify.com/store/print-status-k68snhof/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Edit HUMC catalog</a>
-        </p>
-      </section>
-
-      <section class="store-admin__card">
-        <h2>Payments, accounts, and orders</h2>
-        <p>Checkout and customer login are Shopify systems. This page does not take cards and does not list paid orders.</p>
-        <ul class="store-admin__list">
-          <li>
-            <a href="https://admin.shopify.com/store/print-status-k68snhof/settings/payments">Payments</a>
-            <span>Sandbox: activate Bogus Gateway (test). Live shop: Shopify Payments, then turn test mode off.</span>
-          </li>
-          <li>
-            <a href="https://admin.shopify.com/store/print-status-k68snhof/settings/customer_accounts">Customer accounts</a>
-            <span>Keep Customer accounts on for online store and checkout so people can register and see order history.</span>
-          </li>
-          <li>
-            <a href="https://admin.shopify.com/store/print-status-k68snhof/orders">Orders</a>
-            <span>Paid and test orders land here, not on this theme page.</span>
-          </li>
-          <li>
-            <a href="https://admin.shopify.com/store/print-status-k68snhof/customers">Customers</a>
-            <span>Accounts created at checkout or from Account on the storefront.</span>
-          </li>
-        </ul>
-      </section>
-
-      <section class="store-admin__card">
-        <h2>PRINT Status home</h2>
-        <p>Hero, service cards, and promise row are homepage sections. Open the theme editor on the home page to change copy and images. That does not touch HUMC.</p>
-        <p>
-          <a class="button" href="{{ print_home }}">View PRINT Status home</a>
-          <a class="button button-secondary" href="https://admin.shopify.com/store/print-status-k68snhof/themes/189047013667/editor?previewPath=%2F">Edit PRINT Status home</a>
+        <h2>Payments</h2>
+        <p>Checkout is Shopify Checkout. Sandbox uses Test Payment Gateway (card <code>1</code>). Live shop uses Shopify Payments, then turn test mode off. Do not add Stripe to the theme.</p>
+        <p class="store-admin__actions">
+          <a class="button" href="{{ admin_url }}/settings/payments">Payments</a>
         </p>
       </section>
     </div>
   </div>
+{%- endif -%}
 
-  <script>
-    (function () {
-      var root = document.querySelector('[data-store-admin]');
-      if (!root) return;
-      var gate = root.querySelector('[data-admin-gate]');
-      var body = root.querySelector('[data-admin-body]');
-      var needed = root.getAttribute('data-access') || '';
-      if (!needed || root.getAttribute('data-unlocked') === 'true') return;
+<script>
+  (function () {
+    function parseEvents(raw) {
+      return String(raw || '')
+        .split(/\r?\n/)
+        .map(function (line) {
+          line = line.replace(/^\uFEFF/, '').trim();
+          if (!line || line.charAt(0) === '#') return null;
+          var bits = line.split('|').map(function (bit) {
+            return bit.trim();
+          });
+          if (bits.length < 3 || !/^\d{4}-\d{2}-\d{2}$/.test(bits[0])) return null;
+          return {
+            date: bits[0],
+            kind: bits[1].toLowerCase(),
+            title: bits[2],
+            notes: bits[3] || '',
+          };
+        })
+        .filter(Boolean)
+        .sort(function (a, b) {
+          return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+        });
+    }
 
-      function unlock() {
-        if (gate) gate.hidden = true;
-        if (body) body.hidden = false;
-        try { sessionStorage.setItem('store-admin-ok', '1'); } catch (err) {}
-      }
-
+    function readJson(id, fallback) {
+      var el = document.getElementById(id);
+      if (!el) return fallback;
       try {
-        if (sessionStorage.getItem('store-admin-ok') === '1') {
-          unlock();
-          return;
-        }
-      } catch (err) {}
-
-      var params = new URLSearchParams(window.location.search);
-      if (params.get('key') === needed) {
-        unlock();
-        return;
+        return JSON.parse(el.textContent);
+      } catch (err) {
+        return fallback;
       }
+    }
 
+    var events = parseEvents(readJson('store-ops-events-raw', ''));
+    var meta = readJson('store-ops-meta', {});
+    var today = meta.today || '';
+
+    var announce = document.querySelector('[data-humc-announce]');
+    if (announce && events.length) {
+      var hospital = null;
+      for (var i = 0; i < events.length; i++) {
+        var ev = events[i];
+        if ((ev.kind === 'hospital' || ev.kind === 'pickup') && ev.date >= today) {
+          hospital = ev;
+          break;
+        }
+      }
+      if (hospital) {
+        announce.textContent =
+          hospital.date === today
+            ? hospital.title + ' TODAY'
+            : hospital.title + ' ' + hospital.date;
+      }
+    }
+
+    var root = document.querySelector('[data-store-admin]');
+    if (!root) return;
+
+    var gate = root.querySelector('[data-admin-gate]');
+    var body = root.querySelector('[data-admin-body]');
+    var needed = root.getAttribute('data-access') || '';
+
+    function unlock() {
+      if (gate) gate.hidden = true;
+      if (body) body.hidden = false;
+      try {
+        sessionStorage.setItem('store-admin-ok', '1');
+      } catch (err) {}
+    }
+
+    if (needed && root.getAttribute('data-unlocked') !== 'true') {
+      try {
+        if (sessionStorage.getItem('store-admin-ok') === '1') unlock();
+      } catch (err) {}
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('key') === needed) unlock();
       if (gate) {
         gate.addEventListener('submit', function (event) {
           event.preventDefault();
@@ -176,17 +337,143 @@
           if (input && input.value === needed) unlock();
         });
       }
-    })();
-  </script>
-{%- endif -%}
+    }
+
+    var upcoming = root.querySelector('[data-upcoming]');
+    if (upcoming) {
+      var soon = events.filter(function (ev) {
+        return ev.date >= today;
+      }).slice(0, 8);
+      if (soon.length) {
+        upcoming.innerHTML = soon
+          .map(function (ev) {
+            var when = ev.date === today ? 'Today' : ev.date;
+            var extra = ev.notes ? ' — ' + ev.notes : '';
+            return (
+              '<li><strong>' +
+              when +
+              '</strong> · ' +
+              ev.kind +
+              ' · ' +
+              ev.title +
+              extra +
+              '</li>'
+            );
+          })
+          .join('');
+      }
+    }
+
+    var search = root.querySelector('[data-order-search]');
+    if (search) {
+      search.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var input = search.querySelector('input[name="q"]');
+        var q = input && input.value ? input.value.replace(/^#/, '').trim() : '';
+        var base = root.getAttribute('data-admin-orders') || meta.adminOrders || '';
+        if (!base) return;
+        window.location.href = q ? base + '?query=' + encodeURIComponent(q) : base;
+      });
+    }
+
+    var calRoot = root.querySelector('[data-calendar]');
+    var calTitle = root.querySelector('[data-cal-title]');
+    if (calRoot) {
+      var view = today ? new Date(today + 'T12:00:00') : new Date();
+      var month = view.getMonth();
+      var year = view.getFullYear();
+      var byDate = {};
+      events.forEach(function (ev) {
+        if (!byDate[ev.date]) byDate[ev.date] = [];
+        byDate[ev.date].push(ev);
+      });
+
+      function pad(n) {
+        return n < 10 ? '0' + n : String(n);
+      }
+
+      function draw() {
+        var first = new Date(year, month, 1);
+        var start = first.getDay();
+        var days = new Date(year, month + 1, 0).getDate();
+        var labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        if (calTitle) {
+          calTitle.textContent = first.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        }
+        var html = '<table><thead><tr>' + labels.map(function (d) {
+          return '<th>' + d + '</th>';
+        }).join('') + '</tr></thead><tbody>';
+        var cell = 0;
+        html += '<tr>';
+        for (var i = 0; i < start; i++) {
+          html += '<td></td>';
+          cell++;
+        }
+        for (var day = 1; day <= days; day++) {
+          var iso = year + '-' + pad(month + 1) + '-' + pad(day);
+          var dayEvents = byDate[iso] || [];
+          var cls = [];
+          if (iso === today) cls.push('is-today');
+          if (dayEvents.length) cls.push('has-event');
+          html +=
+            '<td class="' +
+            cls.join(' ') +
+            '"><span class="store-admin__cal-day">' +
+            day +
+            '</span>' +
+            dayEvents
+              .map(function (ev) {
+                return '<span class="store-admin__cal-ev" data-kind="' + ev.kind + '">' + ev.title + '</span>';
+              })
+              .join('') +
+            '</td>';
+          cell++;
+          if (cell % 7 === 0 && day !== days) html += '</tr><tr>';
+        }
+        while (cell % 7 !== 0) {
+          html += '<td></td>';
+          cell++;
+        }
+        html += '</tr></tbody></table>';
+        calRoot.innerHTML = html;
+      }
+
+      draw();
+      var prev = root.querySelector('[data-cal-prev]');
+      var next = root.querySelector('[data-cal-next]');
+      if (prev) {
+        prev.addEventListener('click', function () {
+          month -= 1;
+          if (month < 0) {
+            month = 11;
+            year -= 1;
+          }
+          draw();
+        });
+      }
+      if (next) {
+        next.addEventListener('click', function () {
+          month += 1;
+          if (month > 11) {
+            month = 0;
+            year += 1;
+          }
+          draw();
+        });
+      }
+    }
+  })();
+</script>
 
 {% stylesheet %}
   .store-admin {
     padding-block: 2rem;
-    max-width: 46rem;
+    max-width: 52rem;
+    color: #121212;
   }
   .store-admin h1,
-  .store-admin h2 {
+  .store-admin h2,
+  .store-admin h3 {
     margin: 0 0 0.6rem;
   }
   .store-admin__lead,
@@ -195,8 +482,15 @@
     line-height: 1.45;
   }
   .store-admin__hint {
-    opacity: 0.7;
+    opacity: 0.75;
     font-size: 0.875rem;
+  }
+  .store-admin__warn {
+    margin: 0 0 1.2rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #580202;
+    color: #380000;
+    line-height: 1.4;
   }
   .store-admin__card {
     margin-block: 1.5rem;
@@ -213,11 +507,13 @@
     border: 1px solid #d6d6d6;
     font-size: 0.8rem;
   }
-  .store-admin__list {
+  .store-admin__list,
+  .store-admin__upcoming {
     margin: 0 0 1rem;
     padding-left: 1.1rem;
   }
-  .store-admin__list li {
+  .store-admin__list li,
+  .store-admin__upcoming li {
     margin: 0.4rem 0;
   }
   .store-admin__list span {
@@ -238,8 +534,99 @@
   .store-admin__gate[hidden] {
     display: none;
   }
-  .store-admin .button-secondary {
-    margin-inline-start: 0.4rem;
+  .store-admin__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+  }
+  .store-admin__actions .button-secondary {
+    margin-inline-start: 0;
+  }
+  .store-admin__lookup {
+    display: grid;
+    gap: 0.4rem;
+    max-width: 28rem;
+  }
+  .store-admin__lookup-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .store-admin__lookup input {
+    flex: 1 1 12rem;
+    min-height: 2.4rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #c8c8c8;
+    background: #fff;
+    color: #121212;
+  }
+  .store-admin__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 0.8rem;
+    font-size: 0.9rem;
+  }
+  .store-admin__table th,
+  .store-admin__table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.45rem 0.5rem 0.45rem 0;
+    border-bottom: 1px solid #ececec;
+  }
+  .store-admin__cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+  .store-admin__cal-title {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .store-admin__cal table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .store-admin__cal th,
+  .store-admin__cal td {
+    border: 1px solid #e6e6e6;
+    vertical-align: top;
+    min-height: 4.2rem;
+    padding: 0.3rem;
+    font-size: 0.72rem;
+  }
+  .store-admin__cal th {
+    text-align: center;
+    font-weight: 600;
+    background: #f7f7f5;
+  }
+  .store-admin__cal td.is-today {
+    outline: 2px solid #095aa6;
+    outline-offset: -2px;
+  }
+  .store-admin__cal-day {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+  .store-admin__cal-ev {
+    display: block;
+    margin-top: 0.15rem;
+    color: #380000;
+    line-height: 1.25;
+  }
+  .store-admin__cal-ev[data-kind='print'],
+  .store-admin__cal-ev[data-kind='rush'] {
+    color: #095aa6;
+  }
+  @media (max-width: 699px) {
+    .store-admin__cal th:nth-child(n + 2),
+    .store-admin__cal td:nth-child(n + 2) {
+      font-size: 0.65rem;
+    }
   }
 {% endstylesheet %}
 
@@ -252,6 +639,18 @@
       "id": "access_code",
       "label": "Admin access code",
       "info": "Required to see the admin page on the storefront. Leave blank only while editing in the theme editor."
+    },
+    {
+      "type": "textarea",
+      "id": "calendar",
+      "label": "Shop calendar",
+      "info": "One event per line: YYYY-MM-DD | kind | title | notes. Kinds: hospital, pickup, print, rush, other."
+    },
+    {
+      "type": "textarea",
+      "id": "standing_notes",
+      "label": "Standing shop notes",
+      "default": "PRINT Status: gang sheets submitted by 3PM go on that day's press.\nHUMC Gear: put hospital and pickup days on the shop calendar.\nCheckout email is the customer account. Buyers open Account on either storefront for order history."
     },
     {
       "type": "textarea",

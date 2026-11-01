@@ -88,6 +88,7 @@
     <legend>Color</legend>
     <p class="humc-customize__color-name" data-color-name></p>
     <div class="humc-customize__swatches" data-swatches role="list"></div>
+    <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
     <input type="hidden" name="properties[Color]" form="{{ form_id }}" value="">
   </fieldset>
 
@@ -605,6 +606,10 @@
   })();
 </script>
 {%- endunless -%}
+
+{%- if title_l contains 'personalization' -%}
+  <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
+{%- endif -%}
 
 {% stylesheet %}
   .humc-customize {

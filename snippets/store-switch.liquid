@@ -11,6 +11,9 @@
   endif
 -%}
 
+{%- if target == 'humc' -%}
+  {% render 'store-attribution', store: 'print' %}
+{%- endif -%}
 {%- if target == 'print' -%}
   <a
     class="store-switch"
