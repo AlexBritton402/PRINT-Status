@@ -12,7 +12,7 @@
   assign handle_tail = product_resource.handle | split: '-' | last
 
   assign needs_size = true
-  if title_l contains 'hat' or title_l contains 'bag' or title_l contains 'tumbler' or title_l contains 'tote' or title_l contains 'cap'
+  if title_l contains 'hat' or title_l contains 'bag' or title_l contains 'tumbler' or title_l contains 'tote' or title_l contains 'cap' or title_l contains 'duffle' or title_l contains 'duffel'
     assign needs_size = false
   endif
 
@@ -23,6 +23,8 @@
     assign default_logo = 'Standard HUMC'
   elsif title contains 'LA County'
     assign default_logo = 'LA County'
+  elsif title_l contains '1/4 zip' or title_l contains 'trucker' or title_l contains 'otto' or title_l contains 'canvas' or title_l contains 'jumbo'
+    assign default_logo = 'Standard HUMC'
   endif
 
   assign default_front = true
@@ -282,9 +284,11 @@
     }
 
     function viewNames() {
-      var names = ['Front'];
-      if (preview && preview.views && preview.views.Back) names.push('Back');
-      return names;
+      var order = ['Front', 'Back', 'Left', 'Right'];
+      if (!preview || !preview.views) return ['Front'];
+      return order.filter(function (name) {
+        return name === 'Front' || preview.views[name];
+      });
     }
 
     function lookupPreview(sourceId, title) {
@@ -394,9 +398,11 @@
       var gallery =
         document.querySelector('media-gallery') ||
         document.querySelector('.product-media-container') ||
-        document.querySelector('.product-media');
-      if (!gallery) return;
-      var host = gallery.parentNode;
+        document.querySelector('.product-media') ||
+        document.querySelector('.product-information__media');
+      var host = (gallery && gallery.parentNode) ||
+        document.querySelector('.product-details') ||
+        (root.parentNode);
       if (!host) return;
       document.body.classList.add('has-humc-demo');
       var demo = document.querySelector('[data-humc-demo]');
@@ -413,7 +419,8 @@
           '</div>' +
           '<p class="humc-demo__caption" data-humc-demo-caption></p>' +
           '<div class="humc-demo__views" data-humc-turn></div>';
-        host.insertBefore(demo, gallery);
+        if (gallery) host.insertBefore(demo, gallery);
+        else host.insertBefore(demo, host.firstChild);
       }
       renderViews();
     }
@@ -509,6 +516,9 @@
         var thumb = document.createElement('img');
         thumb.alt = name;
         thumb.src = photoUrl(currentColorId, name);
+        thumb.addEventListener('error', function () {
+          thumb.remove();
+        });
         var label = document.createElement('span');
         label.textContent = name;
         btn.appendChild(thumb);
@@ -670,7 +680,10 @@
       if (!box) return;
       (catalog.marks || []).forEach(function (mark) {
         if (!mark || !mark.name || !markApplies(mark)) return;
-        if (box.querySelector('[data-field="logo"][data-value="' + mark.name + '"]')) return;
+        var exists = Array.prototype.some.call(box.querySelectorAll('[data-field="logo"]'), function (el) {
+          return el.getAttribute('data-value') === mark.name;
+        });
+        if (exists) return;
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'humc-customize__logo';

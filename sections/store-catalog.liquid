@@ -26,6 +26,7 @@
   assign admin_url = 'https://admin.shopify.com/store/' | append: admin_handle
   assign today_iso = 'now' | date: '%Y-%m-%d'
   assign today_label = 'now' | date: '%A, %B %d, %Y'
+  assign editor_theme = theme.id
   assign humc_ids = '|'
   for product in humc.products
     assign humc_ids = humc_ids | append: product.id | append: '|'
@@ -210,7 +211,7 @@
         <p class="store-admin__hint">Create or hide the product in Shopify Admin. Tag <code>company-humc-gear</code>, set the HUMC product template, and add it to the humc-gear collection.</p>
         <p class="store-admin__actions">
           <a class="button" href="{{ admin_url }}/products">Shopify products</a>
-          <a class="button button-secondary" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Edit catalog and calendar</a>
+          <a class="button button-secondary" href="{{ admin_url }}/themes/{{ editor_theme }}/editor?previewPath=%2Fpages%2Fstore-admin">Edit catalog and calendar</a>
         </p>
       </section>
 
@@ -237,7 +238,7 @@
         </ul>
         <p class="store-admin__actions">
           <a class="button" href="{{ print_home }}">View PRINT Status home</a>
-          <a class="button button-secondary" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2F">Edit PRINT Status home</a>
+          <a class="button button-secondary" href="{{ admin_url }}/themes/{{ editor_theme }}/editor?previewPath=%2F">Edit PRINT Status home</a>
         </p>
       </section>
 
@@ -246,7 +247,7 @@
         <p>One mark or color here updates the live customizer. You do not need a new stock photo on every product. Existing Standard HUMC, Single-color HUMC, and LA County already swap the garment photo. A new logo is one PNG laid on the current color. A new color is a swatch on the products you list.</p>
         <p class="store-admin__hint">Theme Access cannot save an upload from this page. Add the file in Theme editor → HUMC catalog → Add block. Use <strong>HUMC logo</strong> or <strong>HUMC color</strong>. Leave product handles blank for every HUMC item, or list handles such as <code>1-4-zip-fleece-customizable</code>.</p>
         <p class="store-admin__actions">
-          <a class="button" href="{{ admin_url }}/themes/189047013667/editor?previewPath=%2Fpages%2Fstore-admin">Add logo or color</a>
+          <a class="button" href="{{ admin_url }}/themes/{{ editor_theme }}/editor?previewPath=%2Fpages%2Fstore-admin">Add logo or color</a>
         </p>
         <h3>Logos on the customizer</h3>
         <ul class="store-admin__list">
