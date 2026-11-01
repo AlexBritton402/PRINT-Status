@@ -5,7 +5,7 @@
 
 {%- liquid
   assign home = pages['humc-gear'].url | default: '/pages/humc-gear'
-  assign shop = collections['humc-gear'].url | default: '/collections/humc-gear'
+  assign catalog = collections['humc-gear'].url | default: '/collections/humc-gear'
 -%}
 
 {%- if part == 'header' -%}
@@ -25,7 +25,12 @@
     </div>
     <nav class="humc-frame__nav" aria-label="HUMC Gear">
       <a href="{{ home }}">Home</a>
-      <a href="{{ shop }}">Products</a>
+      <a href="{{ catalog }}">Products</a>
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}">
+          {%- if customer -%}Orders{%- else -%}Account{%- endif -%}
+        </a>
+      {%- endif -%}
     </nav>
   </header>
 {%- endif -%}
@@ -34,7 +39,10 @@
   <footer class="humc-frame__foot">
     <nav aria-label="HUMC Gear footer">
       <a href="{{ home }}">Home</a>
-      <a href="{{ shop }}">Products</a>
+      <a href="{{ catalog }}">Products</a>
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}">Account</a>
+      {%- endif -%}
     </nav>
   </footer>
 {%- endif -%}
