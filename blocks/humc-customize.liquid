@@ -399,9 +399,28 @@
       if (idInput) idInput.value = variant;
     }
 
-    function photoUrl(colorId, angle) {
-      if (!preview || !preview.id || !colorId) return '';
+    function plainFamilyId() {
+      var family = root.getAttribute('data-family') || '';
+      if (/1\/4 zip|zip fleece/i.test(family)) return '18991186';
+      return '';
+    }
+
+    function needsPlain(angle, mark) {
+      if (!plainFamilyId()) return false;
+      if (angle === 'Front' && !mark) return true;
+      if (angle === 'Right' && mark !== 'LA County') return true;
+      return false;
+    }
+
+    function photoUrl(colorId, angle, mark) {
+      if (!colorId) return '';
       var base = root.getAttribute('data-asset-base') || '';
+      if (needsPlain(angle, mark)) {
+        var plainId = plainFamilyId();
+        var plainSuffix = !angle || angle === 'Front' ? '-plain' : '-' + angle.toLowerCase() + '-plain';
+        return base + 'humc-m-' + plainId + '-' + colorId + plainSuffix + '.jpg';
+      }
+      if (!preview || !preview.id) return '';
       var suffix = !angle || angle === 'Front' ? '' : '-' + angle.toLowerCase();
       return base + 'humc-m-' + preview.id + '-' + colorId + suffix + '.jpg';
     }
@@ -413,28 +432,6 @@
         caption: document.querySelector('[data-humc-demo-caption]'),
         views: document.querySelector('[data-humc-turn]')
       };
-    }
-
-    function coverColor() {
-      var on = root.querySelector('[data-field="color"].is-on');
-      if (on) {
-        var hex = (getComputedStyle(on).getPropertyValue('--swatch') || '').trim();
-        if (hex) return hex;
-      }
-      return '#242729';
-    }
-
-    function applyCover(on) {
-      var stage = document.querySelector('[data-humc-stage]');
-      if (!stage) return;
-      var cover = stage.querySelector('[data-humc-logo-cover]');
-      if (!cover) {
-        cover = document.createElement('span');
-        cover.setAttribute('data-humc-logo-cover', '');
-        stage.appendChild(cover);
-      }
-      stage.style.setProperty('--humc-cover', coverColor());
-      cover.hidden = !on;
     }
 
     function applyOverlay(url) {
@@ -481,6 +478,21 @@
         applyOverlay(overlayUrl);
       };
       probe.onerror = function () {
+        if (url.indexOf('-plain') !== -1 && preview && preview.id) {
+          var suffix = !currentAngle || currentAngle === 'Front' ? '' : '-' + currentAngle.toLowerCase();
+          var fallback =
+            (root.getAttribute('data-asset-base') || '') +
+            'humc-m-' +
+            preview.id +
+            '-' +
+            currentColorId +
+            suffix +
+            '.jpg';
+          if (fallback !== url) {
+            setGallery(fallback);
+            return;
+          }
+        }
         if (currentAngle !== 'Front') {
           currentAngle = 'Front';
           paintPhoto();
@@ -499,18 +511,10 @@
     }
 
     function isBaked(mark, angle) {
-      if (!mark || angle !== 'Front' || !isStockMark(mark) || !preview) return false;
+      if (!mark) return false;
+      if (angle === 'Right' && mark === 'LA County' && apparelFamily()) return true;
+      if (angle !== 'Front' || !isStockMark(mark) || !preview) return false;
       return String(preview.id) === String(logoAttr(mark, 'data-source-id'));
-    }
-
-    function needsCover(mark, angle) {
-      if (angle === 'Front') {
-        if (!apparelFamily()) return false;
-        if (!mark || !isStockMark(mark)) return true;
-        return false;
-      }
-      if (angle === 'Right' && mark !== 'LA County' && apparelFamily()) return true;
-      return false;
     }
 
     function paintPhoto() {
@@ -521,10 +525,9 @@
       var title = root.getAttribute('data-product-title') || '';
       var entry = lookupPreview(sid, title);
       if (entry) preview = entry;
-      setGallery(photoUrl(currentColorId, currentAngle));
+      setGallery(photoUrl(currentColorId, currentAngle, mark));
       var baked = isBaked(mark, currentAngle);
       applyOverlay(mark && !baked ? logoAttr(mark, 'data-overlay') : '');
-      applyCover(needsCover(mark, currentAngle));
       var demo = demoEls();
       if (demo.caption) {
         demo.caption.textContent = [colorInput && colorInput.value, currentAngle, mark || 'No logo']
@@ -559,7 +562,6 @@
           (root.getAttribute('data-family') || '') +
           '">' +
           '<img data-humc-demo-photo alt="">' +
-          '<span data-humc-logo-cover hidden></span>' +
           '<img data-humc-logo-layer hidden alt="">' +
           '</div>' +
           '<p class="humc-demo__caption" data-humc-demo-caption></p>' +
@@ -669,7 +671,7 @@
       var names = viewNames();
       bar.innerHTML = '';
       names.forEach(function (name) {
-        var url = photoUrl(currentColorId, name);
+        var url = photoUrl(currentColorId, name, sideMarks[angleToPlace(name)] || '');
         if (!url) return;
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -1111,85 +1113,44 @@
     transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .humc-demo__stage [data-humc-logo-layer],
-  .humc-demo__stage [data-humc-logo-cover] {
+  .humc-demo__stage [data-humc-logo-layer] {
     position: absolute;
     pointer-events: none;
     object-fit: contain;
-  }
-
-  .humc-demo__stage [data-humc-logo-cover] {
-    z-index: 2;
-    border-radius: 50%;
-    background: var(--humc-cover, #242729);
-    box-shadow: 0 0 10px 8px var(--humc-cover, #242729);
-  }
-
-  .humc-demo__stage [data-humc-logo-layer] {
     z-index: 3;
     height: auto;
+    transform: translate(-50%, -50%);
   }
 
   .humc-demo__stage[data-angle='Front'] [data-humc-logo-layer] {
-    top: 24.5%;
-    left: 58.5%;
-    width: 8.5%;
-  }
-
-  .humc-demo__stage[data-angle='Front'] [data-humc-logo-cover] {
-    top: 21%;
-    left: 55%;
-    width: 16%;
-    height: 16%;
+    top: 28.5%;
+    left: 63%;
+    width: 8.2%;
   }
 
   .humc-demo__stage[data-angle='Back'] [data-humc-logo-layer] {
-    top: 28%;
-    left: 50%;
-    width: 9%;
-    transform: translateX(-50%);
-  }
-
-  .humc-demo__stage[data-angle='Back'] [data-humc-logo-cover] {
-    top: 26%;
+    top: 29.5%;
     left: 50%;
     width: 14%;
-    height: 14%;
-    transform: translateX(-50%);
   }
 
   .humc-demo__stage[data-angle='Left'] [data-humc-logo-layer] {
-    top: 31%;
-    left: 47%;
-    width: 8%;
-  }
-
-  .humc-demo__stage[data-angle='Left'] [data-humc-logo-cover] {
-    top: 29%;
-    left: 45%;
-    width: 12%;
-    height: 12%;
+    top: 34.5%;
+    left: 63.6%;
+    width: 11.7%;
   }
 
   .humc-demo__stage[data-angle='Right'] [data-humc-logo-layer] {
-    top: 29%;
-    left: 32.5%;
-    width: 8%;
-  }
-
-  .humc-demo__stage[data-angle='Right'] [data-humc-logo-cover] {
-    top: 25.5%;
-    left: 28.5%;
-    width: 16%;
-    height: 16%;
+    top: 34.5%;
+    left: 36.4%;
+    width: 11.7%;
   }
 
   .humc-demo__stage[data-family='trucker hat'] [data-humc-logo-layer],
   .humc-demo__stage[data-family='jumbo canvas bag'] [data-humc-logo-layer] {
-    top: 34%;
+    top: 38%;
     left: 50%;
     width: 28%;
-    transform: translateX(-50%);
   }
 
   .humc-demo__caption {
