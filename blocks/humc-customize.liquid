@@ -1,7 +1,7 @@
 {%- comment -%}
-  HUMC Gear purchase options. Color mockups are theme assets (humc-m-*.jpg).
-  Inputs attach to Horizon buy-buttons with the HTML form= attribute.
-  Line item properties land on the order.
+  HUMC Gear purchase options — company-store pattern (Chipply / old Softwear).
+  Logo chips swap real mockup photos. Print locations are order notes.
+  Color mockups are theme assets (humc-m-*.jpg). Inputs use form= for Horizon buy-buttons.
 {%- endcomment -%}
 
 {%- liquid
@@ -66,10 +66,6 @@
   endif
 
   assign humc_col = collections['humc-gear']
-  assign preview_q = ''
-  if theme.id == 189047013667
-    assign preview_q = '?preview_theme_id=189047013667'
-  endif
 -%}
 
 {%- unless title_l contains 'personalization' -%}
@@ -119,7 +115,7 @@
   {%- endif -%}
 
   <fieldset class="humc-customize__set" data-logo-set>
-    <legend>Set Image</legend>
+    <legend>Logo</legend>
     <div class="humc-customize__logos" data-logos>
       {%- assign mark_list = 'Standard HUMC,Single-color HUMC,LA County' | split: ',' -%}
       {%- for mark_raw in mark_list -%}
@@ -164,14 +160,6 @@
           {%- endfor -%}
         {%- endif -%}
         {%- assign logo_sid = pick_tail -%}
-        {%- assign mark_overlay = '' -%}
-        {%- if mark == 'Standard HUMC' -%}
-          {%- assign mark_overlay = 'humc-crest-standard.png' | asset_url -%}
-        {%- elsif mark == 'Single-color HUMC' -%}
-          {%- assign mark_overlay = 'humc-crest-single.png' | asset_url -%}
-        {%- elsif mark == 'LA County' -%}
-          {%- assign mark_overlay = 'humc-crest-la.png' | asset_url -%}
-        {%- endif -%}
         {%- if family_phrase == '1/4 zip fleece' -%}
           {%- if mark == 'Standard HUMC' -%}
             {%- assign logo_sid = '18991186' -%}
@@ -201,7 +189,6 @@
           data-value="{{ mark | escape }}"
           data-title="{{ pick_title | escape }}"
           data-source-id="{{ logo_sid | escape }}"
-          data-overlay="{{ mark_overlay | escape }}"
           data-variant="{{ pick_variant }}"
           data-has-photo="{% if pick_found %}true{% else %}false{% endif %}"
           aria-pressed="{% if mark == default_logo %}true{% else %}false{% endif %}"
@@ -216,32 +203,29 @@
         data-value="No logo"
         data-title="{{ title | escape }}"
         data-source-id="{{ handle_tail | escape }}"
+        data-plain="true"
         data-has-photo="false"
         aria-pressed="{% if default_logo == 'As shown' or default_logo == 'No logo' %}true{% else %}false{% endif %}"
       >
         No logo
       </button>
     </div>
-    <p class="humc-customize__hint">Pick a mark, then tap each side you want it on. No logo takes the mark off the side you are looking at.</p>
+    <p class="humc-customize__hint">Tap a logo to see that mockup. The photo changes to the real decorated garment.</p>
     <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
   </fieldset>
 
   <fieldset class="humc-customize__set">
-    <legend>Print on each side</legend>
+    <legend>Print locations</legend>
     <div class="humc-customize__chips" role="list">
-      <button type="button" class="humc-customize__chip{% if default_front %} is-on is-focus{% endif %}" data-place="Front" aria-pressed="{% if default_front %}true{% else %}false{% endif %}">Front<span data-side-mark>{% if default_front and default_logo != 'As shown' and default_logo != 'No logo' %}HUMC{% endif %}</span></button>
-      <button type="button" class="humc-customize__chip{% if default_back %} is-on{% endif %}" data-place="Back" aria-pressed="{% if default_back %}true{% else %}false{% endif %}">Back<span data-side-mark></span></button>
+      <button type="button" class="humc-customize__chip{% if default_front %} is-on{% endif %}" data-place="Front" aria-pressed="{% if default_front %}true{% else %}false{% endif %}">Front</button>
+      <button type="button" class="humc-customize__chip{% if default_back %} is-on{% endif %}" data-place="Back" aria-pressed="{% if default_back %}true{% else %}false{% endif %}">Back</button>
       {%- if needs_size -%}
-        <button type="button" class="humc-customize__chip{% if default_left %} is-on{% endif %}" data-place="Left sleeve" aria-pressed="{% if default_left %}true{% else %}false{% endif %}">Left sleeve<span data-side-mark></span></button>
-        <button type="button" class="humc-customize__chip{% if default_right %} is-on{% endif %}" data-place="Right sleeve" aria-pressed="{% if default_right %}true{% else %}false{% endif %}">Right sleeve<span data-side-mark></span></button>
+        <button type="button" class="humc-customize__chip{% if default_left %} is-on{% endif %}" data-place="Left sleeve" aria-pressed="{% if default_left %}true{% else %}false{% endif %}">Left sleeve</button>
+        <button type="button" class="humc-customize__chip{% if default_right %} is-on{% endif %}" data-place="Right sleeve" aria-pressed="{% if default_right %}true{% else %}false{% endif %}">Right sleeve</button>
       {%- endif -%}
     </div>
     <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="">
-    <input type="hidden" name="properties[Front]" form="{{ form_id }}" value="{% if default_front and default_logo != 'As shown' and default_logo != 'No logo' %}{{ default_logo | escape }}{% endif %}">
-    <input type="hidden" name="properties[Back]" form="{{ form_id }}" value="{% if default_back and default_logo != 'As shown' and default_logo != 'No logo' %}{{ default_logo | escape }}{% endif %}">
-    <input type="hidden" name="properties[Left sleeve]" form="{{ form_id }}" value="{% if default_left and default_logo != 'As shown' and default_logo != 'No logo' %}{{ default_logo | escape }}{% endif %}">
-    <input type="hidden" name="properties[Right sleeve]" form="{{ form_id }}" value="{% if default_right and default_logo != 'As shown' and default_logo != 'No logo' %}{{ default_logo | escape }}{% endif %}">
-    <p class="humc-customize__hint">Front, back, and both sleeves each keep their own mark. Tap a side to stamp the mark you picked.</p>
+    <p class="humc-customize__hint">Choose where to print. The photo turns to that side. This note goes on the order.</p>
   </fieldset>
 
   <p class="humc-customize__summary" data-summary></p>
@@ -268,21 +252,9 @@
     var previewMap = {};
     var currentAngle = 'Front';
     var currentColorId = '';
+    var usePlain = logoName === 'No logo' || logoName === 'As shown';
     var catalog = { marks: [], extraColors: [] };
-    var overlayUrl = '';
-    var ink = logoName === 'As shown' || logoName === 'No logo' ? 'No logo' : logoName;
-    var activePlace = 'Front';
-    var sideMarks = { Front: '', Back: '', 'Left sleeve': '', 'Right sleeve': '' };
-    var sideInputs = {
-      Front: root.querySelector('input[name="properties[Front]"]'),
-      Back: root.querySelector('input[name="properties[Back]"]'),
-      'Left sleeve': root.querySelector('input[name="properties[Left sleeve]"]'),
-      'Right sleeve': root.querySelector('input[name="properties[Right sleeve]"]')
-    };
-    root.querySelectorAll('[data-place].is-on').forEach(function (btn) {
-      var place = btn.getAttribute('data-place');
-      if (place && ink && ink !== 'No logo' && ink !== 'As shown') sideMarks[place] = ink;
-    });
+    var catalogOverlay = '';
 
     function readCatalog() {
       var el = document.getElementById('store-catalog-config');
@@ -310,50 +282,15 @@
     }
 
     function places() {
-      return ['Front', 'Back', 'Left sleeve', 'Right sleeve'].filter(function (place) {
-        return sideMarks[place] && root.querySelector('[data-place="' + place + '"]');
-      });
-    }
-
-    function shortMark(name) {
-      if (name === 'Standard HUMC' || name === 'Single-color HUMC') return 'HUMC';
-      if (name === 'LA County') return 'LA';
-      return name || '';
-    }
-
-    function logoAttr(name, attr) {
-      var found = '';
-      root.querySelectorAll('[data-field="logo"]').forEach(function (el) {
-        if (el.getAttribute('data-value') === name) found = el.getAttribute(attr) || '';
-      });
-      return found;
+      return Array.prototype.map
+        .call(root.querySelectorAll('[data-place].is-on'), function (btn) {
+          return btn.getAttribute('data-place');
+        })
+        .filter(Boolean);
     }
 
     function syncPlaces() {
-      root.querySelectorAll('[data-place]').forEach(function (btn) {
-        var place = btn.getAttribute('data-place');
-        var mark = sideMarks[place] || '';
-        btn.classList.toggle('is-on', Boolean(mark));
-        btn.classList.toggle('is-focus', place === activePlace);
-        btn.setAttribute('aria-pressed', mark ? 'true' : 'false');
-        var tag = btn.querySelector('[data-side-mark]');
-        if (!tag) {
-          tag = document.createElement('span');
-          tag.setAttribute('data-side-mark', '');
-          btn.appendChild(tag);
-        }
-        tag.textContent = shortMark(mark);
-      });
-      ['Front', 'Back', 'Left sleeve', 'Right sleeve'].forEach(function (place) {
-        if (sideInputs[place]) sideInputs[place].value = sideMarks[place] || '';
-      });
       if (placeInput) placeInput.value = places().join(', ');
-      if (logoInput) {
-        var bits = places().map(function (place) {
-          return place + ': ' + sideMarks[place];
-        });
-        logoInput.value = bits.join('; ') || 'No logo';
-      }
     }
 
     function viewNames() {
@@ -405,17 +342,10 @@
       return '';
     }
 
-    function needsPlain(angle, mark) {
-      if (!plainFamilyId()) return false;
-      if (angle === 'Front' && !mark) return true;
-      if (angle === 'Right' && mark !== 'LA County') return true;
-      return false;
-    }
-
-    function photoUrl(colorId, angle, mark) {
+    function photoUrl(colorId, angle) {
       if (!colorId) return '';
       var base = root.getAttribute('data-asset-base') || '';
-      if (needsPlain(angle, mark)) {
+      if (usePlain && plainFamilyId()) {
         var plainId = plainFamilyId();
         var plainSuffix = !angle || angle === 'Front' ? '-plain' : '-' + angle.toLowerCase() + '-plain';
         return base + 'humc-m-' + plainId + '-' + colorId + plainSuffix + '.jpg';
@@ -434,17 +364,15 @@
       };
     }
 
-    function applyOverlay(url) {
-      overlayUrl = url || '';
+    function applyCatalogOverlay(url) {
+      catalogOverlay = url || '';
       var stage = document.querySelector('[data-humc-stage]');
       if (!stage) return;
-      stage.setAttribute('data-angle', currentAngle);
       var layer = stage.querySelector('[data-humc-logo-layer]');
-      if (!overlayUrl) {
+      if (!catalogOverlay) {
         if (layer) {
           layer.hidden = true;
           layer.removeAttribute('src');
-          layer.style.display = 'none';
         }
         return;
       }
@@ -455,8 +383,7 @@
         stage.appendChild(layer);
       }
       layer.hidden = false;
-      layer.style.display = '';
-      if (layer.getAttribute('src') !== overlayUrl) layer.setAttribute('src', overlayUrl);
+      if (layer.getAttribute('src') !== catalogOverlay) layer.setAttribute('src', catalogOverlay);
     }
 
     function setGallery(url) {
@@ -475,7 +402,7 @@
           shopImg.removeAttribute('srcset');
           shopImg.removeAttribute('srcSet');
         });
-        applyOverlay(overlayUrl);
+        applyCatalogOverlay(catalogOverlay);
       };
       probe.onerror = function () {
         if (url.indexOf('-plain') !== -1 && preview && preview.id) {
@@ -502,35 +429,11 @@
       probe.src = url;
     }
 
-    function apparelFamily() {
-      return /zip|hoodie|crew|tee|fleece|hat|trucker|cap|bag/i.test(root.getAttribute('data-family') || '');
-    }
-
-    function isStockMark(mark) {
-      return mark === 'Standard HUMC' || mark === 'Single-color HUMC' || mark === 'LA County';
-    }
-
-    function isBaked(mark, angle) {
-      if (!mark) return false;
-      if (angle === 'Right' && mark === 'LA County' && apparelFamily()) return true;
-      if (angle !== 'Front' || !isStockMark(mark) || !preview) return false;
-      return String(preview.id) === String(logoAttr(mark, 'data-source-id'));
-    }
-
     function paintPhoto() {
-      var place = angleToPlace(currentAngle);
-      var mark = sideMarks[place] || '';
-      logoName = mark || 'No logo';
-      var sid = logoAttr(mark, 'data-source-id') || root.getAttribute('data-source-id') || '';
-      var title = root.getAttribute('data-product-title') || '';
-      var entry = lookupPreview(sid, title);
-      if (entry) preview = entry;
-      setGallery(photoUrl(currentColorId, currentAngle, mark));
-      var baked = isBaked(mark, currentAngle);
-      applyOverlay(mark && !baked ? logoAttr(mark, 'data-overlay') : '');
+      setGallery(photoUrl(currentColorId, currentAngle));
       var demo = demoEls();
       if (demo.caption) {
-        demo.caption.textContent = [colorInput && colorInput.value, currentAngle, mark || 'No logo']
+        demo.caption.textContent = [colorInput && colorInput.value, logoName, currentAngle]
           .filter(Boolean)
           .join(' · ');
       }
@@ -549,7 +452,7 @@
         document.querySelector('.product-information__media');
       var host = (gallery && gallery.parentNode) ||
         document.querySelector('.product-details') ||
-        (root.parentNode);
+        root.parentNode;
       if (!host) return;
       document.body.classList.add('has-humc-demo');
       var demo = document.querySelector('[data-humc-demo]');
@@ -624,45 +527,62 @@
       return 'Front';
     }
 
-    function angleToPlace(angle) {
-      if (angle === 'Back') return 'Back';
-      if (angle === 'Left') return 'Left sleeve';
-      if (angle === 'Right') return 'Right sleeve';
-      return 'Front';
-    }
-
     function selectView(angle) {
-      activePlace = angleToPlace(angle);
-      currentAngle = viewNames().indexOf(angle) === -1 ? 'Front' : angle;
-      syncPlaces();
+      var names = viewNames();
+      if (names.indexOf(angle) === -1) return;
+      currentAngle = angle;
       paintPhoto();
     }
 
-    function stampPlace(place, mark) {
-      sideMarks[place] = mark || '';
-      activePlace = place;
-      var angle = placeToAngle(place);
-      currentAngle = viewNames().indexOf(angle) !== -1 ? angle : 'Front';
+    function togglePlace(btn) {
+      var wasOn = btn.classList.contains('is-on');
+      if (wasOn && places().length <= 1) {
+        showError('Pick at least one print location.');
+        return;
+      }
+      btn.classList.toggle('is-on', !wasOn);
+      btn.setAttribute('aria-pressed', wasOn ? 'false' : 'true');
+      var place = btn.getAttribute('data-place') || 'Front';
+      if (!wasOn) {
+        var angle = placeToAngle(place);
+        if (viewNames().indexOf(angle) !== -1) selectView(angle);
+        else selectView('Front');
+      } else {
+        var rest = places();
+        selectView(placeToAngle(rest[rest.length - 1] || 'Front'));
+      }
       showError('');
-      syncPlaces();
-      paintPhoto();
       refresh();
     }
 
-    function selectInk(btn) {
+    function selectLogo(btn) {
       var name = btn.getAttribute('data-value') || '';
-      ink = name;
+      var title = btn.getAttribute('data-title') || root.getAttribute('data-product-title') || '';
+      var sourceId = btn.getAttribute('data-source-id') || '';
+      var overlay = btn.getAttribute('data-overlay') || '';
+      var hasPhoto = btn.getAttribute('data-has-photo') !== 'false';
+      var wantsPlain = btn.getAttribute('data-plain') === 'true' || name === 'No logo';
+
+      logoName = name;
+      usePlain = wantsPlain;
+      if (logoInput) logoInput.value = name;
       root.querySelectorAll('[data-field="logo"]').forEach(function (el) {
         var on = el === btn;
         el.classList.toggle('is-on', on);
         el.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
-      stampPlace(activePlace, name === 'No logo' ? '' : name);
-    }
 
-    function tapPlace(btn) {
-      var place = btn.getAttribute('data-place') || 'Front';
-      stampPlace(place, ink === 'No logo' ? '' : ink);
+      applyCatalogOverlay(overlay);
+      if (hasPhoto && !wantsPlain) setVariant(btn.getAttribute('data-variant'));
+
+      var entry = lookupPreview(sourceId, title);
+      if (entry) {
+        renderSwatches(entry, colorInput && colorInput.value);
+      } else {
+        paintPhoto();
+        refresh();
+      }
+      showError('');
     }
 
     function renderViews() {
@@ -671,7 +591,7 @@
       var names = viewNames();
       bar.innerHTML = '';
       names.forEach(function (name) {
-        var url = photoUrl(currentColorId, name, sideMarks[angleToPlace(name)] || '');
+        var url = photoUrl(currentColorId, name);
         if (!url) return;
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -680,6 +600,7 @@
         btn.setAttribute('data-field', 'view');
         btn.setAttribute('data-value', name);
         btn.setAttribute('aria-pressed', name === currentAngle ? 'true' : 'false');
+        if (name === currentAngle) btn.classList.add('is-on');
         var thumb = document.createElement('img');
         thumb.alt = name;
         thumb.addEventListener('load', function () {
@@ -750,54 +671,55 @@
       if (chosen) selectColor(chosen.name, chosen.id);
     }
 
-    document.addEventListener('click', function (event) {
-      var host = document.querySelector('[data-humc-customize]');
-      if (host && host !== root) {
-        root = host;
-        colorInput = root.querySelector('input[name="properties[Color]"]');
-        sizeInput = root.querySelector('input[name="properties[Size]"]');
-        logoInput = root.querySelector('input[name="properties[Logo]"]');
-        placeInput = root.querySelector('input[name="properties[Print locations]"]');
-        summary = root.querySelector('[data-summary]');
-        errorEl = root.querySelector('[data-error]');
-        swatchBox = root.querySelector('[data-swatches]');
-        colorNameEl = root.querySelector('[data-color-name]');
-        sideInputs.Front = root.querySelector('input[name="properties[Front]"]');
-        sideInputs.Back = root.querySelector('input[name="properties[Back]"]');
-        sideInputs['Left sleeve'] = root.querySelector('input[name="properties[Left sleeve]"]');
-        sideInputs['Right sleeve'] = root.querySelector('input[name="properties[Right sleeve]"]');
-      }
-      if (!root || !root.isConnected) return;
-      var t = event.target;
-      if (!t || !t.closest) return;
-      var colorBtn = t.closest('[data-field="color"]');
-      if (colorBtn && root.contains(colorBtn)) {
-        selectColor(colorBtn.getAttribute('data-value'), colorBtn.getAttribute('data-color-id'));
-        return;
-      }
-      var viewBtn = t.closest('[data-humc-turn] [data-field="view"]') || t.closest('[data-field="view"]');
-      if (viewBtn && (root.contains(viewBtn) || viewBtn.closest('[data-humc-turn]'))) {
-        selectView(viewBtn.getAttribute('data-value'));
-        return;
-      }
-      var sizeBtn = t.closest('[data-field="size"]');
-      if (sizeBtn && root.contains(sizeBtn)) {
-        if (sizeInput) sizeInput.value = sizeBtn.getAttribute('data-value') || '';
-        setPressed(root.querySelectorAll('[data-field="size"]'), sizeInput.value);
-        showError('');
-        refresh();
-        return;
-      }
-      var logoBtn = t.closest('[data-field="logo"]');
-      if (logoBtn && root.contains(logoBtn)) {
-        selectInk(logoBtn);
-        return;
-      }
-      var placeBtn = t.closest('[data-place]');
-      if (placeBtn && root.contains(placeBtn)) {
-        tapPlace(placeBtn);
-      }
-    }, true);
+    document.addEventListener(
+      'click',
+      function (event) {
+        var host = document.querySelector('[data-humc-customize]');
+        if (host && host !== root) {
+          root = host;
+          colorInput = root.querySelector('input[name="properties[Color]"]');
+          sizeInput = root.querySelector('input[name="properties[Size]"]');
+          logoInput = root.querySelector('input[name="properties[Logo]"]');
+          placeInput = root.querySelector('input[name="properties[Print locations]"]');
+          summary = root.querySelector('[data-summary]');
+          errorEl = root.querySelector('[data-error]');
+          swatchBox = root.querySelector('[data-swatches]');
+          colorNameEl = root.querySelector('[data-color-name]');
+        }
+        if (!root || !root.isConnected) return;
+        var t = event.target;
+        if (!t || !t.closest) return;
+
+        var colorBtn = t.closest('[data-field="color"]');
+        if (colorBtn && root.contains(colorBtn)) {
+          selectColor(colorBtn.getAttribute('data-value'), colorBtn.getAttribute('data-color-id'));
+          return;
+        }
+        var viewBtn = t.closest('[data-humc-turn] [data-field="view"]') || t.closest('[data-field="view"]');
+        if (viewBtn && (root.contains(viewBtn) || viewBtn.closest('[data-humc-turn]'))) {
+          selectView(viewBtn.getAttribute('data-value'));
+          return;
+        }
+        var sizeBtn = t.closest('[data-field="size"]');
+        if (sizeBtn && root.contains(sizeBtn)) {
+          if (sizeInput) sizeInput.value = sizeBtn.getAttribute('data-value') || '';
+          setPressed(root.querySelectorAll('[data-field="size"]'), sizeInput.value);
+          showError('');
+          refresh();
+          return;
+        }
+        var logoBtn = t.closest('[data-field="logo"]');
+        if (logoBtn && root.contains(logoBtn)) {
+          selectLogo(logoBtn);
+          return;
+        }
+        var placeBtn = t.closest('[data-place]');
+        if (placeBtn && root.contains(placeBtn)) {
+          togglePlace(placeBtn);
+        }
+      },
+      true
+    );
 
     function blockIfIncomplete(event) {
       var form = event.target;
@@ -818,7 +740,6 @@
         if (event.stopImmediatePropagation) event.stopImmediatePropagation();
         showError(msg);
         root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        return;
       }
     }
 
@@ -839,7 +760,6 @@
           if (event.stopImmediatePropagation) event.stopImmediatePropagation();
           showError(msg);
           root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          return;
         }
       },
       true
@@ -867,7 +787,7 @@
         btn.setAttribute('data-value', mark.name);
         btn.setAttribute('data-title', root.getAttribute('data-product-title') || '');
         btn.setAttribute('data-source-id', root.getAttribute('data-source-id') || '');
-        btn.setAttribute('data-has-photo', mark.image ? 'true' : 'false');
+        btn.setAttribute('data-has-photo', 'false');
         btn.setAttribute('data-overlay', mark.image || '');
         btn.setAttribute('aria-pressed', 'false');
         if (mark.image) {
@@ -883,17 +803,27 @@
 
     readCatalog();
     addCatalogMarks();
+    usePlain = logoName === 'No logo';
     syncPlaces();
     refresh();
 
     var mapUrl = root.getAttribute('data-preview-map');
     if (mapUrl) {
       fetch(mapUrl)
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          return res.json();
+        })
         .then(function (map) {
           var title = root.getAttribute('data-product-title') || '';
           var sid = root.getAttribute('data-source-id') || '';
           previewMap = map;
+          if (logoName && logoName !== 'As shown' && logoName !== 'No logo') {
+            var logoBtn = root.querySelector('[data-field="logo"][data-value="' + logoName + '"]');
+            if (logoBtn) {
+              selectLogo(logoBtn);
+              return;
+            }
+          }
           var entry = lookupPreview(sid, title);
           if (entry) {
             renderSwatches(entry);
@@ -999,10 +929,6 @@
 
   .humc-customize__chip {
     appearance: none;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.12rem;
     margin: 0;
     padding: 0.4rem 0.65rem;
     border: 1px solid #d6d6d6;
@@ -1014,23 +940,10 @@
     cursor: pointer;
   }
 
-  .humc-customize__chip [data-side-mark] {
-    min-height: 0.85em;
-    font-size: 0.65rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    opacity: 0.8;
-  }
-
   .humc-customize__chip.is-on {
     border-color: #121212;
     background: #121212;
     color: #fff;
-  }
-
-  .humc-customize__chip.is-focus {
-    outline: 2px solid #121212;
-    outline-offset: 2px;
   }
 
   .humc-customize__logos {
@@ -1108,42 +1021,19 @@
     height: 100%;
     object-fit: contain;
     pointer-events: none;
-    position: relative;
-    z-index: 0;
     transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .humc-demo__stage [data-humc-logo-layer] {
     position: absolute;
-    pointer-events: none;
-    object-fit: contain;
-    z-index: 3;
-    height: auto;
-    transform: translate(-50%, -50%);
-  }
-
-  .humc-demo__stage[data-angle='Front'] [data-humc-logo-layer] {
-    top: 28.5%;
+    top: 26%;
     left: 63%;
     width: 8.2%;
-  }
-
-  .humc-demo__stage[data-angle='Back'] [data-humc-logo-layer] {
-    top: 29.5%;
-    left: 50%;
-    width: 14%;
-  }
-
-  .humc-demo__stage[data-angle='Left'] [data-humc-logo-layer] {
-    top: 34.5%;
-    left: 63.6%;
-    width: 11.7%;
-  }
-
-  .humc-demo__stage[data-angle='Right'] [data-humc-logo-layer] {
-    top: 34.5%;
-    left: 36.4%;
-    width: 11.7%;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
   }
 
   .humc-demo__stage[data-family='trucker hat'] [data-humc-logo-layer],
