@@ -1,28 +1,29 @@
 /**
- * HUMC Gear design studio — Tapstitch-style Fabric.js editor.
- * Official store marks + custom lettering. Preset zones or free place.
+ * HUMC Gear design studio — place store marks on Front/Back/Left/Right.
+ * Standard snap zones or free place. Lettering deferred.
  * Writes compact design JSON onto line-item properties.
  */
 (function () {
   'use strict';
 
   var CANVAS_SIZE = 600;
-
+  var ANGLES = ['Front', 'Right', 'Back', 'Left'];
+  // Chest / sleeve spots calibrated from HUMC mockup photos (600×600).
   var ZONES = {
     Front: {
-      'Left chest': { left: 0.56, top: 0.26, width: 0.12, height: 0.12 },
-      'Center chest': { left: 0.35, top: 0.30, width: 0.30, height: 0.22 },
-      'Full front': { left: 0.28, top: 0.28, width: 0.44, height: 0.36 }
+      'Left chest': { left: 0.56, top: 0.20, width: 0.13, height: 0.13 },
+      'Center chest': { left: 0.38, top: 0.28, width: 0.24, height: 0.18 },
+      'Full front': { left: 0.30, top: 0.26, width: 0.40, height: 0.32 }
     },
     Back: {
-      'Upper back': { left: 0.35, top: 0.24, width: 0.30, height: 0.18 },
-      'Center back': { left: 0.32, top: 0.32, width: 0.36, height: 0.28 }
+      'Upper back': { left: 0.38, top: 0.22, width: 0.24, height: 0.16 },
+      'Center back': { left: 0.34, top: 0.34, width: 0.32, height: 0.24 }
     },
     Left: {
-      'Left sleeve': { left: 0.56, top: 0.30, width: 0.14, height: 0.14 }
+      'Left sleeve': { left: 0.54, top: 0.26, width: 0.16, height: 0.16 }
     },
     Right: {
-      'Right sleeve': { left: 0.30, top: 0.30, width: 0.14, height: 0.14 }
+      'Right sleeve': { left: 0.18, top: 0.26, width: 0.16, height: 0.16 }
     }
   };
 
@@ -49,15 +50,12 @@
     if (!root || root.dataset.humcDesignBound === '1') return;
     root.dataset.humcDesignBound = '1';
 
-    var formId = root.getAttribute('data-form-id');
     var assetBase = root.getAttribute('data-asset-base') || '';
     var familyId = root.getAttribute('data-family-id') || '18991186';
     var dialog = root.querySelector('[data-humc-design-dialog]');
     var canvasEl = root.querySelector('[data-humc-design-canvas]');
     var zoneBar = root.querySelector('[data-humc-design-zones]');
     var statusEl = root.querySelector('[data-humc-design-status]');
-    var textInput = root.querySelector('[data-humc-design-text]');
-    var textColor = root.querySelector('[data-humc-design-text-color]');
     var designInput = root.querySelector('input[name="properties[Design]"]');
     var logoInput = root.querySelector('input[name="properties[Logo]"]');
     var placeInput = root.querySelector('input[name="properties[Print locations]"]');
@@ -77,6 +75,7 @@
     var currentColorName = root.getAttribute('data-color-name') || '';
     var sideData = { Front: [], Back: [], Left: [], Right: [] };
     var zoneGuides = [];
+    var lastActive = null;
 
     function say(msg) {
       if (statusEl) statusEl.textContent = msg || '';
@@ -123,7 +122,6 @@
           else if (done) done(false);
           return;
         }
-        // crossOrigin required so Apply can export toDataURL without tainting
         window.fabric.Image.fromURL(
           url,
           function (img) {
@@ -176,8 +174,8 @@
           top: z.top * CANVAS_SIZE,
           width: z.width * CANVAS_SIZE,
           height: z.height * CANVAS_SIZE,
-          fill: 'rgba(9, 90, 166, 0.06)',
-          stroke: 'rgba(9, 90, 166, 0.55)',
+          fill: 'rgba(9, 90, 166, 0.05)',
+          stroke: 'rgba(9, 90, 166, 0.5)',
           strokeDashArray: [6, 4],
           strokeWidth: 1,
           selectable: false,
@@ -198,24 +196,31 @@
       });
     }
 
+    function rememberActive(obj) {
+      if (obj && !obj.humcGuide) lastActive = obj;
+    }
+
+    function activeLogo() {
+      var obj = (canvas && canvas.getActiveObject()) || lastActive;
+      if (!obj || obj.humcGuide || !canvas) return null;
+      if (designObjects().indexOf(obj) === -1) return null;
+      return obj;
+    }
+
     function saveSide() {
       sideData[currentAngle] = designObjects().map(function (obj) {
-        var base = {
-          type: obj.humcKind || (obj.type === 'i-text' || obj.type === 'textbox' ? 'text' : 'logo'),
+        return {
+          type: 'logo',
           name: obj.humcName || '',
-          text: obj.text || '',
-          fill: obj.fill || '',
           left: obj.left || 0,
           top: obj.top || 0,
           scaleX: obj.scaleX || 1,
           scaleY: obj.scaleY || 1,
           angle: obj.angle || 0,
-          fontSize: obj.fontSize || 28,
-          originX: obj.originX || 'left',
-          originY: obj.originY || 'top'
+          originX: obj.originX || 'center',
+          originY: obj.originY || 'center',
+          src: obj.humcSrc || marks[obj.humcName] || ''
         };
-        if (base.type === 'logo') base.src = obj.humcSrc || marks[obj.humcName] || '';
-        return base;
       });
     }
 
@@ -224,6 +229,7 @@
         canvas.remove(obj);
       });
       clearGuides();
+      lastActive = null;
       var items = sideData[angle] || [];
       var pending = items.length;
       if (!pending) {
@@ -232,66 +238,41 @@
         return;
       }
       items.forEach(function (item) {
-        if (item.type === 'text') {
-          var t = new window.fabric.IText(item.text || 'Text', {
-            left: item.left,
-            top: item.top,
-            scaleX: item.scaleX || 1,
-            scaleY: item.scaleY || 1,
-            angle: item.angle || 0,
-            fill: item.fill || '#ffffff',
-            fontSize: item.fontSize || 28,
-            fontFamily: 'Montserrat, Karla, sans-serif',
-            originX: item.originX || 'left',
-            originY: item.originY || 'top',
-            humcKind: 'text',
-            humcName: 'Lettering'
-          });
-          canvas.add(t);
-          pending -= 1;
-          if (!pending) {
-            drawGuides();
-            canvas.requestRenderAll();
-          }
-        } else {
-          window.fabric.Image.fromURL(
-            item.src || marks[item.name],
-            function (img) {
-              if (!img) {
-                pending -= 1;
-                if (!pending) {
-                  drawGuides();
-                  canvas.requestRenderAll();
-                }
-                return;
-              }
-              img.set({
-                left: item.left,
-                top: item.top,
-                scaleX: item.scaleX || 1,
-                scaleY: item.scaleY || 1,
-                angle: item.angle || 0,
-                originX: item.originX || 'left',
-                originY: item.originY || 'top',
-                humcKind: 'logo',
-                humcName: item.name,
-                humcSrc: item.src || marks[item.name]
-              });
-              canvas.add(img);
+        window.fabric.Image.fromURL(
+          item.src || marks[item.name],
+          function (img) {
+            if (!img) {
               pending -= 1;
               if (!pending) {
                 drawGuides();
                 canvas.requestRenderAll();
               }
-            },
-            { crossOrigin: 'anonymous' }
-          );
-        }
+              return;
+            }
+            decorateLogo(img, item.name, item.src || marks[item.name]);
+            img.set({
+              left: item.left,
+              top: item.top,
+              scaleX: item.scaleX || 1,
+              scaleY: item.scaleY || 1,
+              angle: item.angle || 0,
+              originX: item.originX || 'center',
+              originY: item.originY || 'center'
+            });
+            canvas.add(img);
+            pending -= 1;
+            if (!pending) {
+              drawGuides();
+              canvas.requestRenderAll();
+            }
+          },
+          { crossOrigin: 'anonymous' }
+        );
       });
     }
 
     function setAngle(angle) {
-      if (!canvas) return;
+      if (!canvas || !angle) return;
       saveSide();
       currentAngle = angle;
       root.querySelectorAll('[data-humc-design-view]').forEach(function (btn) {
@@ -302,8 +283,15 @@
       renderZoneChips();
       loadBackground(angle, function () {
         restoreSide(angle);
-        say(angle + ' view. Drag to place. Use a standard spot or move freely.');
+        say(angle + ' view — drag to place, or snap to a standard spot.');
       });
+    }
+
+    function turn(delta) {
+      var i = ANGLES.indexOf(currentAngle);
+      if (i < 0) i = 0;
+      var next = ANGLES[(i + delta + ANGLES.length) % ANGLES.length];
+      setAngle(next);
     }
 
     function renderZoneChips() {
@@ -326,19 +314,35 @@
       free.className = 'humc-design__chip';
       free.textContent = 'Free place';
       free.addEventListener('click', function () {
-        say('Free place: drag and resize anywhere on this side.');
+        say('Free place: drag and resize on this side. Keep logos small for a clean print.');
       });
       zoneBar.appendChild(free);
+    }
+
+    function clampLogoScale(obj) {
+      if (!obj) return;
+      var maxEdge = 0.18 * CANVAS_SIZE;
+      var w = Math.max(obj.width || 1, 1) * Math.abs(obj.scaleX || 1);
+      var h = Math.max(obj.height || 1, 1) * Math.abs(obj.scaleY || 1);
+      var edge = Math.max(w, h);
+      if (edge > maxEdge) {
+        var f = maxEdge / edge;
+        obj.set({
+          scaleX: (obj.scaleX || 1) * f,
+          scaleY: (obj.scaleY || 1) * f
+        });
+      }
     }
 
     function snapToZone(name) {
       var z = (ZONES[currentAngle] || {})[name];
       if (!z || !canvas) return;
-      var obj = canvas.getActiveObject();
-      if (!obj || obj.humcGuide) {
-        say('Select a logo or text first, then tap a standard spot.');
+      var obj = activeLogo();
+      if (!obj) {
+        say('Select a logo first, then tap a standard spot.');
         return;
       }
+      canvas.setActiveObject(obj);
       var boxW = z.width * CANVAS_SIZE;
       var boxH = z.height * CANVAS_SIZE;
       var scale = Math.min(boxW / Math.max(obj.width || 1, 1), boxH / Math.max(obj.height || 1, 1));
@@ -351,9 +355,23 @@
         scaleY: scale,
         angle: 0
       });
+      clampLogoScale(obj);
       obj.setCoords();
       canvas.requestRenderAll();
       say('Snapped to ' + name + '.');
+    }
+
+    function decorateLogo(img, name, src) {
+      img.set({
+        originX: 'center',
+        originY: 'center',
+        humcKind: 'logo',
+        humcName: name,
+        humcSrc: src,
+        lockUniScaling: true,
+        centeredScaling: true,
+        objectCaching: false
+      });
     }
 
     function addMark(name) {
@@ -366,20 +384,19 @@
         src,
         function (img) {
           if (!img) return;
-          var target = 0.1 * CANVAS_SIZE;
+          // Default ~ left-chest print size; stay sharp (no giant upscales).
+          var target = 0.11 * CANVAS_SIZE;
           var scale = target / Math.max(img.width || 1, img.height || 1);
+          decorateLogo(img, name, src);
           img.set({
             left: CANVAS_SIZE * 0.62,
-            top: CANVAS_SIZE * 0.30,
-            originX: 'center',
-            originY: 'center',
+            top: CANVAS_SIZE * 0.26,
             scaleX: scale,
-            scaleY: scale,
-            humcKind: 'logo',
-            humcName: name,
-            humcSrc: src
+            scaleY: scale
           });
+          clampLogoScale(img);
           canvas.add(img).setActiveObject(img);
+          rememberActive(img);
           canvas.requestRenderAll();
           say(name + ' added. Snap to a standard spot or drag freely.');
         },
@@ -387,65 +404,85 @@
       );
     }
 
-    function addLettering() {
-      if (!canvas) return;
-      var val = ((textInput && textInput.value) || '').trim();
-      if (!val) {
-        say('Type the lettering first.');
+    function removeSelected() {
+      var obj = activeLogo();
+      if (!obj) {
+        say('Select a logo to remove.');
         return;
       }
-      var fill = (textColor && textColor.value) || '#ffffff';
-      var t = new window.fabric.IText(val, {
-        left: CANVAS_SIZE / 2,
-        top: CANVAS_SIZE * 0.34,
-        originX: 'center',
-        originY: 'center',
-        fill: fill,
-        fontSize: 32,
-        fontFamily: 'Montserrat, Karla, sans-serif',
-        fontWeight: '600',
-        humcKind: 'text',
-        humcName: 'Lettering'
-      });
-      canvas.add(t).setActiveObject(t);
+      canvas.remove(obj);
+      if (lastActive === obj) lastActive = null;
+      canvas.discardActiveObject();
       canvas.requestRenderAll();
-      if (textInput) textInput.value = '';
-      say('Lettering added. Drag to place or snap to a zone.');
+      say('Logo removed.');
+    }
+
+    function clearSide() {
+      designObjects().forEach(function (obj) {
+        canvas.remove(obj);
+      });
+      lastActive = null;
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+      say('This side cleared.');
     }
 
     function compactDesign() {
       saveSide();
       var out = { v: 1, color: currentColorName, colorId: currentColorId, sides: {} };
-      ['Front', 'Back', 'Left', 'Right'].forEach(function (angle) {
+      ANGLES.forEach(function (angle) {
         var items = sideData[angle] || [];
         if (!items.length) return;
         out.sides[angle] = items.map(function (item) {
           return {
-            type: item.type,
+            type: 'logo',
             name: item.name,
-            text: item.text,
-            fill: item.fill,
             left: Math.round(item.left),
             top: Math.round(item.top),
             scaleX: Math.round((item.scaleX || 1) * 1000) / 1000,
             scaleY: Math.round((item.scaleY || 1) * 1000) / 1000,
-            angle: Math.round(item.angle || 0),
-            fontSize: item.fontSize || undefined
+            angle: Math.round(item.angle || 0)
           };
         });
       });
       return out;
     }
 
+    function renderPreviewForAngle(angle, done) {
+      if (!canvas) {
+        if (done) done('');
+        return;
+      }
+      var prev = currentAngle;
+      saveSide();
+      currentAngle = angle;
+      loadBackground(angle, function () {
+        restoreSide(angle);
+        window.setTimeout(function () {
+          clearGuides();
+          var dataUrl = '';
+          try {
+            dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1.5 });
+          } catch (err) {
+            dataUrl = '';
+          }
+          drawGuides();
+          currentAngle = prev;
+          loadBackground(prev, function () {
+            restoreSide(prev);
+            if (done) done(dataUrl);
+          });
+        }, 120);
+      });
+    }
+
     function applyToForm() {
       var design = compactDesign();
       var sides = Object.keys(design.sides);
       var logos = [];
-      var letters = [];
       sides.forEach(function (angle) {
         (design.sides[angle] || []).forEach(function (item) {
-          if (item.type === 'logo' && item.name && logos.indexOf(item.name) === -1) logos.push(item.name);
-          if (item.type === 'text' && item.text) letters.push(item.text);
+          if (item.name && logos.indexOf(item.name) === -1) logos.push(item.name);
         });
       });
 
@@ -458,20 +495,18 @@
           })
           .join(', ');
       }
-      if (letterInput) letterInput.value = letters.join(' · ');
+      if (letterInput) letterInput.value = '';
 
       var bits = [];
       if (currentColorName) bits.push(currentColorName);
       if (logoInput && logoInput.value) bits.push(logoInput.value);
-      if (letterInput && letterInput.value) bits.push('“' + letterInput.value + '”');
       if (placeInput && placeInput.value) bits.push(placeInput.value);
       if (summary) summary.textContent = bits.join(' · ');
 
-      // Live product preview from current canvas (without guides)
       clearGuides();
       var dataUrl = '';
       try {
-        dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1 });
+        dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1.5 });
       } catch (err) {
         dataUrl = '';
       }
@@ -488,8 +523,59 @@
       if (caption) {
         caption.textContent = bits.concat([currentAngle]).filter(Boolean).join(' · ');
       }
+      buildProductTurn(design, bits);
       showError('');
       say('Design saved on this product.');
+    }
+
+    function buildProductTurn(design, bits) {
+      var host = document.querySelector('[data-humc-demo]') || document.querySelector('[data-humc-stage]');
+      if (!host) return;
+      var bar = document.querySelector('[data-humc-view-turn]');
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'humc-demo__turn';
+        bar.setAttribute('data-humc-view-turn', '');
+        var stage = document.querySelector('[data-humc-stage]') || host;
+        stage.parentNode.insertBefore(bar, stage.nextSibling);
+      }
+      bar.innerHTML = '';
+      var sides = Object.keys((design && design.sides) || {});
+      var list = sides.length ? sides : ['Front'];
+      list.forEach(function (angle) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'humc-customize__chip' + (angle === currentAngle ? ' is-on' : '');
+        btn.textContent = angle;
+        btn.addEventListener('click', function () {
+          bar.querySelectorAll('button').forEach(function (b) {
+            b.classList.toggle('is-on', b === btn);
+          });
+          // Quick stock/plain preview without reopening studio when possible
+          var url = plainUrl(angle) || stockUrl(angle);
+          if (url) {
+            var photo = document.querySelector('[data-humc-demo-photo]');
+            if (photo) photo.setAttribute('src', url);
+            document.querySelectorAll('.product-media__image').forEach(function (shopImg) {
+              shopImg.setAttribute('src', url);
+              shopImg.removeAttribute('srcset');
+            });
+          }
+          if (!canvas) return;
+          renderPreviewForAngle(angle, function (dataUrl) {
+            if (!dataUrl) return;
+            var photo = document.querySelector('[data-humc-demo-photo]');
+            if (photo) photo.setAttribute('src', dataUrl);
+            document.querySelectorAll('.product-media__image').forEach(function (shopImg) {
+              shopImg.setAttribute('src', dataUrl);
+              shopImg.removeAttribute('srcset');
+            });
+            var caption = document.querySelector('[data-humc-demo-caption]');
+            if (caption) caption.textContent = (bits || []).concat([angle]).filter(Boolean).join(' · ');
+          });
+        });
+        bar.appendChild(btn);
+      });
     }
 
     function fitCanvasDisplay() {
@@ -521,7 +607,22 @@
             selection: true,
             width: CANVAS_SIZE,
             height: CANVAS_SIZE,
-            backgroundColor: '#e8e8e8'
+            backgroundColor: '#e8e8e8',
+            enableRetinaScaling: true,
+            uniScaleKey: null
+          });
+          canvas.on('selection:created', function (e) {
+            rememberActive(e && e.selected && e.selected[0]);
+          });
+          canvas.on('selection:updated', function (e) {
+            rememberActive(e && e.selected && e.selected[0]);
+          });
+          canvas.on('object:scaling', function (e) {
+            clampLogoScale(e && e.target);
+          });
+          canvas.on('object:modified', function (e) {
+            clampLogoScale(e && e.target);
+            canvas.requestRenderAll();
           });
           fitCanvasDisplay();
           setAngle(currentAngle);
@@ -553,7 +654,6 @@
       }
     }
 
-    // Controls
     root.querySelectorAll('[data-humc-design-open]').forEach(function (btn) {
       btn.addEventListener('click', function (event) {
         event.preventDefault();
@@ -571,13 +671,17 @@
         setAngle(btn.getAttribute('data-humc-design-view'));
       });
     });
+    root.querySelectorAll('[data-humc-design-turn]').forEach(function (btn) {
+      btn.addEventListener('click', function (event) {
+        event.preventDefault();
+        turn(Number(btn.getAttribute('data-humc-design-turn')) || 1);
+      });
+    });
     root.querySelectorAll('[data-humc-design-mark]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         addMark(btn.getAttribute('data-humc-design-mark'));
       });
     });
-    var addTextBtn = root.querySelector('[data-humc-design-add-text]');
-    if (addTextBtn) addTextBtn.addEventListener('click', addLettering);
     var applyBtn = root.querySelector('[data-humc-design-apply]');
     if (applyBtn) {
       applyBtn.addEventListener('click', function () {
@@ -587,26 +691,41 @@
     }
     var delBtn = root.querySelector('[data-humc-design-delete]');
     if (delBtn) {
-      delBtn.addEventListener('click', function () {
-        var obj = canvas && canvas.getActiveObject();
-        if (!obj || obj.humcGuide) {
-          say('Select a logo or text to remove.');
-          return;
-        }
-        canvas.remove(obj);
-        canvas.requestRenderAll();
+      // Keep canvas selection when pressing the button (mousedown would clear it).
+      delBtn.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+      });
+      delBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        removeSelected();
       });
     }
     var clearBtn = root.querySelector('[data-humc-design-clear]');
     if (clearBtn) {
-      clearBtn.addEventListener('click', function () {
-        designObjects().forEach(function (obj) {
-          canvas.remove(obj);
-        });
-        canvas.requestRenderAll();
-        say('This side cleared.');
+      clearBtn.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+      });
+      clearBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        clearSide();
       });
     }
+
+    document.addEventListener('keydown', function (event) {
+      if (!dialog || !(dialog.open || dialog.hasAttribute('open'))) return;
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        var tag = (event.target && event.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        event.preventDefault();
+        removeSelected();
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        turn(-1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        turn(1);
+      }
+    });
 
     if (dialog) {
       dialog.addEventListener('close', function () {
@@ -622,22 +741,11 @@
       apply: applyToForm,
       hasArt: function () {
         saveSide();
-        return ['Front', 'Back', 'Left', 'Right'].some(function (a) {
+        return ANGLES.some(function (a) {
           return (sideData[a] || []).length;
         });
       }
     };
-
-    // Sync color from customize swatches
-    document.addEventListener(
-      'click',
-      function (event) {
-        var swatch = event.target && event.target.closest && event.target.closest('[data-field="color"]');
-        if (!swatch || !root.contains(swatch.closest('[data-humc-customize]') || swatch)) return;
-        // color handled by customize; also listen via custom event below
-      },
-      true
-    );
   }
 
   function boot() {
@@ -651,7 +759,6 @@
     window.setTimeout(boot, ms);
   });
 
-  // Public helper for customize color changes
   window.humcDesignSetColor = function (name, colorId) {
     studioRoots().forEach(function (root) {
       if (root._humcDesignApi) root._humcDesignApi.setColor(name, colorId);

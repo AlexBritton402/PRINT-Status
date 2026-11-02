@@ -102,7 +102,7 @@
     <button type="button" class="humc-customize__studio-btn" data-humc-design-open>
       Open design studio
     </button>
-    <p class="humc-customize__hint">Place official HUMC marks, snap to standard spots, or move freely. Add custom lettering. Same idea as a full design lab — store logos now, custom uploads later.</p>
+    <p class="humc-customize__hint">Place official HUMC marks on Front, Back, Left, or Right. Snap to a standard spot or move freely. Custom lettering comes later.</p>
     <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
     <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="Front">
     <input type="hidden" name="properties[Lettering]" form="{{ form_id }}" value="">
@@ -124,18 +124,22 @@
 
       <div class="humc-design__layout">
         <div class="humc-design__stage-wrap">
-          <canvas data-humc-design-canvas width="600" height="600"></canvas>
-          <p class="humc-design__status" data-humc-design-status>Pick a side, add a mark or lettering, then place it.</p>
+          <div class="humc-design__stage">
+            <button type="button" class="humc-design__turn humc-design__turn--prev" data-humc-design-turn="-1" aria-label="Previous angle">‹</button>
+            <canvas data-humc-design-canvas width="600" height="600"></canvas>
+            <button type="button" class="humc-design__turn humc-design__turn--next" data-humc-design-turn="1" aria-label="Next angle">›</button>
+          </div>
+          <p class="humc-design__status" data-humc-design-status>Turn the garment, add a store logo, then place it.</p>
         </div>
 
         <aside class="humc-design__tools">
           <fieldset class="humc-design__fieldset">
-            <legend>Side</legend>
+            <legend>Turn garment</legend>
             <div class="humc-design__chips">
               <button type="button" class="humc-design__chip is-on" data-humc-design-view="Front" aria-pressed="true">Front</button>
+              <button type="button" class="humc-design__chip" data-humc-design-view="Right" aria-pressed="false">Right</button>
               <button type="button" class="humc-design__chip" data-humc-design-view="Back" aria-pressed="false">Back</button>
               <button type="button" class="humc-design__chip" data-humc-design-view="Left" aria-pressed="false">Left</button>
-              <button type="button" class="humc-design__chip" data-humc-design-view="Right" aria-pressed="false">Right</button>
             </div>
           </fieldset>
 
@@ -151,16 +155,7 @@
           <fieldset class="humc-design__fieldset">
             <legend>Standard spots</legend>
             <div class="humc-design__chips" data-humc-design-zones></div>
-            <p class="humc-design__note">Select a logo or text, then tap a spot to snap. Or drag freely anywhere.</p>
-          </fieldset>
-
-          <fieldset class="humc-design__fieldset">
-            <legend>Custom lettering</legend>
-            <div class="humc-design__text-row">
-              <input type="text" class="humc-design__text" data-humc-design-text maxlength="40" placeholder="Name or department" autocomplete="off">
-              <input type="color" class="humc-design__color" data-humc-design-text-color value="#ffffff" title="Lettering color" aria-label="Lettering color">
-              <button type="button" class="humc-design__chip" data-humc-design-add-text>Add text</button>
-            </div>
+            <p class="humc-design__note">Select a logo, then tap a spot to snap. Or drag freely. Resize stays capped so marks stay sharp.</p>
           </fieldset>
 
           <div class="humc-design__actions">
@@ -667,10 +662,42 @@
     min-height: 12rem;
   }
 
+  .humc-design__stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
   /* Fabric owns canvas pixel size; only scale the wrapper so lower/upper stay aligned */
   .humc-design__stage-wrap .canvas-container {
     margin: 0 auto !important;
     max-width: 100%;
+  }
+
+  .humc-design__turn {
+    appearance: none;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    color: #121212;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .humc-design__turn:active {
+    transform: scale(0.97);
+  }
+
+  .humc-demo__turn {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.55rem 0 0;
   }
 
   .humc-design__status,
