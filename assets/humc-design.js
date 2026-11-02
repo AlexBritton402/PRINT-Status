@@ -116,14 +116,21 @@
       if (!canvas || !window.fabric) return;
       var prefer = plainUrl(angle);
       var fallback = stockUrl(angle);
-      var tryUrl = prefer || fallback;
 
-      function place(url) {
+      function place(url, onFail) {
+        if (!url) {
+          if (onFail) onFail();
+          else if (done) done(false);
+          return;
+        }
+        // crossOrigin required so Apply can export toDataURL without tainting
         window.fabric.Image.fromURL(
           url,
           function (img) {
-            if (!img) {
-              if (done) done(false);
+            var el = img && img.getElement && img.getElement();
+            if (!img || !el || !el.naturalWidth) {
+              if (onFail) onFail();
+              else if (done) done(false);
               return;
             }
             img.set({
@@ -145,15 +152,10 @@
         );
       }
 
-      var probe = new Image();
-      probe.onload = function () {
-        place(tryUrl);
-      };
-      probe.onerror = function () {
-        if (fallback && fallback !== tryUrl) place(fallback);
+      place(prefer || fallback, function () {
+        if (fallback && prefer && fallback !== prefer) place(fallback);
         else if (done) done(false);
-      };
-      probe.src = tryUrl;
+      });
     }
 
     function clearGuides() {
@@ -467,24 +469,43 @@
 
       // Live product preview from current canvas (without guides)
       clearGuides();
-      var dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1 });
+      var dataUrl = '';
+      try {
+        dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1 });
+      } catch (err) {
+        dataUrl = '';
+      }
       drawGuides();
-      var photo = document.querySelector('[data-humc-demo-photo]');
-      if (photo) photo.setAttribute('src', dataUrl);
+      if (dataUrl) {
+        var photo = document.querySelector('[data-humc-demo-photo]');
+        if (photo) photo.setAttribute('src', dataUrl);
+        document.querySelectorAll('.product-media__image').forEach(function (shopImg) {
+          shopImg.setAttribute('src', dataUrl);
+          shopImg.removeAttribute('srcset');
+        });
+      }
       var caption = document.querySelector('[data-humc-demo-caption]');
       if (caption) {
         caption.textContent = bits.concat([currentAngle]).filter(Boolean).join(' · ');
       }
-      document.querySelectorAll('.product-media__image').forEach(function (shopImg) {
-        shopImg.setAttribute('src', dataUrl);
-        shopImg.removeAttribute('srcset');
-      });
       showError('');
       say('Design saved on this product.');
     }
 
+    function fitCanvasDisplay() {
+      if (!canvas || !canvasEl) return;
+      var wrap = root.querySelector('.humc-design__stage-wrap');
+      var avail = wrap ? Math.max(220, wrap.clientWidth - 8) : CANVAS_SIZE;
+      var css = Math.min(CANVAS_SIZE, avail);
+      canvas.setDimensions({ width: css, height: css }, { cssOnly: true });
+      canvas.calcOffset();
+      canvas.requestRenderAll();
+    }
+
     function openStudio() {
       if (!dialog) return;
+      currentColorId = root.getAttribute('data-color-id') || currentColorId;
+      currentColorName = root.getAttribute('data-color-name') || currentColorName;
       dialog.removeAttribute('inert');
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
@@ -500,11 +521,14 @@
             selection: true,
             width: CANVAS_SIZE,
             height: CANVAS_SIZE,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#e8e8e8'
           });
+          fitCanvasDisplay();
           setAngle(currentAngle);
+          window.setTimeout(fitCanvasDisplay, 50);
         });
       } else {
+        fitCanvasDisplay();
         setAngle(currentAngle);
       }
     }

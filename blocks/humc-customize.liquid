@@ -332,6 +332,8 @@
       currentColorId = colorId || '';
       if (colorInput) colorInput.value = name || '';
       if (colorNameEl) colorNameEl.textContent = name || '';
+      root.setAttribute('data-color-id', currentColorId);
+      root.setAttribute('data-color-name', name || '');
       root.querySelectorAll('[data-field="color"]').forEach(function (btn) {
         var on = btn.getAttribute('data-value') === name;
         btn.classList.toggle('is-on', on);
@@ -662,15 +664,13 @@
   .humc-design__stage-wrap {
     background: #f3f3f3;
     padding: 0.55rem;
+    min-height: 12rem;
   }
 
-  .humc-design__stage-wrap canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-width: 600px;
-    margin: 0 auto;
-    background: #fff;
+  /* Fabric owns canvas pixel size; only scale the wrapper so lower/upper stay aligned */
+  .humc-design__stage-wrap .canvas-container {
+    margin: 0 auto !important;
+    max-width: 100%;
   }
 
   .humc-design__status,
