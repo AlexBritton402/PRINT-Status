@@ -51,6 +51,10 @@
             {%- endunless -%}
             {%- assign type_l = product.type | downcase -%}
             {%- assign title_l = product.title | downcase -%}
+            {%- comment -%} Match vv Radiant: PPLR_HIDDEN_PRODUCT stays in catalog JSON but is not listed for shoppers. {%- endcomment -%}
+            {%- if type_l == 'pplr_hidden_product' or title_l contains 'personalization' -%}
+              {%- continue -%}
+            {%- endif -%}
             {%- assign groups = 'all' -%}
             {%- if product.title contains 'Heavyweight' or type_l == 'value buy' -%}
               {%- assign groups = groups | append: ' value' -%}
