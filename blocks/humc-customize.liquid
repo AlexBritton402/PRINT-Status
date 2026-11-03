@@ -18,49 +18,127 @@
   endif
 
   assign default_logo = 'Standard HUMC'
-  assign family_id = handle_tail
+  assign family_id = ''
   assign show_logo_picker = false
   if title_l contains 'customizable'
     assign show_logo_picker = true
   endif
-  if title contains 'Single Color' or title contains 'Single-color'
+  comment
+    Logo label from listing title. Check Standard / Single Color before bare
+    "LA County" — many titles include both (e.g. Standard + sleeve seal).
+  endcomment
+  if title contains 'Standard HUMC' or title contains 'w/ Standard'
+    assign default_logo = 'Standard HUMC'
+  elsif title contains 'Single Color' or title contains 'Single-color'
     assign default_logo = 'Single-color HUMC'
-    assign family_id = '18867111'
   elsif title contains 'LA County'
     assign default_logo = 'LA County'
-    assign family_id = '18993506'
-  elsif title contains 'Standard'
-    assign default_logo = 'Standard HUMC'
-    assign family_id = '18991186'
+  endif
+
+  comment
+    Chipply source id when baked into the handle (...-18991186).
+  endcomment
+  if handle_tail == '20857516' or handle_tail == '19193821' or handle_tail == '19027956' or handle_tail == '18991476' or handle_tail == '19028676' or handle_tail == '18993506' or handle_tail == '18867111' or handle_tail == '18991186' or handle_tail == '18991311' or handle_tail == '18991341' or handle_tail == '18993671' or handle_tail == '18861296' or handle_tail == '19193761' or handle_tail == '18993686' or handle_tail == '19193831' or handle_tail == '18991396' or handle_tail == '18991431' or handle_tail == '19193876' or handle_tail == '18416451' or handle_tail == '18417261' or handle_tail == '18753436' or handle_tail == '13923078' or handle_tail == '23857561'
+    assign family_id = handle_tail
   endif
 
   assign family_phrase = ''
   if title_l contains 'heavyweight tee'
     assign family_phrase = 'heavyweight tee'
+    if family_id == blank
+      assign family_id = '20857516'
+    endif
+  elsif title_l contains 'drop shoulder' and title_l contains 'la county'
+    assign family_phrase = 'drop shoulder hoodie'
+    if family_id == blank
+      assign family_id = '18993671'
+    endif
   elsif title_l contains 'drop shoulder'
     assign family_phrase = 'drop shoulder hoodie'
+    if family_id == blank
+      assign family_id = '18993686'
+    endif
   elsif title_l contains 'sustainable'
     assign family_phrase = 'sustainable full zip hoodie'
+    if family_id == blank
+      assign family_id = '19193761'
+    endif
+  elsif title_l contains 'full zip hoodie' and title_l contains 'standard'
+    assign family_phrase = 'full zip hoodie'
+    if family_id == blank
+      assign family_id = '18991341'
+    endif
+  elsif title_l contains 'full zip hoodie' and title_l contains 'single'
+    assign family_phrase = 'full zip hoodie'
+    if family_id == blank
+      assign family_id = '18991311'
+    endif
   elsif title_l contains 'full zip hoodie'
     assign family_phrase = 'full zip hoodie'
+    if family_id == blank
+      assign family_id = '18861296'
+    endif
   elsif title_l contains '1/4 zip' or title_l contains 'zip fleece'
     assign family_phrase = '1/4 zip fleece'
-    if family_id == handle_tail or family_id == blank
-      assign family_id = '18991186'
+    if family_id == blank
+      if default_logo == 'Single-color HUMC'
+        assign family_id = '18867111'
+      elsif default_logo == 'LA County'
+        assign family_id = '18993506'
+      else
+        assign family_id = '18991186'
+      endif
     endif
-    if show_logo_picker
-      assign family_id = '18991186'
+  elsif title_l contains 'fleece crew' and title_l contains 'la county'
+    assign family_phrase = 'fleece crew'
+    if family_id == blank
+      assign family_id = '18991431'
     endif
   elsif title_l contains 'fleece crew'
     assign family_phrase = 'fleece crew'
+    if family_id == blank
+      assign family_id = '18991396'
+    endif
+  elsif title_l contains 'soft blend tee' and title_l contains 'women'
+    assign family_phrase = 'women soft blend tee'
+    if family_id == blank
+      assign family_id = '19028676'
+    endif
+  elsif title_l contains 'soft blend tee' and title_l contains 'front and back'
+    assign family_phrase = 'unisex soft blend tee'
+    if family_id == blank
+      assign family_id = '18991476'
+    endif
   elsif title_l contains 'soft blend tee'
     assign family_phrase = 'unisex soft blend tee'
+    if family_id == blank
+      if title contains '19193821' or product_resource.handle contains '19193821'
+        assign family_id = '19193821'
+      else
+        assign family_id = '19027956'
+      endif
+    endif
   elsif title_l contains 'trucker' or title_l contains 'snapback'
     assign family_phrase = 'trucker hat'
-    assign family_id = '19193876'
+    if family_id == blank
+      assign family_id = '19193876'
+    endif
   elsif title_l contains 'canvas bag' or title_l contains 'jumbo'
     assign family_phrase = 'jumbo canvas bag'
-    assign family_id = '18416451'
+    if family_id == blank
+      if default_logo == 'Single-color HUMC'
+        assign family_id = '18417261'
+      elsif default_logo == 'LA County'
+        assign family_id = '18753436'
+      else
+        assign family_id = '18416451'
+      endif
+    endif
+  elsif title_l contains 'tumbler'
+    assign family_phrase = 'tumbler'
+    if family_id == blank
+      assign family_id = '13923078'
+    endif
   endif
 
   assign sizes = 'XS,S,M,L,XL,2XL,3XL,4XL' | split: ','
@@ -292,6 +370,9 @@
     }
 
     function syncListingTitle() {
+      // Only rewrite the heading when the old customizable logo picker is on.
+      // Fixed Chipply listings keep their own Shopify title.
+      if (!showLogoPicker) return;
       var family = root.getAttribute('data-family-phrase') || '';
       var next = TITLE_FOR_LOGO[logoName];
       if (family !== '1/4 zip fleece' || !next) return;
@@ -541,8 +622,10 @@
         chosen = colors.find(function (c) { return c.name === currentColorName; });
       }
       if (!chosen) {
+        // Chipply defaults Standard zip to Light Heather Grey, not Black.
         chosen =
           colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
+          colors.find(function (c) { return /light heather grey/i.test(c.name || ''); }) ||
           colors.find(function (c) { return c.name === 'Black'; }) ||
           colors[0];
       }
