@@ -267,10 +267,12 @@
       // Chipply order: size → Add to cart → tax → bullets → size guide
       var slot = root.querySelector('[data-humc-buy-slot]');
       var addBtn = document.querySelector('[name="add"]');
-      var buy =
-        (addBtn && (addBtn.closest('.buy-buttons') || addBtn.closest('.product-form-buttons') || addBtn.closest('form')?.querySelector('.buy-buttons'))) ||
-        document.querySelector('.buy-buttons') ||
-        document.querySelector('.product-form-buttons');
+      var buy = null;
+      if (addBtn) {
+        buy = addBtn.closest('.buy-buttons') || addBtn.closest('.product-form-buttons');
+        if (!buy && addBtn.form) buy = addBtn.form.querySelector('.buy-buttons');
+      }
+      if (!buy) buy = document.querySelector('.buy-buttons') || document.querySelector('.product-form-buttons');
       if (slot && buy) {
         slot.appendChild(buy);
       } else if (slot && addBtn) {
