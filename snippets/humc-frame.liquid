@@ -1,17 +1,31 @@
 {% doc %}
-  HUMC Gear chrome. Matches the old store header: official wordmark + navy bar.
+  HUMC Gear chrome — Chipply/humcgear.com replica header + footer.
   @param {string} part - header or footer
 {% enddoc %}
 
 {%- liquid
   assign home = pages['humc-gear'].url | default: '/pages/humc-gear'
   assign catalog = collections['humc-gear'].url | default: '/collections/humc-gear'
+  assign contact = pages['contact'].url | default: '/pages/contact'
 -%}
 
 {%- if part == 'header' -%}
   {% render 'store-switch', target: 'print' %}
   {% render 'store-attribution', store: 'humc' %}
-  <div class="humc-announce" data-humc-announce>Harbor-UCLA hospital shop</div>
+  <div class="humc-announce" data-humc-announce>
+    <span class="humc-announce__shop">Harbor-UCLA hospital shop</span>
+    <span class="humc-announce__auth">
+      {%- if shop.customer_accounts_enabled -%}
+        {%- if customer -%}
+          <a href="{{ routes.account_url }}">Account</a>
+        {%- else -%}
+          <a href="{{ routes.account_login_url }}">Login</a>
+          <a href="{{ routes.account_register_url }}">Register</a>
+        {%- endif -%}
+      {%- endif -%}
+      <a href="{{ routes.cart_url }}" aria-label="Cart">Cart{% if cart.item_count > 0 %}: {{ cart.item_count }}{% endif %}</a>
+    </span>
+  </div>
   <header class="humc-frame">
     <div class="humc-frame__bar">
       <a class="humc-frame__logo" href="{{ home }}">
@@ -27,11 +41,7 @@
     <nav class="humc-frame__nav" aria-label="HUMC Gear">
       <a href="{{ home }}">Home</a>
       <a href="{{ catalog }}">Products</a>
-      {%- if shop.customer_accounts_enabled -%}
-        <a href="{{ routes.account_url }}">
-          {%- if customer -%}Orders{%- else -%}Account{%- endif -%}
-        </a>
-      {%- endif -%}
+      <a href="{{ contact }}">Contact Us</a>
     </nav>
   </header>
 {%- endif -%}
@@ -41,8 +51,11 @@
     <nav aria-label="HUMC Gear footer">
       <a href="{{ home }}">Home</a>
       <a href="{{ catalog }}">Products</a>
+      <a href="{{ contact }}">Contact Us</a>
       {%- if shop.customer_accounts_enabled -%}
-        <a href="{{ routes.account_url }}">Account</a>
+        <a href="{{ routes.account_url }}">
+          {%- if customer -%}Account{%- else -%}Login{%- endif -%}
+        </a>
       {%- endif -%}
     </nav>
   </footer>
@@ -60,26 +73,44 @@
     font-family: Montserrat, Helvetica, Arial, sans-serif;
   }
   .humc-announce {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
     background: #fff;
     color: #380000;
-    text-align: center;
-    padding: 10px var(--page-margin);
+    padding: 8px var(--page-margin);
     border-bottom: 1px solid #eee;
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+  }
+  .humc-announce__shop {
     text-transform: uppercase;
+  }
+  .humc-announce__auth {
+    display: flex;
+    gap: 0.85rem;
+    margin-inline-start: auto;
+    text-transform: uppercase;
+  }
+  .humc-announce__auth a {
+    color: #333;
+    text-decoration: none;
+  }
+  .humc-announce__auth a:hover {
+    text-decoration: underline;
   }
   .humc-frame__bar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     max-width: 1600px;
     margin-inline: auto;
-    padding: 14px var(--page-margin) 10px;
+    padding: 16px var(--page-margin) 12px;
   }
   .humc-frame__logo img {
     display: block;
-    width: min(280px, 72vw);
+    width: min(320px, 78vw);
     height: auto;
   }
   .humc-frame__nav {
@@ -87,11 +118,12 @@
     align-items: center;
     justify-content: center;
     gap: 36px;
-    min-height: 60px;
-    background: #095aa6;
+    min-height: 52px;
+    background: #005696;
     color: #fff;
-    font-size: 0.95rem;
-    letter-spacing: 0.02em;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .humc-frame__nav a,
   .humc-frame__foot a {
@@ -108,10 +140,9 @@
     justify-content: center;
     gap: 28px;
     padding: 36px var(--page-margin);
-    background: #095aa6;
+    background: #005696;
     color: #fff;
   }
-  /* Chipply replica: primary cart button matches old #005696 bar */
   .humc-body .product-form-buttons .button,
   .humc-body button[name="add"],
   .humc-body .buy-buttons .button {

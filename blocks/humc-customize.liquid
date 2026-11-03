@@ -79,11 +79,22 @@
   data-family-id="{{ family_id | escape }}"
   data-logo-name="{{ default_logo | escape }}"
   data-show-logo-picker="{% if show_logo_picker %}true{% else %}false{% endif %}"
+  data-family-phrase="{{ family_phrase | escape }}"
   data-preview-map="{{ 'humc-preview.json' | asset_url }}"
   data-asset-base="{{ 'humc-preview.json' | asset_url | split: 'humc-preview.json' | first }}"
   style="{% render 'spacing-style', settings: block.settings %}"
   {{ block.shopify_attributes }}
 >
+  <nav class="humc-customize__crumbs" data-humc-crumbs aria-label="Breadcrumb">
+    <a href="{{ pages['humc-gear'].url | default: '/pages/humc-gear' }}">Home</a>
+    <span aria-hidden="true">›</span>
+    <a href="{{ collections['humc-gear'].url | default: '/collections/humc-gear' }}">Products</a>
+    <span aria-hidden="true">›</span>
+    <span>Outerwear</span>
+    <span aria-hidden="true">›</span>
+    <span data-humc-crumb-title>{{ title | escape }}</span>
+  </nav>
+
   <div class="humc-customize__gallery" data-humc-gallery>
     <div class="humc-customize__stage" data-humc-stage>
       <img data-humc-demo-photo alt="{{ title | escape }}" width="600" height="600">
@@ -159,6 +170,41 @@
   <p class="humc-customize__summary" data-summary></p>
   <p class="humc-customize__error" data-error hidden></p>
   <p class="humc-customize__tax">*Tax collected only if you are in the state of California.</p>
+
+  {%- if family_phrase == '1/4 zip fleece' -%}
+    <ul class="humc-customize__bullets">
+      <li>8.3-ounce, 65/35 ring spun cotton/polyester</li>
+      <li>100% ring spun cotton face (Solids, Light Heather Grey)</li>
+      <li>60/40 ring spun cotton/polyester (Heathered Charcoal)</li>
+      <li>Dyed-to-match twill back neck tape</li>
+      <li>YKK Vislon® dyed-to-match zipper</li>
+      <li>Side seamed</li>
+      <li>1x1 rib knit cuffs and hem</li>
+      <li>Front pouch pocket</li>
+      <li>Tear-away label</li>
+    </ul>
+
+    <div class="humc-customize__size-guide">
+      <h3 class="humc-customize__size-guide-title">Size Guide</h3>
+      <p class="humc-customize__size-guide-note">Chest — measure under arms around the fullest part of the chest.</p>
+      <div class="humc-customize__size-table-wrap">
+        <table class="humc-customize__size-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th><th>4XL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Chest</th>
+              <td>32-34</td><td>35-37</td><td>38-40</td><td>41-43</td><td>44-46</td><td>47-49</td><td>50-53</td><td>54-57</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {%- endif -%}
 </div>
 
 <script>
@@ -194,9 +240,58 @@
       'Single-color HUMC': '18867111',
       'LA County': '18993506'
     };
+    var TITLE_FOR_LOGO = {
+      'Standard HUMC': '1/4 Zip Fleece w/ Standard HUMC Logo and LA County Logo on Sleeve',
+      'Single-color HUMC': '1/4 Zip Fleece w/ Single Color HUMC Logo and LA County Logo on Sleeve',
+      'LA County': '1/4 Zip Fleece w/ LA County Logo'
+    };
 
     function assetBase() {
       return root.getAttribute('data-asset-base') || '';
+    }
+
+    function mountChipplyLayout() {
+      document.body.classList.add('has-humc-demo');
+      var gallery = root.querySelector('[data-humc-gallery]');
+      var media = document.querySelector('.product-information__media');
+      if (gallery && media && gallery.parentNode !== media) {
+        media.innerHTML = '';
+        media.appendChild(gallery);
+      }
+      var crumbs = root.querySelector('[data-humc-crumbs]');
+      var section = document.querySelector('.product-information.section') || document.querySelector('.product-information');
+      if (crumbs && section && crumbs.parentNode !== section) {
+        section.insertBefore(crumbs, section.firstChild);
+      }
+      // Hide Horizon qty stepper — Chipply uses size qty boxes only
+      document.querySelectorAll('quantity-selector, .quantity-selector, [name="quantity"]').forEach(function (el) {
+        var wrap = el.closest('.quantity-selector') || el.closest('quantity-selector') || el.parentElement;
+        if (wrap && wrap !== el && /quantity/i.test(wrap.className || wrap.tagName || '')) {
+          wrap.style.display = 'none';
+        } else if (el.tagName === 'INPUT' && el.name === 'quantity') {
+          el.style.display = 'none';
+          if (el.previousElementSibling) el.previousElementSibling.style.display = 'none';
+          if (el.nextElementSibling) el.nextElementSibling.style.display = 'none';
+        }
+      });
+      var qtyBlock = document.querySelector('.product-form-buttons quantity-input, .buy-buttons quantity-selector, .quantity');
+      if (qtyBlock) {
+        var host = qtyBlock.closest('.quantity') || qtyBlock.parentElement;
+        if (host) host.style.display = 'none';
+      }
+    }
+
+    function syncListingTitle() {
+      var family = root.getAttribute('data-family-phrase') || '';
+      var next = TITLE_FOR_LOGO[logoName];
+      if (family !== '1/4 zip fleece' || !next) return;
+      document.querySelectorAll('.product-details h1, .product-information h1, h1').forEach(function (h) {
+        if (/zip|fleece|customizable|humc|la county/i.test(h.textContent || '')) {
+          h.textContent = next;
+        }
+      });
+      var crumb = root.querySelector('[data-humc-crumb-title]');
+      if (crumb) crumb.textContent = next;
     }
 
     function showError(msg) {
@@ -329,6 +424,7 @@
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+      syncListingTitle();
       // Re-bind colors for this family if present in map
       var entry = previewMap[familyId];
       if (entry) {
@@ -476,8 +572,8 @@
       }
     }
 
-    // Hide Horizon media gallery — Chipply layout uses our square gallery
-    document.body.classList.add('has-humc-demo');
+    mountChipplyLayout();
+    syncListingTitle();
 
     root.querySelectorAll('[data-view]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -772,11 +868,131 @@
     font-size: 0.85rem;
   }
 
-  /* Match old Chipply: our gallery is the product photo */
-  body.has-humc-demo media-gallery,
-  body.has-humc-demo .product-media-container,
-  body.has-humc-demo .product-media {
+  .humc-customize__crumbs,
+  .product-information > .humc-customize__crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    margin: 0 0 0.85rem;
+    padding-inline: var(--page-margin, 0);
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    grid-column: 1 / -1;
+  }
+
+  .humc-customize__crumbs a {
+    color: #666;
+    text-decoration: none;
+  }
+
+  .humc-customize__crumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .humc-customize__bullets {
+    margin: 0.75rem 0 0;
+    padding-inline-start: 1.15rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .humc-customize__bullets li {
+    margin-block-end: 0.25rem;
+  }
+
+  .humc-customize__size-guide {
+    margin-block-start: 1.25rem;
+  }
+
+  .humc-customize__size-guide-title {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+  }
+
+  .humc-customize__size-guide-note {
+    margin: 0 0 0.55rem;
+    font-size: 0.8rem;
+    color: #555;
+  }
+
+  .humc-customize__size-table-wrap {
+    overflow-x: auto;
+  }
+
+  .humc-customize__size-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+
+  .humc-customize__size-table th,
+  .humc-customize__size-table td {
+    border: 1px solid #ddd;
+    padding: 0.35rem 0.4rem;
+    text-align: center;
+  }
+
+  .humc-customize__size-table thead th {
+    background: #eee;
+    font-weight: 600;
+  }
+
+  /* Chipply 2-column: photo left (media), buy column right (details) */
+  body.has-humc-demo .product-information__grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 1.5rem 2rem;
+    align-items: start;
+  }
+
+  body.has-humc-demo .product-information__media {
+    display: block !important;
+    width: 100%;
+    max-width: none;
+  }
+
+  body.has-humc-demo .product-information__media media-gallery,
+  body.has-humc-demo .product-information__media .product-media-container,
+  body.has-humc-demo .product-information__media .product-media {
     display: none !important;
+  }
+
+  body.has-humc-demo .product-information__media .humc-customize__gallery {
+    width: 100%;
+  }
+
+  body.has-humc-demo .product-details .humc-customize__gallery {
+    display: none;
+  }
+
+  body.has-humc-demo .buy-buttons,
+  body.has-humc-demo .product-form-buttons {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  body.has-humc-demo .buy-buttons .button,
+  body.has-humc-demo button[name="add"] {
+    width: 100%;
+    min-height: 2.75rem;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  body.has-humc-demo quantity-selector,
+  body.has-humc-demo .quantity-selector,
+  body.has-humc-demo .quantity {
+    display: none !important;
+  }
+
+  @media (max-width: 900px) {
+    body.has-humc-demo .product-information__grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
