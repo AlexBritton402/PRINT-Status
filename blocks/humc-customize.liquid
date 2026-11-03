@@ -232,35 +232,89 @@
       });
     }
 
+    function probeUrl(url, ok, fail) {
+      if (!url) {
+        if (fail) fail();
+        return;
+      }
+      var img = new Image();
+      img.onload = function () {
+        if (img.naturalWidth > 0) ok(url);
+        else if (fail) fail();
+      };
+      img.onerror = function () {
+        if (fail) fail();
+      };
+      img.src = url;
+    }
+
     function fillThumbs() {
       ['Front', 'Back', 'Left', 'Right'].forEach(function (angle) {
+        var btn = root.querySelector('[data-view="' + angle + '"]');
         var thumb = root.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = stockUrl(familyId, currentColorId, angle);
-        if (thumb && url) {
-          thumb.setAttribute('src', url);
-          thumb.hidden = false;
-        } else if (thumb) {
-          thumb.hidden = true;
-        }
+        probeUrl(
+          url,
+          function (okUrl) {
+            if (thumb) {
+              thumb.setAttribute('src', okUrl);
+              thumb.hidden = false;
+            }
+            if (btn) {
+              btn.hidden = false;
+              btn.disabled = false;
+            }
+          },
+          function () {
+            if (thumb) {
+              thumb.removeAttribute('src');
+              thumb.hidden = true;
+            }
+            if (btn) {
+              // Front always stays; other missing angles hide like Chipply only showing available shots
+              if (angle === 'Front') {
+                btn.hidden = false;
+              } else {
+                btn.hidden = true;
+              }
+            }
+            if (currentView === angle && angle !== 'Front') setView('Front');
+          }
+        );
       });
     }
 
     function setView(angle) {
       currentView = angle || 'Front';
+      var label = currentView === 'Left' ? 'Left sleeve' : currentView === 'Right' ? 'Right sleeve' : currentView;
       root.querySelectorAll('[data-view]').forEach(function (btn) {
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       var url = stockUrl(familyId, currentColorId, currentView);
-      setMainPhoto(url);
+      var front = stockUrl(familyId, currentColorId, 'Front');
+      probeUrl(
+        url,
+        function (okUrl) {
+          setMainPhoto(okUrl);
+        },
+        function () {
+          setMainPhoto(front);
+          currentView = 'Front';
+          label = 'Front';
+          root.querySelectorAll('[data-view]').forEach(function (btn) {
+            var on = btn.getAttribute('data-view') === 'Front';
+            btn.classList.toggle('is-on', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+        }
+      );
       if (caption) {
-        caption.textContent = [currentColorName, logoName, currentView === 'Left' ? 'Left sleeve' : currentView === 'Right' ? 'Right sleeve' : currentView]
-          .filter(Boolean)
-          .join(' · ');
+        caption.textContent = [currentColorName, logoName, label].filter(Boolean).join(' · ');
       }
       if (placeInput) {
-        placeInput.value = 'As shown (' + (currentView === 'Left' ? 'Left sleeve' : currentView === 'Right' ? 'Right sleeve' : currentView) + ')';
+        placeInput.value = 'As shown (' + label + ')';
       }
     }
 
