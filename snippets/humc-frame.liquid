@@ -1,5 +1,5 @@
 {% doc %}
-  HUMC Gear chrome — Chipply/humcgear.com replica header + footer.
+  HUMC Gear chrome — match vvpx4r Radiant: Home / Catalog / Contact.
   @param {string} part - header or footer
 {% enddoc %}
 
@@ -8,30 +8,11 @@
   assign catalog = collections['humc-gear'].url | default: '/collections/humc-gear'
   assign contact = pages['contact'].url | default: '/pages/contact'
   assign learn = pages['humc-learn-more'].url | default: '/pages/humc-learn-more'
-  assign returns = pages['returns-policy'].url | default: pages['returns'].url | default: '/pages/contact'
-  assign privacy = pages['privacy-policy'].url | default: shop.privacy_policy.url | default: '/policies/privacy-policy'
-  assign terms = pages['user-agreement'].url | default: shop.terms_of_service.url | default: '/policies/terms-of-service'
 -%}
 
 {%- if part == 'header' -%}
   {% render 'store-switch', target: 'print' %}
   {% render 'store-attribution', store: 'humc' %}
-  <div class="humc-announce" data-humc-announce>
-    <span class="humc-announce__spacer" aria-hidden="true"></span>
-    <span class="humc-announce__auth">
-      {%- if shop.customer_accounts_enabled -%}
-        {%- if customer -%}
-          <a href="{{ routes.account_url }}">Login</a>
-        {%- else -%}
-          <a href="{{ routes.account_login_url }}">Login</a>
-          <a href="{{ routes.account_register_url }}">Register</a>
-        {%- endif -%}
-      {%- endif -%}
-      <a href="{{ routes.cart_url }}" aria-label="Cart">
-        Cart{% if cart.item_count > 0 %}: {{ cart.item_count }} item{% if cart.item_count != 1 %}s{% endif %}{% endif %}
-      </a>
-    </span>
-  </div>
   <header class="humc-frame">
     <div class="humc-frame__bar">
       <a class="humc-frame__logo" href="{{ home }}">
@@ -43,196 +24,124 @@
           loading="eager"
         >
       </a>
+      <nav class="humc-frame__nav" aria-label="HUMC Gear">
+        <a href="{{ home }}">Home</a>
+        <a href="{{ catalog }}">Catalog</a>
+        <a href="{{ contact }}">Contact</a>
+      </nav>
+      <div class="humc-frame__tools">
+        {%- if shop.customer_accounts_enabled -%}
+          <a href="{{ routes.account_url }}" aria-label="Account">Account</a>
+        {%- endif -%}
+        <a href="{{ routes.cart_url }}" aria-label="Cart">Cart{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}</a>
+      </div>
     </div>
-    <nav class="humc-frame__nav" aria-label="HUMC Gear">
-      <a href="{{ home }}">Home</a>
-      <a href="{{ catalog }}">Products</a>
-      <a href="{{ contact }}">Contact Us</a>
-    </nav>
   </header>
 {%- endif -%}
 
 {%- if part == 'footer' -%}
   <footer class="humc-frame__foot">
-    <div class="humc-frame__foot-row">
-      <nav class="humc-frame__foot-links" aria-label="HUMC Gear footer">
-        <a href="{{ home }}">Home</a>
-        <a href="{{ contact }}">Contact Us</a>
-        <a href="{{ returns }}">Returns Policy</a>
-        <a href="{{ privacy }}">Privacy Policy</a>
-        <a href="{{ terms }}">User Agreement</a>
-        <a href="{{ learn }}">Learn more</a>
-      </nav>
-      <div class="humc-frame__updates" id="humc-updates">
-        <p>Want updates on new products?</p>
-        {% form 'contact', class: 'humc-frame__updates-form' %}
-          {%- if form.posted_successfully? -%}
-            <p class="humc-frame__thanks">Thanks. We will send HUMC Gear updates to that email.</p>
-          {%- else -%}
-            <label class="visually-hidden" for="humc-foot-email">Email</label>
-            <input
-              id="humc-foot-email"
-              type="email"
-              name="contact[email]"
-              placeholder="Email"
-              required
-              autocomplete="email"
-            >
-            <input type="hidden" name="contact[body]" value="HUMC Gear product updates">
-            <button type="submit">Sign Up</button>
-          {%- endif -%}
-        {% endform %}
-        <p class="humc-frame__note">If you are an employee of HUMC or LA County, please only use your personal email.</p>
-      </div>
-    </div>
+    <nav aria-label="HUMC Gear footer">
+      <a href="{{ home }}">Home</a>
+      <a href="{{ catalog }}">Catalog</a>
+      <a href="{{ contact }}">Contact</a>
+      <a href="{{ learn }}">Learn more</a>
+    </nav>
   </footer>
 {%- endif -%}
 
 {% stylesheet %}
   .humc-body {
     background: #fff;
-    color: #121212;
+    color: #380000;
     font-family: Karla, Helvetica, sans-serif;
-    font-size: 13px;
   }
   .humc-body h1,
   .humc-body h2,
   .humc-body h3 {
     font-family: Montserrat, Helvetica, Arial, sans-serif;
   }
-  .humc-announce {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1rem;
-    background: #fff;
-    color: #333;
-    padding: 10px var(--page-margin, 24px) 4px;
-    font-size: 0.78rem;
-    letter-spacing: 0.03em;
-  }
-  .humc-announce__auth {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    text-transform: uppercase;
-  }
-  .humc-announce__auth a {
-    color: #333;
-    text-decoration: none;
-  }
-  .humc-announce__auth a:hover {
-    text-decoration: underline;
-  }
   .humc-frame__bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: center;
-    max-width: 1600px;
+    gap: 16px;
+    max-width: 1400px;
     margin-inline: auto;
-    padding: 8px var(--page-margin, 24px) 12px;
+    padding: 14px var(--page-margin, 24px);
+    border-bottom: 1px solid #eee;
+  }
+  .humc-frame__logo {
+    justify-self: start;
   }
   .humc-frame__logo img {
     display: block;
-    width: min(320px, 78vw);
+    width: min(220px, 55vw);
     height: auto;
   }
   .humc-frame__nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 36px;
-    min-height: 48px;
-    background: #095aa6;
-    color: #fff;
-    font-size: 0.92rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    gap: 28px;
+    font-size: 0.95rem;
   }
-  .humc-frame__nav a,
-  .humc-frame__foot a {
-    color: #fff;
+  .humc-frame__nav a {
+    color: #380000;
     text-decoration: none;
   }
-  .humc-frame__nav a:hover,
-  .humc-frame__foot a:hover {
+  .humc-frame__nav a:hover {
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: 4px;
+  }
+  .humc-frame__tools {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    font-size: 0.85rem;
+  }
+  .humc-frame__tools a {
+    color: #380000;
+    text-decoration: none;
   }
   .humc-frame__foot {
-    padding: 28px var(--page-margin, 24px) 36px;
-    background: #095aa6;
-    color: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 36px var(--page-margin, 24px);
+    background: #580202;
+    color: #f5f4f0;
   }
-  .humc-frame__foot-row {
+  .humc-frame__foot nav {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 28px 48px;
-    max-width: 1100px;
-    margin-inline: auto;
+    justify-content: center;
+    gap: 28px;
   }
-  .humc-frame__foot-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px 22px;
-    align-items: flex-start;
-    font-size: 0.9rem;
+  .humc-frame__foot a {
+    color: #f5f4f0;
+    text-decoration: none;
   }
-  .humc-frame__foot-links a {
+  .humc-frame__foot a:hover {
     text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-  .humc-frame__updates {
-    max-width: 360px;
-  }
-  .humc-frame__updates > p:first-child {
-    margin: 0 0 10px;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  .humc-frame__updates-form {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .humc-frame__updates-form input[type='email'] {
-    flex: 1 1 180px;
-    min-width: 160px;
-    padding: 8px 10px;
-    border: 0;
-    border-radius: 0;
-    font-size: 0.9rem;
-  }
-  .humc-frame__updates-form button {
-    padding: 8px 14px;
-    border: 0;
-    background: #2792c3;
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-  .humc-frame__note {
-    margin: 10px 0 0;
-    font-size: 0.75rem;
-    font-style: italic;
-    opacity: 0.95;
-  }
-  .humc-frame__thanks {
-    margin: 0;
   }
   .humc-body .product-form-buttons .button,
   .humc-body button[name='add'],
   .humc-body .buy-buttons .button {
-    background: #095aa6 !important;
+    background: #380000 !important;
     color: #fff !important;
-    border-color: #095aa6 !important;
+    border-color: #380000 !important;
   }
-
+  @media screen and (max-width: 749px) {
+    .humc-frame__bar {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
+    .humc-frame__logo,
+    .humc-frame__tools {
+      justify-self: center;
+    }
+  }
   #PBarNextFrame {
     display: none !important;
   }
