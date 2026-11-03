@@ -266,17 +266,13 @@
       }
       // Chipply order: size → Add to cart → tax → bullets → size guide
       var slot = root.querySelector('[data-humc-buy-slot]');
-      var addBtn = document.querySelector('[name="add"]');
-      var buy = null;
-      if (addBtn) {
-        buy = addBtn.closest('.buy-buttons') || addBtn.closest('.product-form-buttons');
-        if (!buy && addBtn.form) buy = addBtn.form.querySelector('.buy-buttons');
-      }
-      if (!buy) buy = document.querySelector('.buy-buttons') || document.querySelector('.product-form-buttons');
-      if (slot && buy) {
+      var buy =
+        document.querySelector('.product-form-buttons') ||
+        document.querySelector('.buy-buttons') ||
+        document.querySelector('add-to-cart-component') ||
+        document.querySelector('[name="add"]');
+      if (slot && buy && buy.parentNode !== slot) {
         slot.appendChild(buy);
-      } else if (slot && addBtn) {
-        slot.appendChild(addBtn);
       }
       // Hide leftover Horizon back-link / qty stepper
       document.querySelectorAll('a').forEach(function (a) {
