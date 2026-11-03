@@ -169,6 +169,7 @@
 
   <p class="humc-customize__summary" data-summary></p>
   <p class="humc-customize__error" data-error hidden></p>
+  <div class="humc-customize__buy-slot" data-humc-buy-slot></div>
   <p class="humc-customize__tax">*Tax collected only if you are in the state of California.</p>
 
   {%- if family_phrase == '1/4 zip fleece' -%}
@@ -264,14 +265,16 @@
         section.insertBefore(crumbs, section.firstChild);
       }
       // Chipply order: size → Add to cart → tax → bullets → size guide
-      var tax = root.querySelector('.humc-customize__tax');
-      var bullets = root.querySelector('.humc-customize__bullets');
+      var slot = root.querySelector('[data-humc-buy-slot]');
+      var addBtn = document.querySelector('[name="add"]');
       var buy =
+        (addBtn && (addBtn.closest('.buy-buttons') || addBtn.closest('.product-form-buttons') || addBtn.closest('form')?.querySelector('.buy-buttons'))) ||
         document.querySelector('.buy-buttons') ||
-        document.querySelector('.product-form-buttons') ||
-        document.querySelector('[id*="BuyButtons"]');
-      if (buy && tax && tax.parentNode) {
-        tax.parentNode.insertBefore(buy, tax);
+        document.querySelector('.product-form-buttons');
+      if (slot && buy) {
+        slot.appendChild(buy);
+      } else if (slot && addBtn) {
+        slot.appendChild(addBtn);
       }
       // Hide leftover Horizon back-link / qty stepper
       document.querySelectorAll('a').forEach(function (a) {
