@@ -622,10 +622,10 @@
         chosen = colors.find(function (c) { return c.name === currentColorName; });
       }
       if (!chosen) {
-        // Chipply defaults Standard zip to Light Heather Grey, not Black.
+        // Chipply Standard zip opens on Light Heather Grey (not Black).
         chosen =
-          colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
           colors.find(function (c) { return /light heather grey/i.test(c.name || ''); }) ||
+          colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
           colors.find(function (c) { return c.name === 'Black'; }) ||
           colors[0];
       }
