@@ -265,15 +265,23 @@
         section.insertBefore(crumbs, section.firstChild);
       }
       // Chipply order: size → Add to cart → tax → bullets → size guide
-      var slot = root.querySelector('[data-humc-buy-slot]');
-      var buy =
-        document.querySelector('.product-form-buttons') ||
-        document.querySelector('.buy-buttons') ||
-        document.querySelector('add-to-cart-component') ||
-        document.querySelector('[name="add"]');
-      if (slot && buy && buy.parentNode !== slot) {
-        slot.appendChild(buy);
+      function placeBuy() {
+        var slot = root.querySelector('[data-humc-buy-slot]');
+        var buy =
+          document.querySelector('.product-form-buttons') ||
+          document.querySelector('.buy-buttons') ||
+          document.querySelector('add-to-cart-component') ||
+          document.querySelector('[name="add"]');
+        if (slot && buy && buy.parentNode !== slot) {
+          slot.appendChild(buy);
+          return true;
+        }
+        return !!(slot && buy);
       }
+      placeBuy();
+      [100, 400, 1000, 2000].forEach(function (ms) {
+        window.setTimeout(placeBuy, ms);
+      });
       // Hide leftover Horizon back-link / qty stepper
       document.querySelectorAll('a').forEach(function (a) {
         if (/back to humc/i.test(a.textContent || '')) a.style.display = 'none';
