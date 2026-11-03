@@ -263,22 +263,23 @@
       if (crumbs && section && crumbs.parentNode !== section) {
         section.insertBefore(crumbs, section.firstChild);
       }
-      // Hide Horizon qty stepper — Chipply uses size qty boxes only
-      document.querySelectorAll('quantity-selector, .quantity-selector, [name="quantity"]').forEach(function (el) {
-        var wrap = el.closest('.quantity-selector') || el.closest('quantity-selector') || el.parentElement;
-        if (wrap && wrap !== el && /quantity/i.test(wrap.className || wrap.tagName || '')) {
-          wrap.style.display = 'none';
-        } else if (el.tagName === 'INPUT' && el.name === 'quantity') {
-          el.style.display = 'none';
-          if (el.previousElementSibling) el.previousElementSibling.style.display = 'none';
-          if (el.nextElementSibling) el.nextElementSibling.style.display = 'none';
-        }
-      });
-      var qtyBlock = document.querySelector('.product-form-buttons quantity-input, .buy-buttons quantity-selector, .quantity');
-      if (qtyBlock) {
-        var host = qtyBlock.closest('.quantity') || qtyBlock.parentElement;
-        if (host) host.style.display = 'none';
+      // Chipply order: size → Add to cart → tax → bullets → size guide
+      var tax = root.querySelector('.humc-customize__tax');
+      var bullets = root.querySelector('.humc-customize__bullets');
+      var buy =
+        document.querySelector('.buy-buttons') ||
+        document.querySelector('.product-form-buttons') ||
+        document.querySelector('[id*="BuyButtons"]');
+      if (buy && tax && tax.parentNode) {
+        tax.parentNode.insertBefore(buy, tax);
       }
+      // Hide leftover Horizon back-link / qty stepper
+      document.querySelectorAll('a').forEach(function (a) {
+        if (/back to humc/i.test(a.textContent || '')) a.style.display = 'none';
+      });
+      document.querySelectorAll('quantity-selector, .quantity-selector, .quantity').forEach(function (el) {
+        el.style.display = 'none';
+      });
     }
 
     function syncListingTitle() {
