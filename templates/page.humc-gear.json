@@ -13,29 +13,15 @@
     "store": {
       "type": "humc-store",
       "settings": {
-        "hero_heading": "Your Exclusive Provider of Harbor-UCLA and LA COUNTY Gear",
+        "announce": "10/28 We apologize as we had a last minute change in our schedule for equipment delivery. We will be back on 11/04. Please reach out regarding any orders for pickup.",
+        "hero_heading": "YOUR EXCLUSIVE PROVIDER OF HARBOR-UCLA AND LA COUNTY GEAR",
         "hero_image": "humc-bg-home.png",
-        "shop_label": "Shop now",
         "shop_link": "/collections/humc-gear",
-        "polo_image": "humc-custompolo.jpg",
-        "polo_alt": "Custom Harbor-UCLA polo",
-        "polo_heading": "Custom polos",
-        "polo_text": "Harbor-UCLA and LA County staff gear.",
-        "polo_button": "Shop now",
-        "polo_link": "/collections/humc-gear",
         "sleeve_image": "humc-long-sleeve.png",
-        "sleeve_alt": "Custom long sleeve",
-        "sleeve_heading": "customize",
-        "sleeve_text": "FOR YOUR DEPARTMENT",
-        "sleeve_button": "Shop now",
-        "featured_heading": "Featured products",
-        "view_all": "View all",
-        "updates_heading": "Want updates on new products?",
-        "updates_button": "Sign up"
+        "scrub_image": "humc-scrubs.png",
+        "polo_image": "humc-custompolo.jpg"
       }
     }
   },
-  "order": [
-    "store"
-  ]
+  "order": ["store"]
 }

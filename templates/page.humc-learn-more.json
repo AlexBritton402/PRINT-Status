@@ -1,0 +1,24 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "layout": "humc",
+  "sections": {
+    "learn": {
+      "type": "humc-learn-more",
+      "settings": {
+        "kicker": "COMING SOON!",
+        "heading": "CUSTOMIZE FOR YOUR DEPARTMENT",
+        "body": "Soon you will be able to customize apparel with your name, position, and department. Until then, shop the current Harbor-UCLA and LA County lineup — logos are already on every listing.",
+        "polo_image": "humc-custompolo.jpg"
+      }
+    }
+  },
+  "order": ["learn"]
+}

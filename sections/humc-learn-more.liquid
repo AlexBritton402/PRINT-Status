@@ -1,0 +1,155 @@
+{%- comment -%}
+  HUMC Learn more — Coming Soon customize-for-department page
+  (kept from the prior HUMC home CTA; Chipply “COMING SOON” content).
+{%- endcomment -%}
+
+{%- liquid
+  assign home = pages['humc-gear'].url | default: '/pages/humc-gear'
+  assign shop_link = collections['humc-gear'].url | default: '/collections/humc-gear'
+  assign polo_image = section.settings.polo_image | default: 'humc-custompolo.jpg'
+-%}
+
+<div class="humc-learn">
+  <nav class="humc-learn__crumb" aria-label="Breadcrumb">
+    <a href="{{ home }}">Home</a>
+    <span>›</span>
+    <span>Learn more</span>
+  </nav>
+
+  <p class="humc-learn__kicker">{{ section.settings.kicker | default: 'COMING SOON!' | escape }}</p>
+  <div class="humc-learn__media">
+    <img
+      src="{{ polo_image | asset_url }}"
+      alt="{{ section.settings.heading | escape }}"
+      width="640"
+      height="635"
+      loading="eager"
+    >
+  </div>
+  <h1>{{ section.settings.heading | default: 'CUSTOMIZE FOR YOUR DEPARTMENT' | escape }}</h1>
+  <p class="humc-learn__body">
+    {{
+      section.settings.body
+      | default: 'Soon you will be able to customize apparel with your name, position, and department. Until then, shop the current Harbor-UCLA and LA County lineup — logos are already on every listing.'
+      | escape
+    }}
+  </p>
+  <div class="humc-learn__actions">
+    <a class="humc-learn__btn" href="{{ shop_link }}">Shop products</a>
+    <a class="humc-learn__btn humc-learn__btn--ghost" href="{{ home }}">Back to home</a>
+  </div>
+</div>
+
+{% stylesheet %}
+  .humc-learn {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+    text-align: center;
+    color: #121212;
+    font-family: Karla, Helvetica, sans-serif;
+  }
+  .humc-learn__crumb {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 28px;
+    color: #888;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .humc-learn__crumb a {
+    color: #888;
+    text-decoration: none;
+  }
+  .humc-learn__crumb a:hover {
+    text-decoration: underline;
+  }
+  .humc-learn__kicker {
+    margin: 0 0 12px;
+    color: #c41230;
+    font-family: Montserrat, Helvetica, Arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .humc-learn__media img {
+    width: min(100%, 420px);
+    height: auto;
+    border: 1px solid #121212;
+    background: #fff;
+  }
+  .humc-learn h1 {
+    margin: 18px 0 12px;
+    color: #c41230;
+    font-family: Montserrat, Helvetica, Arial, sans-serif;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  .humc-learn__body {
+    margin: 0 auto 24px;
+    max-width: 520px;
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .humc-learn__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .humc-learn__btn {
+    display: inline-block;
+    min-width: 150px;
+    padding: 12px 18px;
+    background: #095aa6;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .humc-learn__btn--ghost {
+    background: #fff;
+    color: #095aa6;
+    border: 1px solid #095aa6;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "HUMC Learn more",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker",
+      "default": "COMING SOON!"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "CUSTOMIZE FOR YOUR DEPARTMENT"
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body",
+      "default": "Soon you will be able to customize apparel with your name, position, and department. Until then, shop the current Harbor-UCLA and LA County lineup — logos are already on every listing."
+    },
+    {
+      "type": "text",
+      "id": "polo_image",
+      "label": "Image asset",
+      "default": "humc-custompolo.jpg"
+    }
+  ],
+  "presets": [{ "name": "HUMC Learn more" }]
+}
+{% endschema %}

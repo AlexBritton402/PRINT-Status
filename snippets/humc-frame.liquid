@@ -7,23 +7,29 @@
   assign home = pages['humc-gear'].url | default: '/pages/humc-gear'
   assign catalog = collections['humc-gear'].url | default: '/collections/humc-gear'
   assign contact = pages['contact'].url | default: '/pages/contact'
+  assign learn = pages['humc-learn-more'].url | default: '/pages/humc-learn-more'
+  assign returns = pages['returns-policy'].url | default: pages['returns'].url | default: '/pages/contact'
+  assign privacy = pages['privacy-policy'].url | default: shop.privacy_policy.url | default: '/policies/privacy-policy'
+  assign terms = pages['user-agreement'].url | default: shop.terms_of_service.url | default: '/policies/terms-of-service'
 -%}
 
 {%- if part == 'header' -%}
   {% render 'store-switch', target: 'print' %}
   {% render 'store-attribution', store: 'humc' %}
   <div class="humc-announce" data-humc-announce>
-    <span class="humc-announce__shop">Harbor-UCLA hospital shop</span>
+    <span class="humc-announce__spacer" aria-hidden="true"></span>
     <span class="humc-announce__auth">
       {%- if shop.customer_accounts_enabled -%}
         {%- if customer -%}
-          <a href="{{ routes.account_url }}">Account</a>
+          <a href="{{ routes.account_url }}">Login</a>
         {%- else -%}
           <a href="{{ routes.account_login_url }}">Login</a>
           <a href="{{ routes.account_register_url }}">Register</a>
         {%- endif -%}
       {%- endif -%}
-      <a href="{{ routes.cart_url }}" aria-label="Cart">Cart{% if cart.item_count > 0 %}: {{ cart.item_count }}{% endif %}</a>
+      <a href="{{ routes.cart_url }}" aria-label="Cart">
+        Cart{% if cart.item_count > 0 %}: {{ cart.item_count }} item{% if cart.item_count != 1 %}s{% endif %}{% endif %}
+      </a>
     </span>
   </div>
   <header class="humc-frame">
@@ -48,16 +54,37 @@
 
 {%- if part == 'footer' -%}
   <footer class="humc-frame__foot">
-    <nav aria-label="HUMC Gear footer">
-      <a href="{{ home }}">Home</a>
-      <a href="{{ catalog }}">Products</a>
-      <a href="{{ contact }}">Contact Us</a>
-      {%- if shop.customer_accounts_enabled -%}
-        <a href="{{ routes.account_url }}">
-          {%- if customer -%}Account{%- else -%}Login{%- endif -%}
-        </a>
-      {%- endif -%}
-    </nav>
+    <div class="humc-frame__foot-row">
+      <nav class="humc-frame__foot-links" aria-label="HUMC Gear footer">
+        <a href="{{ home }}">Home</a>
+        <a href="{{ contact }}">Contact Us</a>
+        <a href="{{ returns }}">Returns Policy</a>
+        <a href="{{ privacy }}">Privacy Policy</a>
+        <a href="{{ terms }}">User Agreement</a>
+        <a href="{{ learn }}">Learn more</a>
+      </nav>
+      <div class="humc-frame__updates" id="humc-updates">
+        <p>Want updates on new products?</p>
+        {% form 'contact', class: 'humc-frame__updates-form' %}
+          {%- if form.posted_successfully? -%}
+            <p class="humc-frame__thanks">Thanks. We will send HUMC Gear updates to that email.</p>
+          {%- else -%}
+            <label class="visually-hidden" for="humc-foot-email">Email</label>
+            <input
+              id="humc-foot-email"
+              type="email"
+              name="contact[email]"
+              placeholder="Email"
+              required
+              autocomplete="email"
+            >
+            <input type="hidden" name="contact[body]" value="HUMC Gear product updates">
+            <button type="submit">Sign Up</button>
+          {%- endif -%}
+        {% endform %}
+        <p class="humc-frame__note">If you are an employee of HUMC or LA County, please only use your personal email.</p>
+      </div>
+    </div>
   </footer>
 {%- endif -%}
 
@@ -66,6 +93,7 @@
     background: #fff;
     color: #121212;
     font-family: Karla, Helvetica, sans-serif;
+    font-size: 13px;
   }
   .humc-body h1,
   .humc-body h2,
@@ -75,22 +103,18 @@
   .humc-announce {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1rem;
     background: #fff;
-    color: #380000;
-    padding: 8px var(--page-margin);
-    border-bottom: 1px solid #eee;
+    color: #333;
+    padding: 10px var(--page-margin, 24px) 4px;
     font-size: 0.78rem;
     letter-spacing: 0.03em;
   }
-  .humc-announce__shop {
-    text-transform: uppercase;
-  }
   .humc-announce__auth {
     display: flex;
+    align-items: center;
     gap: 0.85rem;
-    margin-inline-start: auto;
     text-transform: uppercase;
   }
   .humc-announce__auth a {
@@ -106,7 +130,7 @@
     justify-content: center;
     max-width: 1600px;
     margin-inline: auto;
-    padding: 16px var(--page-margin) 12px;
+    padding: 8px var(--page-margin, 24px) 12px;
   }
   .humc-frame__logo img {
     display: block;
@@ -118,11 +142,12 @@
     align-items: center;
     justify-content: center;
     gap: 36px;
-    min-height: 52px;
-    background: #005696;
+    min-height: 48px;
+    background: #095aa6;
     color: #fff;
     font-size: 0.92rem;
-    letter-spacing: 0.04em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
   .humc-frame__nav a,
@@ -136,27 +161,78 @@
     text-underline-offset: 3px;
   }
   .humc-frame__foot {
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    padding: 36px var(--page-margin);
-    background: #005696;
+    padding: 28px var(--page-margin, 24px) 36px;
+    background: #095aa6;
     color: #fff;
   }
-  .humc-body .product-form-buttons .button,
-  .humc-body button[name="add"],
-  .humc-body .buy-buttons .button {
-    background: #005696 !important;
-    color: #fff !important;
-    border-color: #005696 !important;
-  }
-
-  .humc-frame__foot nav {
+  .humc-frame__foot-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 28px;
+    justify-content: space-between;
+    gap: 28px 48px;
+    max-width: 1100px;
+    margin-inline: auto;
   }
+  .humc-frame__foot-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 22px;
+    align-items: flex-start;
+    font-size: 0.9rem;
+  }
+  .humc-frame__foot-links a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .humc-frame__updates {
+    max-width: 360px;
+  }
+  .humc-frame__updates > p:first-child {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .humc-frame__updates-form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .humc-frame__updates-form input[type='email'] {
+    flex: 1 1 180px;
+    min-width: 160px;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 0;
+    font-size: 0.9rem;
+  }
+  .humc-frame__updates-form button {
+    padding: 8px 14px;
+    border: 0;
+    background: #2792c3;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .humc-frame__note {
+    margin: 10px 0 0;
+    font-size: 0.75rem;
+    font-style: italic;
+    opacity: 0.95;
+  }
+  .humc-frame__thanks {
+    margin: 0;
+  }
+  .humc-body .product-form-buttons .button,
+  .humc-body button[name='add'],
+  .humc-body .buy-buttons .button {
+    background: #095aa6 !important;
+    color: #fff !important;
+    border-color: #095aa6 !important;
+  }
+
   #PBarNextFrame {
     display: none !important;
   }

@@ -50,19 +50,30 @@
               {%- continue -%}
             {%- endunless -%}
             {%- assign type_l = product.type | downcase -%}
+            {%- assign title_l = product.title | downcase -%}
             {%- assign groups = 'all' -%}
-            {%- if product.title contains 'Heavyweight' -%}
+            {%- if product.title contains 'Heavyweight' or type_l == 'value buy' -%}
               {%- assign groups = groups | append: ' value' -%}
             {%- endif -%}
-            {%- if type_l == 'tee' -%}
+            {%- if type_l == 'tee' or title_l contains 'tee' -%}
               {%- assign groups = groups | append: ' tees' -%}
-            {%- elsif type_l == 'outerwear' -%}
+            {%- endif -%}
+            {%- if type_l == 'outerwear' or title_l contains 'fleece' or title_l contains 'hoodie' or title_l contains 'zip' -%}
               {%- assign groups = groups | append: ' outerwear' -%}
-            {%- elsif type_l == 'headwear' -%}
+            {%- endif -%}
+            {%- if type_l == 'polo' or title_l contains 'polo' -%}
+              {%- assign groups = groups | append: ' polos' -%}
+            {%- endif -%}
+            {%- if type_l == 'scrub' or title_l contains 'scrub' -%}
+              {%- assign groups = groups | append: ' scrubs' -%}
+            {%- endif -%}
+            {%- if type_l == 'headwear' or title_l contains 'hat' or title_l contains 'cap' or title_l contains 'trucker' -%}
               {%- assign groups = groups | append: ' headwear' -%}
-            {%- elsif type_l == 'bag' -%}
+            {%- endif -%}
+            {%- if type_l == 'bag' or title_l contains 'bag' or title_l contains 'tote' -%}
               {%- assign groups = groups | append: ' bags' -%}
-            {%- elsif type_l == 'drinkware' -%}
+            {%- endif -%}
+            {%- if type_l == 'drinkware' or title_l contains 'tumbler' or title_l contains 'mug' -%}
               {%- assign groups = groups | append: ' drinkware' -%}
             {%- endif -%}
             <li data-groups="{{ groups | strip }}">
@@ -90,7 +101,7 @@
                   {%- endunless -%}
                 </span>
                 <span class="humc-catalog__title">{{ product.title | escape }}</span>
-                <span class="humc-catalog__price">{{ product.price | money }}</span>
+                <span class="humc-catalog__price">{{ product.price | money }} USD*</span>
               </a>
             </li>
           {%- endfor -%}
