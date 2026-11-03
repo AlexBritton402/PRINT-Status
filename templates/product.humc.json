@@ -164,6 +164,7 @@
             "divider_VJhene": {
               "type": "_divider",
               "name": "t:names.divider",
+              "disabled": true,
               "settings": {
                 "thickness": 1,
                 "corner_radius": "square",
@@ -175,6 +176,7 @@
             },
             "variant_picker_R3rGDr": {
               "type": "variant-picker",
+              "disabled": true,
               "settings": {
                 "variant_style": "buttons",
                 "show_swatches": false,
@@ -225,6 +227,7 @@
             "text_aEtTtq": {
               "type": "text",
               "name": "Product description",
+              "disabled": true,
               "settings": {
                 "text": "{{ closest.product.description }}",
                 "width": "100%",
@@ -258,6 +261,7 @@
             },
             "company-store-link": {
               "type": "company-store-link",
+              "disabled": true,
               "settings": {
                 "label": "Back to HUMC Gear",
                 "padding-block-start": 0,
@@ -267,23 +271,23 @@
             }
           },
           "block_order": [
-            "company-store-link",
             "group_icgrde",
             "price_RrMEK3",
-            "divider_VJhene",
             "humc-customize",
-            "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
-            "text_aEtTtq"
+            "divider_VJhene",
+            "variant_picker_R3rGDr",
+            "text_aEtTtq",
+            "company-store-link"
           ]
         }
       },
       "settings": {
         "content_width": "content-center-aligned",
         "desktop_media_position": "left",
-        "equal_columns": false,
+        "equal_columns": true,
         "limit_details_width": false,
-        "gap": 20,
+        "gap": 28,
         "enable_sticky_add_to_cart": false,
         "color_scheme": "",
         "padding-block-start": 0,
