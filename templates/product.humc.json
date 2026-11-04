@@ -251,14 +251,6 @@
               },
               "blocks": {}
             },
-            "humc-customize": {
-              "type": "humc-customize",
-              "settings": {
-                "padding-block-start": 8,
-                "padding-block-end": 8
-              },
-              "blocks": {}
-            },
             "company-store-link": {
               "type": "company-store-link",
               "disabled": true,
@@ -273,10 +265,9 @@
           "block_order": [
             "group_icgrde",
             "price_RrMEK3",
-            "humc-customize",
+            "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",
             "divider_VJhene",
-            "variant_picker_R3rGDr",
             "text_aEtTtq",
             "company-store-link"
           ]
