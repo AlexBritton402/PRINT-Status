@@ -174,22 +174,49 @@
       {%- comment -%} One stage image at a time; angle thumbs swap pre-meshed mockups (not logo overlays). {%- endcomment -%}
       <img data-humc-demo-photo alt="{{ title | escape }}" width="600" height="600">
     </div>
-    <div class="humc-customize__views" data-humc-views role="tablist" aria-label="Product views">
-      <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
-        <img data-humc-view-thumb="Front" alt="" width="72" height="72">
-        <span>Front</span>
-      </button>
-      <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
-        <img data-humc-view-thumb="Back" alt="" width="72" height="72">
-        <span>Back</span>
-      </button>
-      <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
-        <img data-humc-view-thumb="Right" alt="" width="72" height="72">
-        <span>Right sleeve</span>
-      </button>
+    <div
+      class="humc-customize__views{% if logo_map_kind == 'soft-tee' %} humc-customize__views--tee{% elsif logo_map_kind == 'zip' %} humc-customize__views--zip{% endif %}"
+      data-humc-views
+      role="tablist"
+      aria-label="Product views"
+    >
+      {%- if logo_map_kind == 'soft-tee' -%}
+        <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
+          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+          <span>Front design</span>
+        </button>
+        <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
+          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+          <span>Back design</span>
+        </button>
+      {%- else -%}
+        <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
+          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+          <span>Front</span>
+        </button>
+        <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
+          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+          <span>Back</span>
+        </button>
+        <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
+          <img data-humc-view-thumb="Right" alt="" width="72" height="72">
+          <span>Right sleeve</span>
+        </button>
+      {%- endif -%}
     </div>
     <p class="humc-customize__caption" data-humc-demo-caption></p>
   </div>
+
+  {%- comment -%} vv order: views → color swatches → front design / logo {%- endcomment -%}
+  <fieldset class="humc-customize__set" data-color-set>
+    <legend>{{ color_legend | escape }}</legend>
+    <p class="humc-customize__color-name" data-color-name></p>
+    <div class="humc-customize__swatches" data-swatches role="list"></div>
+    <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
+    <input type="hidden" name="properties[Color]" form="{{ form_id }}" value="">
+    <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
+    <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="As shown">
+  </fieldset>
 
   {%- if show_logo_picker -%}
     <fieldset class="humc-customize__set">
@@ -207,41 +234,8 @@
     </fieldset>
   {%- endif -%}
 
-  <fieldset class="humc-customize__set" data-color-set>
-    <legend>{{ color_legend | escape }}</legend>
-    <p class="humc-customize__color-name" data-color-name></p>
-    <div class="humc-customize__swatches" data-swatches role="list"></div>
-    <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
-    <input type="hidden" name="properties[Color]" form="{{ form_id }}" value="">
-    <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
-    <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="As shown">
-  </fieldset>
-
-  {%- if needs_size -%}
-    <fieldset class="humc-customize__set">
-      <legend>Size</legend>
-      <div class="humc-customize__size-grid" data-size-grid role="list">
-        {%- for size in sizes -%}
-          <label class="humc-customize__size-cell">
-            <span class="humc-customize__size-label">{{ size | escape }}</span>
-            <input
-              type="number"
-              class="humc-customize__size-qty"
-              data-size-qty="{{ size | escape }}"
-              min="0"
-              max="99"
-              value="0"
-              inputmode="numeric"
-              aria-label="Quantity for {{ size | escape }}"
-            >
-          </label>
-        {%- endfor -%}
-      </div>
-      <input type="hidden" name="properties[Size]" form="{{ form_id }}" value="">
-    </fieldset>
-  {%- else -%}
-    <input type="hidden" name="properties[Size]" form="{{ form_id }}" value="One size">
-  {%- endif -%}
+  {%- comment -%} vv CUSTOMIZABLE uses quantity only — no size matrix on the shopper PDP. {%- endcomment -%}
+  <input type="hidden" name="properties[Size]" form="{{ form_id }}" value="">
 
   <p class="humc-customize__summary" data-summary></p>
   <p class="humc-customize__error" data-error hidden></p>
@@ -370,17 +364,12 @@
     }
 
     function syncListingTitle() {
-      // Only rewrite the heading when the customizable logo picker is on.
-      if (!showLogoPicker) return;
-      var next = TITLE_FOR_LOGO[logoName];
-      if (!next) return;
-      document.querySelectorAll('.product-details h1, .product-information h1, h1').forEach(function (h) {
-        if (/zip|fleece|tee|hoodie|customizable|humc|la county/i.test(h.textContent || '')) {
-          h.textContent = next;
-        }
-      });
+      // Keep the Shopify listing title (e.g. "… - CUSTOMIZABLE") — vv does not rename the H1
+      // when the shopper picks a left-chest logo. Only update the breadcrumb trail quietly.
       var crumb = root.querySelector('[data-humc-crumb-title]');
-      if (crumb) crumb.textContent = next;
+      if (crumb && root.getAttribute('data-product-title')) {
+        crumb.textContent = root.getAttribute('data-product-title');
+      }
     }
 
     function showError(msg) {
@@ -394,7 +383,7 @@
       var bits = [];
       if (currentColorName) bits.push(currentColorName);
       if (logoInput && logoInput.value) bits.push(logoInput.value);
-      if (sizeInput && sizeInput.value) bits.push(sizeInput.value);
+      if (needsSize && sizeInput && sizeInput.value) bits.push(sizeInput.value);
       summary.textContent = bits.join(' · ');
     }
 
@@ -432,9 +421,14 @@
       img.src = url;
     }
 
+    function viewAngles() {
+      // Soft tee (vv): Front design / Back design only. Zip: Front / Back / Right sleeve.
+      if (logoMapKind === 'soft-tee') return ['Front', 'Back'];
+      return ['Front', 'Back', 'Right'];
+    }
+
     function fillThumbs() {
-      // vv Radiant CUSTOMIZABLE: Front / Back / Right sleeve only
-      ['Front', 'Back', 'Right'].forEach(function (angle) {
+      viewAngles().forEach(function (angle) {
         var btn = root.querySelector('[data-view="' + angle + '"]');
         var thumb = root.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = stockUrl(familyId, currentColorId, angle);
@@ -456,7 +450,7 @@
               thumb.hidden = true;
             }
             if (btn) {
-              // Front always stays; other missing angles hide like Chipply only showing available shots
+              // Front always stays; other missing angles hide like only available shots
               if (angle === 'Front') {
                 btn.hidden = false;
               } else {
@@ -471,7 +465,14 @@
 
     function setView(angle) {
       currentView = angle || 'Front';
-      var label = currentView === 'Left' ? 'Left sleeve' : currentView === 'Right' ? 'Right sleeve' : currentView;
+      var label =
+        logoMapKind === 'soft-tee'
+          ? currentView === 'Back'
+            ? 'Back design'
+            : 'Front design'
+          : currentView === 'Right'
+            ? 'Right sleeve'
+            : currentView;
       root.querySelectorAll('[data-view]').forEach(function (btn) {
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
@@ -822,8 +823,16 @@
 
   .humc-customize__views {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.4rem;
+  }
+
+  .humc-customize__views--tee {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .humc-customize__views--zip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .humc-customize__view {
