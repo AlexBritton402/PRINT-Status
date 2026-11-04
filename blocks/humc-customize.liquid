@@ -1,8 +1,8 @@
 {%- comment -%}
-  HUMC Gear purchase options — replica of humcgear.com (Chipply company store).
-  Large photo + Front/Back/Left sleeve/Right sleeve thumbs.
-  Color swatches, size qty boxes, Add to cart via Horizon buy-buttons.
-  Logo is the listing photo family (Standard / Single-color / LA County).
+  HUMC CUSTOMIZABLE PDPs — match vv Radiant shopper view:
+  Front / Back / Right sleeve, jacket/shirt color swatches, design/logo,
+  quantity (no Chipply size grid). Pre-meshed mockup photos only.
+  Non-customizable catalog SKUs keep a simple Horizon buy box (like vv).
 {%- endcomment -%}
 
 {%- liquid
@@ -12,36 +12,33 @@
   assign form_id = 'BuyButtons-ProductForm-' | append: section.id
   assign handle_tail = product_resource.handle | split: '-' | last
 
-  assign needs_size = true
-  if title_l contains 'hat' or title_l contains 'bag' or title_l contains 'tumbler' or title_l contains 'tote' or title_l contains 'cap' or title_l contains 'duffle' or title_l contains 'duffel'
-    assign needs_size = false
+  assign is_customizable = false
+  if title_l contains 'customizable'
+    assign is_customizable = true
   endif
 
-  assign default_logo = 'Standard HUMC'
+  comment
+    vv CUSTOMIZABLE uses quantity only — no XS–4XL size matrix.
+  endcomment
+  assign needs_size = false
+
+  assign default_logo = 'LA County'
   assign family_id = ''
   assign show_logo_picker = false
   assign logo_map_kind = 'none'
-  if title_l contains 'customizable'
+  assign color_legend = 'Color'
+  if is_customizable
     assign show_logo_picker = true
   endif
   if title_l contains 'soft blend'
     assign logo_map_kind = 'soft-tee'
-    assign default_logo = 'Single-color HUMC'
-  elsif title_l contains 'sustainable'
-    assign logo_map_kind = 'hoodie'
-    assign default_logo = 'Single-color HUMC'
+    assign color_legend = 'Shirt color'
   elsif title_l contains '1/4 zip' or title_l contains 'zip fleece'
     assign logo_map_kind = 'zip'
-  elsif title_l contains 'duffel' or title_l contains 'duffle' or title_l contains 'canvas bag' or title_l contains 'jumbo'
-    assign logo_map_kind = 'bag'
-    assign show_logo_picker = true
-  elsif title_l contains 'tilikum' or title_l contains 'trucker' or title_l contains 'snapback' or title_l contains 'cap' or title_l contains 'hat'
-    assign logo_map_kind = 'hat'
-    assign default_logo = 'LA County'
+    assign color_legend = 'Jacket color'
   endif
   comment
-    Logo label from listing title. Check Standard / Single Color before bare
-    "LA County" — many titles include both (e.g. Standard + sleeve seal).
+    Prefer LA County left-chest look to match vv default design.
   endcomment
   if title contains 'Standard HUMC' or title contains 'w/ Standard'
     assign default_logo = 'Standard HUMC'
@@ -128,44 +125,25 @@
   elsif title_l contains 'soft blend tee'
     assign family_phrase = 'unisex soft blend tee'
     if family_id == blank
-      if title contains '19193821' or product_resource.handle contains '19193821'
+      if default_logo == 'LA County'
+        assign family_id = '18991476'
+      elsif title contains '19193821' or product_resource.handle contains '19193821'
         assign family_id = '19193821'
       else
         assign family_id = '19027956'
       endif
     endif
-  elsif title_l contains 'tilikum' or title_l contains 'trucker' or title_l contains 'snapback' or title_l contains 'otto' or title_l contains 'cap' or title_l contains 'hat'
-    assign family_phrase = 'trucker hat'
-    if family_id == blank
-      assign family_id = '19193876'
-    endif
-  elsif title_l contains 'duffel' or title_l contains 'duffle' or title_l contains 'canvas bag' or title_l contains 'jumbo'
-    assign family_phrase = 'jumbo canvas bag'
-    if family_id == blank
-      if default_logo == 'Single-color HUMC'
-        assign family_id = '18417261'
-      elsif default_logo == 'LA County'
-        assign family_id = '18753436'
-      else
-        assign family_id = '18416451'
-      endif
-    endif
-  elsif title_l contains 'tumbler'
-    assign family_phrase = 'tumbler'
-    if family_id == blank
-      assign family_id = '13923078'
-    endif
   endif
 
-  assign sizes = 'XS,S,M,L,XL,2XL,3XL,4XL' | split: ','
+  assign sizes = 'S,M,L,XL,2XL' | split: ','
 -%}
 
-{%- unless title_l contains 'personalization' -%}
+{%- if is_customizable -%}
 <div
   class="humc-customize spacing-style"
   data-humc-customize
   data-form-id="{{ form_id }}"
-  data-needs-size="{% if needs_size %}true{% else %}false{% endif %}"
+  data-needs-size="false"
   data-product-title="{{ title | escape }}"
   data-product-handle="{{ product_resource.handle | escape }}"
   data-source-id="{{ handle_tail | escape }}"
@@ -175,6 +153,7 @@
   data-show-logo-picker="{% if show_logo_picker %}true{% else %}false{% endif %}"
   data-logo-map-kind="{{ logo_map_kind | escape }}"
   data-family-phrase="{{ family_phrase | escape }}"
+  data-color-legend="{{ color_legend | escape }}"
   data-preview-map="{{ 'humc-preview.json' | asset_url }}"
   data-asset-base="{{ 'humc-preview.json' | asset_url | split: 'humc-preview.json' | first }}"
   style="{% render 'spacing-style', settings: block.settings %}"
@@ -204,10 +183,6 @@
         <img data-humc-view-thumb="Back" alt="" width="72" height="72">
         <span>Back</span>
       </button>
-      <button type="button" class="humc-customize__view" data-view="Left" aria-pressed="false">
-        <img data-humc-view-thumb="Left" alt="" width="72" height="72">
-        <span>Left sleeve</span>
-      </button>
       <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
         <img data-humc-view-thumb="Right" alt="" width="72" height="72">
         <span>Right sleeve</span>
@@ -218,30 +193,22 @@
 
   {%- if show_logo_picker -%}
     <fieldset class="humc-customize__set">
-      <legend>Logo</legend>
+      <legend>Front design</legend>
       <div class="humc-customize__chips" role="list">
         {%- if logo_map_kind == 'soft-tee' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19027956" aria-pressed="false">Single-color HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18991476" aria-pressed="false">LA County</button>
-        {%- elsif logo_map_kind == 'hoodie' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19193761" aria-pressed="false">Single-color HUMC</button>
-        {%- elsif logo_map_kind == 'bag' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18416451" aria-pressed="false">Standard HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18417261" aria-pressed="false">Single-color HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18753436" aria-pressed="false">LA County</button>
-        {%- elsif logo_map_kind == 'hat' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="19193876" aria-pressed="false">LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18991476" aria-pressed="false">Left Chest LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19027956" aria-pressed="false">Left Chest Single-color HUMC</button>
         {%- elsif logo_map_kind == 'zip' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Standard HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Single-color HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">Left Chest LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Left Chest Standard HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Left Chest Single-color HUMC</button>
         {%- endif -%}
       </div>
     </fieldset>
   {%- endif -%}
 
   <fieldset class="humc-customize__set" data-color-set>
-    <legend>Color</legend>
+    <legend>{{ color_legend | escape }}</legend>
     <p class="humc-customize__color-name" data-color-name></p>
     <div class="humc-customize__swatches" data-swatches role="list"></div>
     <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
@@ -281,40 +248,6 @@
   <div class="humc-customize__buy-slot" data-humc-buy-slot></div>
   <p class="humc-customize__tax">*Tax collected only if you are in the state of California.</p>
 
-  {%- if family_phrase == '1/4 zip fleece' -%}
-    <ul class="humc-customize__bullets">
-      <li>8.3-ounce, 65/35 ring spun cotton/polyester</li>
-      <li>100% ring spun cotton face (Solids, Light Heather Grey)</li>
-      <li>60/40 ring spun cotton/polyester (Heathered Charcoal)</li>
-      <li>Dyed-to-match twill back neck tape</li>
-      <li>YKK Vislon® dyed-to-match zipper</li>
-      <li>Side seamed</li>
-      <li>1x1 rib knit cuffs and hem</li>
-      <li>Front pouch pocket</li>
-      <li>Tear-away label</li>
-    </ul>
-
-    <div class="humc-customize__size-guide">
-      <h3 class="humc-customize__size-guide-title">Size Guide</h3>
-      <p class="humc-customize__size-guide-note">Chest — measure under arms around the fullest part of the chest.</p>
-      <div class="humc-customize__size-table-wrap">
-        <table class="humc-customize__size-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th><th>4XL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Chest</th>
-              <td>32-34</td><td>35-37</td><td>38-40</td><td>41-43</td><td>44-46</td><td>47-49</td><td>50-53</td><td>54-57</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  {%- endif -%}
 </div>
 
 <script>
@@ -433,9 +366,7 @@
       document.querySelectorAll('a').forEach(function (a) {
         if (/back to humc/i.test(a.textContent || '')) a.style.display = 'none';
       });
-      document.querySelectorAll('quantity-selector, .quantity-selector, .quantity').forEach(function (el) {
-        el.style.display = 'none';
-      });
+      // Keep Horizon quantity stepper — vv CUSTOMIZABLE uses quantity, not a size matrix.
     }
 
     function syncListingTitle() {
@@ -502,7 +433,8 @@
     }
 
     function fillThumbs() {
-      ['Front', 'Back', 'Left', 'Right'].forEach(function (angle) {
+      // vv Radiant CUSTOMIZABLE: Front / Back / Right sleeve only
+      ['Front', 'Back', 'Right'].forEach(function (angle) {
         var btn = root.querySelector('[data-view="' + angle + '"]');
         var thumb = root.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = stockUrl(familyId, currentColorId, angle);
@@ -669,6 +601,20 @@
         seen[key] = true;
         return true;
       });
+      // Match vv Zepto shopper color rows (not the full Chipply catalog).
+      var allow =
+        logoMapKind === 'soft-tee'
+          ? ['Aqua Heather', 'Awareness Pink Heather', 'Black', 'Heathered Red', 'Charcoal', 'Deep Orange Heather']
+          : logoMapKind === 'zip'
+            ? ['Black', 'Charcoal', 'Heathered Charcoal', 'Light Heather Grey', 'New Navy', 'Deep Royal']
+            : null;
+      if (allow) {
+        colors = allow
+          .map(function (name) {
+            return colors.find(function (c) { return c.name === name; });
+          })
+          .filter(Boolean);
+      }
       swatchBox.innerHTML = '';
       colors.forEach(function (color) {
         var btn = document.createElement('button');
@@ -689,11 +635,10 @@
         chosen = colors.find(function (c) { return c.name === currentColorName; });
       }
       if (!chosen) {
-        // Chipply Standard zip opens on Light Heather Grey (not Black).
+        // vv opens CUSTOMIZABLE garments on Black.
         chosen =
-          colors.find(function (c) { return /light heather grey/i.test(c.name || ''); }) ||
-          colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
           colors.find(function (c) { return c.name === 'Black'; }) ||
+          colors.find(function (c) { return String(c.id) === String(entry.default); }) ||
           colors[0];
       }
       if (chosen) selectColor(chosen.name, chosen.id);
@@ -843,7 +788,7 @@
     }
   })();
 </script>
-{%- endunless -%}
+{%- endif -%}
 
 {%- if title_l contains 'personalization' -%}
   <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
