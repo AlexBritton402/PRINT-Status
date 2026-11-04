@@ -32,6 +32,12 @@
     assign default_logo = 'Single-color HUMC'
   elsif title_l contains '1/4 zip' or title_l contains 'zip fleece'
     assign logo_map_kind = 'zip'
+  elsif title_l contains 'duffel' or title_l contains 'duffle' or title_l contains 'canvas bag' or title_l contains 'jumbo'
+    assign logo_map_kind = 'bag'
+    assign show_logo_picker = true
+  elsif title_l contains 'tilikum' or title_l contains 'trucker' or title_l contains 'snapback' or title_l contains 'cap' or title_l contains 'hat'
+    assign logo_map_kind = 'hat'
+    assign default_logo = 'LA County'
   endif
   comment
     Logo label from listing title. Check Standard / Single Color before bare
@@ -128,12 +134,12 @@
         assign family_id = '19027956'
       endif
     endif
-  elsif title_l contains 'trucker' or title_l contains 'snapback'
+  elsif title_l contains 'tilikum' or title_l contains 'trucker' or title_l contains 'snapback' or title_l contains 'otto' or title_l contains 'cap' or title_l contains 'hat'
     assign family_phrase = 'trucker hat'
     if family_id == blank
       assign family_id = '19193876'
     endif
-  elsif title_l contains 'canvas bag' or title_l contains 'jumbo'
+  elsif title_l contains 'duffel' or title_l contains 'duffle' or title_l contains 'canvas bag' or title_l contains 'jumbo'
     assign family_phrase = 'jumbo canvas bag'
     if family_id == blank
       if default_logo == 'Single-color HUMC'
@@ -219,7 +225,13 @@
           <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18991476" aria-pressed="false">LA County</button>
         {%- elsif logo_map_kind == 'hoodie' -%}
           <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19193761" aria-pressed="false">Single-color HUMC</button>
-        {%- else -%}
+        {%- elsif logo_map_kind == 'bag' -%}
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18416451" aria-pressed="false">Standard HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18417261" aria-pressed="false">Single-color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18753436" aria-pressed="false">LA County</button>
+        {%- elsif logo_map_kind == 'hat' -%}
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="19193876" aria-pressed="false">LA County</button>
+        {%- elsif logo_map_kind == 'zip' -%}
           <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Standard HUMC</button>
           <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Single-color HUMC</button>
           <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">LA County</button>
@@ -347,6 +359,14 @@
       },
       hoodie: {
         'Single-color HUMC': '19193761'
+      },
+      bag: {
+        'Standard HUMC': '18416451',
+        'Single-color HUMC': '18417261',
+        'LA County': '18753436'
+      },
+      hat: {
+        'LA County': '19193876'
       }
     };
     var TITLE_FOR_LOGO_BY_KIND = {
@@ -361,6 +381,14 @@
       },
       hoodie: {
         'Single-color HUMC': "Women's Sustainable Full Zip Hoodie w/ Single Color HUMC Logo and LA County Logo on Sleeve"
+      },
+      bag: {
+        'Standard HUMC': 'Jumbo Canvas Bag w/ Standard HUMC Logo',
+        'Single-color HUMC': 'Jumbo Canvas Bag w/ Single Color HUMC Logo',
+        'LA County': 'Jumbo Canvas Bag w/ LA County Logo'
+      },
+      hat: {
+        'LA County': 'Snapback Trucker Hat w/ LA County Logo'
       }
     };
     var LOGO_FAMILY = LOGO_FAMILY_BY_KIND[logoMapKind] || LOGO_FAMILY_BY_KIND.zip;
