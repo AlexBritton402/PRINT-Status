@@ -208,31 +208,59 @@
     {%- endif -%}
   </div>
 
-  {%- comment -%} vv order: views → color swatches → front design / logo {%- endcomment -%}
-  <fieldset class="humc-customize__set" data-color-set>
-    <legend>{{ color_legend | escape }}</legend>
+  {%- comment -%}
+    vv Zepto: each angle tab exposes that location's color + design.
+    Front / Back / Right sleeve each keep their own design (incl. BLANK).
+  {%- endcomment -%}
+  <fieldset class="humc-customize__set" data-color-set data-location-panel="color">
+    <legend data-color-legend>{{ color_legend | escape }}</legend>
     <p class="humc-customize__color-name" data-color-name></p>
     <div class="humc-customize__swatches" data-swatches role="list"></div>
     <input type="hidden" name="properties[Store]" form="{{ form_id }}" value="HUMC Gear">
     <input type="hidden" name="properties[Color]" form="{{ form_id }}" value="">
+    <input type="hidden" name="properties[Front design]" form="{{ form_id }}" value="Left Chest LA County" data-design-input="Front">
+    <input type="hidden" name="properties[Back design]" form="{{ form_id }}" value="BLANK" data-design-input="Back">
+    <input type="hidden" name="properties[Right sleeve design]" form="{{ form_id }}" value="BLANK" data-design-input="Right">
     <input type="hidden" name="properties[Logo]" form="{{ form_id }}" value="{{ default_logo | escape }}">
     <input type="hidden" name="properties[Print locations]" form="{{ form_id }}" value="As shown">
   </fieldset>
 
   {%- if show_logo_picker -%}
-    <fieldset class="humc-customize__set">
-      <legend>Front design</legend>
-      <div class="humc-customize__chips" role="list">
+    <fieldset class="humc-customize__set" data-design-panel="Front">
+      <legend data-design-legend>Front design</legend>
+      <div class="humc-customize__chips" role="list" data-design-chips="Front">
         {%- if logo_map_kind == 'soft-tee' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18991476" aria-pressed="false">Left Chest LA County</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19027956" aria-pressed="false">Left Chest Single-color HUMC</button>
-        {%- elsif logo_map_kind == 'zip' -%}
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">Left Chest LA County</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Left Chest Standard HUMC</button>
-          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Left Chest Single-color HUMC</button>
+          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Front" data-value="Left Chest LA County" data-family-id="18991476" aria-pressed="true">Left Chest LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest Single-color HUMC" data-family-id="19027956" aria-pressed="false">Left Chest Single-color HUMC</button>
+        {%- else -%}
+          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Front" data-value="Left Chest LA County" data-family-id="18993506" aria-pressed="true">Left Chest LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest White LA County" data-family-id="18867111" aria-pressed="false">Left Chest White LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest Full Color HUMC" data-family-id="18991186" aria-pressed="false">Left Chest Full Color HUMC</button>
         {%- endif -%}
       </div>
     </fieldset>
+
+    <fieldset class="humc-customize__set" data-design-panel="Back" hidden>
+      <legend>Back design</legend>
+      <div class="humc-customize__chips" role="list" data-design-chips="Back">
+        <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Back" data-value="BLANK" data-family-id="" aria-pressed="true">BLANK</button>
+        {%- if logo_map_kind == 'soft-tee' -%}
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back LA County" data-family-id="18991476" aria-pressed="false">Full Back LA County</button>
+        {%- else -%}
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back LA County" data-family-id="18993506" aria-pressed="false">Full Back LA County</button>
+        {%- endif -%}
+      </div>
+    </fieldset>
+
+    {%- if logo_map_kind == 'zip' -%}
+      <fieldset class="humc-customize__set" data-design-panel="Right" hidden>
+        <legend>Right sleeve design</legend>
+        <div class="humc-customize__chips" role="list" data-design-chips="Right">
+          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Right" data-value="BLANK" data-family-id="" aria-pressed="true">BLANK</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="LA County" data-family-id="18991186" aria-pressed="false">LA County</button>
+        </div>
+      </fieldset>
+    {%- endif -%}
   {%- endif -%}
 
   {%- comment -%} vv CUSTOMIZABLE uses quantity only — no size matrix on the shopper PDP. {%- endcomment -%}
@@ -271,56 +299,46 @@
     var currentColorName = '';
     var currentView = 'Front';
     var familyId = root.getAttribute('data-family-id') || '';
-    var logoName = root.getAttribute('data-logo-name') || 'Standard HUMC';
     var logoMapKind = root.getAttribute('data-logo-map-kind') || 'zip';
 
-    // Pre-meshed Chipply mockup families — logo choice swaps photo pack, never overlays a crest.
-    var LOGO_FAMILY_BY_KIND = {
-      zip: {
-        'Standard HUMC': '18991186',
-        'Single-color HUMC': '18867111',
-        'LA County': '18993506'
-      },
-      'soft-tee': {
-        'Single-color HUMC': '19027956',
-        'LA County': '18991476'
-      },
-      hoodie: {
-        'Single-color HUMC': '19193761'
-      },
-      bag: {
-        'Standard HUMC': '18416451',
-        'Single-color HUMC': '18417261',
-        'LA County': '18753436'
-      },
-      hat: {
-        'LA County': '19193876'
-      }
+    // Per-location designs — mirrors vv Zepto FRONT / BACK / RIGHT SLEEVE design fields.
+    var designs = {
+      Front: 'Left Chest LA County',
+      Back: 'BLANK',
+      Right: 'BLANK'
     };
-    var TITLE_FOR_LOGO_BY_KIND = {
-      zip: {
-        'Standard HUMC': '1/4 Zip Fleece w/ Standard HUMC Logo and LA County Logo on Sleeve',
-        'Single-color HUMC': '1/4 Zip Fleece w/ Single Color HUMC Logo and LA County Logo on Sleeve',
-        'LA County': '1/4 Zip Fleece w/ LA County Logo'
-      },
-      'soft-tee': {
-        'Single-color HUMC': 'Unisex Soft Blend Tee w/ Single Color HUMC Logo',
-        'LA County': 'Unisex Soft Blend Tee w/ LA County Logo on Front and Back'
-      },
-      hoodie: {
-        'Single-color HUMC': "Women's Sustainable Full Zip Hoodie w/ Single Color HUMC Logo and LA County Logo on Sleeve"
-      },
-      bag: {
-        'Standard HUMC': 'Jumbo Canvas Bag w/ Standard HUMC Logo',
-        'Single-color HUMC': 'Jumbo Canvas Bag w/ Single Color HUMC Logo',
-        'LA County': 'Jumbo Canvas Bag w/ LA County Logo'
-      },
-      hat: {
-        'LA County': 'Snapback Trucker Hat w/ LA County Logo'
-      }
-    };
-    var LOGO_FAMILY = LOGO_FAMILY_BY_KIND[logoMapKind] || LOGO_FAMILY_BY_KIND.zip;
-    var TITLE_FOR_LOGO = TITLE_FOR_LOGO_BY_KIND[logoMapKind] || TITLE_FOR_LOGO_BY_KIND.zip;
+
+    // Pre-meshed family ids for each location + design (no crest overlays).
+    var DESIGN_FAMILY = logoMapKind === 'soft-tee'
+      ? {
+          Front: {
+            'Left Chest LA County': '18991476',
+            'Left Chest Single-color HUMC': '19027956'
+          },
+          Back: {
+            BLANK: '19027956',
+            'Full Back LA County': '18991476'
+          },
+          Right: {}
+        }
+      : {
+          Front: {
+            'Left Chest LA County': '18993506',
+            'Left Chest White LA County': '18867111',
+            'Left Chest Full Color HUMC': '18991186'
+          },
+          Back: {
+            BLANK: '18993506',
+            'Full Back LA County': '18993506'
+          },
+          Right: {
+            BLANK: '18991186',
+            'LA County': '18991186'
+          }
+        };
+
+    // Blank / plain shot helpers (Chipply plain packs when a location is BLANK).
+    var BLANK_PACK = logoMapKind === 'soft-tee' ? '19027956' : '18991186';
 
     function assetBase() {
       return root.getAttribute('data-asset-base') || '';
@@ -332,6 +350,60 @@
     }
     function viewsHost() {
       return root.querySelector('[data-humc-views]') || document.querySelector('[data-humc-views]') || root;
+    }
+
+    function colorLegendFor(view) {
+      if (logoMapKind === 'soft-tee') {
+        return view === 'Back' ? 'Shirt color back' : 'Shirt color front';
+      }
+      if (view === 'Back') return 'Back jacket color';
+      if (view === 'Right') return 'Jacket sleeve color';
+      return 'Jacket color';
+    }
+
+    function designLabelFor(view) {
+      if (logoMapKind === 'soft-tee') {
+        return view === 'Back' ? 'Back design' : 'Front design';
+      }
+      if (view === 'Back') return 'Back design';
+      if (view === 'Right') return 'Right sleeve design';
+      return 'Front design';
+    }
+
+    function familyFor(location, designName) {
+      var map = DESIGN_FAMILY[location] || {};
+      return map[designName] || familyId || root.getAttribute('data-family-id') || '';
+    }
+
+    function syncDesignInputs() {
+      Object.keys(designs).forEach(function (loc) {
+        var input = root.querySelector('[data-design-input="' + loc + '"]');
+        if (input) input.value = designs[loc];
+      });
+      if (logoInput) {
+        logoInput.value = ['Front: ' + designs.Front, 'Back: ' + designs.Back]
+          .concat(logoMapKind === 'zip' ? ['Right: ' + designs.Right] : [])
+          .join(' · ');
+      }
+      if (placeInput) {
+        var parts = [];
+        if (designs.Front && designs.Front !== 'BLANK') parts.push('Front');
+        if (designs.Back && designs.Back !== 'BLANK') parts.push('Back');
+        if (logoMapKind === 'zip' && designs.Right && designs.Right !== 'BLANK') parts.push('Right sleeve');
+        placeInput.value = parts.length ? parts.join(', ') : 'As shown';
+      }
+    }
+
+    function showLocationPanels(view) {
+      root.querySelectorAll('[data-design-panel]').forEach(function (panel) {
+        var loc = panel.getAttribute('data-design-panel');
+        panel.hidden = loc !== view;
+      });
+      var legend = root.querySelector('[data-color-legend]');
+      if (legend) legend.textContent = colorLegendFor(view);
+      // vv still shows color on every tab (shirt/jacket/sleeve color labels change).
+      var colorSet = root.querySelector('[data-color-set]');
+      if (colorSet) colorSet.hidden = false;
     }
 
     function mountChipplyLayout() {
@@ -389,17 +461,26 @@
 
     function refreshSummary() {
       if (!summary) return;
-      var bits = [];
-      if (currentColorName) bits.push(currentColorName);
-      if (logoInput && logoInput.value) bits.push(logoInput.value);
-      if (needsSize && sizeInput && sizeInput.value) bits.push(sizeInput.value);
-      summary.textContent = bits.join(' · ');
+      var bits = [currentColorName, designLabelFor(currentView) + ' — ' + (designs[currentView] || 'BLANK')];
+      summary.textContent = bits.filter(Boolean).join(' · ');
     }
 
-    function stockUrl(fid, colorId, angle) {
+    function stockUrl(fid, colorId, angle, blank) {
       if (!fid || !colorId) return '';
+      var base = assetBase() + 'humc-m-' + fid + '-' + colorId;
+      if (blank && angle === 'Front') return base + '-plain.jpg';
+      if (blank && angle === 'Right') return base + '-right-plain.jpg';
+      if (blank && angle === 'Back') return base + '-back.jpg';
       var suffix = !angle || angle === 'Front' ? '' : '-' + angle.toLowerCase();
-      return assetBase() + 'humc-m-' + fid + '-' + colorId + suffix + '.jpg';
+      return base + suffix + '.jpg';
+    }
+
+    function urlForLocation(location) {
+      var design = designs[location] || 'BLANK';
+      var blank = design === 'BLANK';
+      var fid = blank ? BLANK_PACK : familyFor(location, design);
+      if (!fid) fid = familyId;
+      return stockUrl(fid, currentColorId, location, blank);
     }
 
     function setMainPhoto(url) {
@@ -441,7 +522,8 @@
       viewAngles().forEach(function (angle) {
         var btn = host.querySelector('[data-view="' + angle + '"]');
         var thumb = host.querySelector('[data-humc-view-thumb="' + angle + '"]');
-        var url = stockUrl(familyId, currentColorId, angle);
+        var url = urlForLocation(angle);
+        var fallback = stockUrl(familyFor('Front', designs.Front) || familyId, currentColorId, angle, false);
         probeUrl(
           url,
           function (okUrl) {
@@ -455,19 +537,27 @@
             }
           },
           function () {
-            if (thumb) {
-              thumb.removeAttribute('src');
-              thumb.hidden = true;
-            }
-            if (btn) {
-              // Front always stays; other missing angles hide like only available shots
-              if (angle === 'Front') {
-                btn.hidden = false;
-              } else {
-                btn.hidden = true;
+            probeUrl(
+              fallback,
+              function (okUrl) {
+                if (thumb) {
+                  thumb.setAttribute('src', okUrl);
+                  thumb.hidden = false;
+                }
+                if (btn) {
+                  btn.hidden = false;
+                  btn.disabled = false;
+                }
+              },
+              function () {
+                if (thumb) {
+                  thumb.removeAttribute('src');
+                  thumb.hidden = true;
+                }
+                if (btn && angle !== 'Front') btn.hidden = true;
+                if (currentView === angle && angle !== 'Front') setView('Front');
               }
-            }
-            if (currentView === angle && angle !== 'Front') setView('Front');
+            );
           }
         );
       });
@@ -475,21 +565,15 @@
 
     function setView(angle) {
       currentView = angle || 'Front';
-      var label =
-        logoMapKind === 'soft-tee'
-          ? currentView === 'Back'
-            ? 'Back design'
-            : 'Front design'
-          : currentView === 'Right'
-            ? 'Right sleeve'
-            : currentView;
+      var label = designLabelFor(currentView);
       viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
-      var url = stockUrl(familyId, currentColorId, currentView);
-      var front = stockUrl(familyId, currentColorId, 'Front');
+      showLocationPanels(currentView);
+      var url = urlForLocation(currentView);
+      var front = urlForLocation('Front');
       probeUrl(
         url,
         function (okUrl) {
@@ -497,38 +581,37 @@
         },
         function () {
           setMainPhoto(front);
-          currentView = 'Front';
-          label = logoMapKind === 'soft-tee' ? 'Front design' : 'Front';
-          viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
-            var on = btn.getAttribute('data-view') === 'Front';
-            btn.classList.toggle('is-on', on);
-            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-          });
         }
       );
       if (caption) {
-        caption.textContent = [currentColorName, logoName, label].filter(Boolean).join(' · ');
+        caption.textContent = [currentColorName, label, designs[currentView]].filter(Boolean).join(' · ');
       }
-      if (placeInput) {
-        placeInput.value = 'As shown (' + label + ')';
-      }
+      syncDesignInputs();
+      refreshSummary();
     }
 
-    function selectLogo(name, fid) {
-      logoName = name || logoName;
-      familyId = fid || LOGO_FAMILY[logoName] || familyId;
-      root.setAttribute('data-family-id', familyId);
-      root.setAttribute('data-logo-name', logoName);
-      if (logoInput) logoInput.value = logoName;
-      root.querySelectorAll('[data-field="logo"]').forEach(function (btn) {
-        var on = btn.getAttribute('data-value') === logoName;
+    function selectDesign(location, name, fid) {
+      if (!location) return;
+      designs[location] = name || designs[location];
+      if (fid) {
+        // Keep primary family for color map lookups from the front design.
+        if (location === 'Front') {
+          familyId = fid;
+          root.setAttribute('data-family-id', familyId);
+        }
+      } else if (location === 'Front') {
+        familyId = familyFor('Front', designs.Front) || familyId;
+        root.setAttribute('data-family-id', familyId);
+      }
+      root.querySelectorAll('[data-field="design"][data-location="' + location + '"]').forEach(function (btn) {
+        var on = btn.getAttribute('data-value') === designs[location];
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+      syncDesignInputs();
       syncListingTitle();
-      // Re-bind colors for this family if present in map
       var entry = previewMap[familyId];
-      if (entry) {
+      if (entry && location === 'Front') {
         entry.id = familyId;
         renderSwatches(entry, true);
       } else {
@@ -578,7 +661,7 @@
     function isReady() {
       if (!colorInput || !colorInput.value) return 'Pick a color.';
       if (needsSize && (!sizeInput || !sizeInput.value)) return 'Enter a quantity for a size.';
-      if (showLogoPicker && logoInput && !logoInput.value) return 'Pick a logo.';
+      if (showLogoPicker && (!designs.Front || designs.Front === '')) return 'Pick a front design.';
       return '';
     }
 
@@ -697,9 +780,13 @@
       });
     });
 
-    root.querySelectorAll('[data-field="logo"]').forEach(function (btn) {
+    root.querySelectorAll('[data-field="design"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        selectLogo(btn.getAttribute('data-value'), btn.getAttribute('data-family-id'));
+        selectDesign(
+          btn.getAttribute('data-location'),
+          btn.getAttribute('data-value'),
+          btn.getAttribute('data-family-id')
+        );
       });
     });
 
@@ -771,9 +858,18 @@
     );
 
     readCatalog();
-    if (logoInput) logoInput.value = logoName;
+    familyId = familyFor('Front', designs.Front) || familyId;
+    root.setAttribute('data-family-id', familyId);
+    syncDesignInputs();
+    showLocationPanels('Front');
     if (showLogoPicker) {
-      selectLogo(logoName, LOGO_FAMILY[logoName] || familyId);
+      Object.keys(designs).forEach(function (loc) {
+        root.querySelectorAll('[data-field="design"][data-location="' + loc + '"]').forEach(function (btn) {
+          var on = btn.getAttribute('data-value') === designs[loc];
+          btn.classList.toggle('is-on', on);
+          btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      });
     }
 
     var mapUrl = root.getAttribute('data-preview-map');
@@ -785,13 +881,9 @@
           var entry = lookupPreview(familyId || root.getAttribute('data-source-id'), root.getAttribute('data-product-title'));
           if (entry) renderSwatches(entry);
           else showError('Preview photos are missing for this product.');
-          if (showLogoPicker) {
-            root.querySelectorAll('[data-field="logo"]').forEach(function (btn) {
-              var on = btn.getAttribute('data-value') === logoName;
-              btn.classList.toggle('is-on', on);
-              btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            });
-          }
+          showLocationPanels(currentView);
+          fillThumbs();
+          setView(currentView);
         })
         .catch(function () {
           showError('Could not load product photos.');
