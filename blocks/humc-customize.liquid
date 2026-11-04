@@ -408,9 +408,17 @@
       return DESIGN_LAYER[designName] || null;
     }
 
+    // Bump when garment/stamp assets are replaced so CDN/browser cache cannot keep stale frames.
+    var ASSET_V = '20261104b';
+
     function layerUrl(file) {
       if (!file) return '';
-      return assetBase() + file;
+      return assetBase() + file + (file.indexOf('?') >= 0 ? '&' : '?') + 'v=' + ASSET_V;
+    }
+
+    function garmentUrl(path) {
+      if (!path) return '';
+      return path + (path.indexOf('?') >= 0 ? '&' : '?') + 'v=' + ASSET_V;
     }
 
     function setDesignLayer(designName) {
@@ -528,21 +536,25 @@
       // Zepto blank garments + pz design layer (not Chipply meshed packs — those double-print logos).
       var slug = garmentSlug();
       var angle = location || 'Front';
+      var path;
       if (logoMapKind === 'soft-tee') {
         if (angle === 'Back') {
-          if (slug === 'deep-orange') return assetBase() + 'pz-tee-deep-orange-heather-back.jpg';
-          return assetBase() + 'pz-tee-' + slug + '-back.jpg';
+          if (slug === 'deep-orange') path = assetBase() + 'pz-tee-deep-orange-heather-back.jpg';
+          else path = assetBase() + 'pz-tee-' + slug + '-back.jpg';
+        } else {
+          path = assetBase() + 'pz-tee-' + slug + '-front.jpg';
         }
-        return assetBase() + 'pz-tee-' + slug + '-front.jpg';
-      }
-      // zip
-      if (angle === 'Back') return assetBase() + 'pz-zip-QZ-' + slug + '-back.png';
-      if (angle === 'Right') {
+      } else if (angle === 'Back') {
+        path = assetBase() + 'pz-zip-QZ-' + slug + '-back.png';
+      } else if (angle === 'Right') {
         // Zepto file uses capital N for navy sleeve only
-        if (slug === 'navy') return assetBase() + 'pz-zip-QZ-Navy-right-sleeve.png';
-        return assetBase() + 'pz-zip-QZ-' + slug + '-right-sleeve.png';
+        path = slug === 'navy'
+          ? assetBase() + 'pz-zip-QZ-Navy-right-sleeve.png'
+          : assetBase() + 'pz-zip-QZ-' + slug + '-right-sleeve.png';
+      } else {
+        path = assetBase() + 'pz-zip-QZ-' + slug + '-front.png';
       }
-      return assetBase() + 'pz-zip-QZ-' + slug + '-front.png';
+      return garmentUrl(path);
     }
 
     function setMainPhoto(url) {
