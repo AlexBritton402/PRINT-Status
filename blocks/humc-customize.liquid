@@ -20,8 +20,16 @@
   assign default_logo = 'Standard HUMC'
   assign family_id = ''
   assign show_logo_picker = false
+  assign logo_map_kind = 'zip'
   if title_l contains 'customizable'
     assign show_logo_picker = true
+  endif
+  if title_l contains 'soft blend'
+    assign logo_map_kind = 'soft-tee'
+    assign default_logo = 'Single-color HUMC'
+  elsif title_l contains 'sustainable'
+    assign logo_map_kind = 'hoodie'
+    assign default_logo = 'Single-color HUMC'
   endif
   comment
     Logo label from listing title. Check Standard / Single Color before bare
@@ -157,6 +165,7 @@
   data-family-id="{{ family_id | escape }}"
   data-logo-name="{{ default_logo | escape }}"
   data-show-logo-picker="{% if show_logo_picker %}true{% else %}false{% endif %}"
+  data-logo-map-kind="{{ logo_map_kind | escape }}"
   data-family-phrase="{{ family_phrase | escape }}"
   data-preview-map="{{ 'humc-preview.json' | asset_url }}"
   data-asset-base="{{ 'humc-preview.json' | asset_url | split: 'humc-preview.json' | first }}"
@@ -168,13 +177,14 @@
     <span aria-hidden="true">›</span>
     <a href="{{ collections['humc-gear'].url | default: '/collections/humc-gear' }}">Products</a>
     <span aria-hidden="true">›</span>
-    <span>Outerwear</span>
+    <span>Catalog</span>
     <span aria-hidden="true">›</span>
     <span data-humc-crumb-title>{{ title | escape }}</span>
   </nav>
 
   <div class="humc-customize__gallery" data-humc-gallery>
     <div class="humc-customize__stage" data-humc-stage>
+      {%- comment -%} One stage image at a time; angle thumbs swap pre-meshed mockups (not logo overlays). {%- endcomment -%}
       <img data-humc-demo-photo alt="{{ title | escape }}" width="600" height="600">
     </div>
     <div class="humc-customize__views" data-humc-views role="tablist" aria-label="Product views">
@@ -202,9 +212,16 @@
     <fieldset class="humc-customize__set">
       <legend>Logo</legend>
       <div class="humc-customize__chips" role="list">
-        <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Standard HUMC</button>
-        <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Single-color HUMC</button>
-        <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">LA County</button>
+        {%- if logo_map_kind == 'soft-tee' -%}
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19027956" aria-pressed="false">Single-color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18991476" aria-pressed="false">LA County</button>
+        {%- elsif logo_map_kind == 'hoodie' -%}
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="19193761" aria-pressed="false">Single-color HUMC</button>
+        {%- else -%}
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Standard HUMC" data-family-id="18991186" aria-pressed="false">Standard HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="Single-color HUMC" data-family-id="18867111" aria-pressed="false">Single-color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="logo" data-value="LA County" data-family-id="18993506" aria-pressed="false">LA County</button>
+        {%- endif -%}
       </div>
     </fieldset>
   {%- endif -%}
@@ -313,17 +330,39 @@
     var currentView = 'Front';
     var familyId = root.getAttribute('data-family-id') || '';
     var logoName = root.getAttribute('data-logo-name') || 'Standard HUMC';
+    var logoMapKind = root.getAttribute('data-logo-map-kind') || 'zip';
 
-    var LOGO_FAMILY = {
-      'Standard HUMC': '18991186',
-      'Single-color HUMC': '18867111',
-      'LA County': '18993506'
+    // Pre-meshed Chipply mockup families — logo choice swaps photo pack, never overlays a crest.
+    var LOGO_FAMILY_BY_KIND = {
+      zip: {
+        'Standard HUMC': '18991186',
+        'Single-color HUMC': '18867111',
+        'LA County': '18993506'
+      },
+      'soft-tee': {
+        'Single-color HUMC': '19027956',
+        'LA County': '18991476'
+      },
+      hoodie: {
+        'Single-color HUMC': '19193761'
+      }
     };
-    var TITLE_FOR_LOGO = {
-      'Standard HUMC': '1/4 Zip Fleece w/ Standard HUMC Logo and LA County Logo on Sleeve',
-      'Single-color HUMC': '1/4 Zip Fleece w/ Single Color HUMC Logo and LA County Logo on Sleeve',
-      'LA County': '1/4 Zip Fleece w/ LA County Logo'
+    var TITLE_FOR_LOGO_BY_KIND = {
+      zip: {
+        'Standard HUMC': '1/4 Zip Fleece w/ Standard HUMC Logo and LA County Logo on Sleeve',
+        'Single-color HUMC': '1/4 Zip Fleece w/ Single Color HUMC Logo and LA County Logo on Sleeve',
+        'LA County': '1/4 Zip Fleece w/ LA County Logo'
+      },
+      'soft-tee': {
+        'Single-color HUMC': 'Unisex Soft Blend Tee w/ Single Color HUMC Logo',
+        'LA County': 'Unisex Soft Blend Tee w/ LA County Logo on Front and Back'
+      },
+      hoodie: {
+        'Single-color HUMC': "Women's Sustainable Full Zip Hoodie w/ Single Color HUMC Logo and LA County Logo on Sleeve"
+      }
     };
+    var LOGO_FAMILY = LOGO_FAMILY_BY_KIND[logoMapKind] || LOGO_FAMILY_BY_KIND.zip;
+    var TITLE_FOR_LOGO = TITLE_FOR_LOGO_BY_KIND[logoMapKind] || TITLE_FOR_LOGO_BY_KIND.zip;
 
     function assetBase() {
       return root.getAttribute('data-asset-base') || '';
@@ -370,14 +409,12 @@
     }
 
     function syncListingTitle() {
-      // Only rewrite the heading when the old customizable logo picker is on.
-      // Fixed Chipply listings keep their own Shopify title.
+      // Only rewrite the heading when the customizable logo picker is on.
       if (!showLogoPicker) return;
-      var family = root.getAttribute('data-family-phrase') || '';
       var next = TITLE_FOR_LOGO[logoName];
-      if (family !== '1/4 zip fleece' || !next) return;
+      if (!next) return;
       document.querySelectorAll('.product-details h1, .product-information h1, h1').forEach(function (h) {
-        if (/zip|fleece|customizable|humc|la county/i.test(h.textContent || '')) {
+        if (/zip|fleece|tee|hoodie|customizable|humc|la county/i.test(h.textContent || '')) {
           h.textContent = next;
         }
       });
