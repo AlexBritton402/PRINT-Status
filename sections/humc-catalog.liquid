@@ -34,15 +34,7 @@
         <li>
           <a class="humc-catalog__card" href="{{ product.url }}">
             <span class="humc-catalog__photo">
-              {%- if product.featured_image -%}
-                {{
-                  product.featured_image
-                  | image_url: width: 800
-                  | image_tag: loading: 'lazy', widths: '200, 400, 800', sizes: '(min-width: 990px) 22vw, 45vw', alt: product.title
-                }}
-              {%- else -%}
-                <span class="humc-catalog__empty">Photo coming soon</span>
-              {%- endif -%}
+              {% render 'humc-vv-image', product: product, loading: 'lazy' %}
               {%- unless product.available -%}
                 <span class="humc-catalog__sold">Sold out</span>
               {%- endunless -%}

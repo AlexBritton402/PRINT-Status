@@ -1,0 +1,46 @@
+{% doc %}
+  Resolve the vv Radiant product photo for a HUMC SKU.
+  Prefers theme assets copied from vv CDN so Catalog/Featured match
+  even when Admin featured media is still a leftover upload.
+  @param {object} product - product drop
+  @param {string} [class] - optional class on img
+  @param {string} [loading] - lazy|eager
+{% enddoc %}
+{%- liquid
+  assign vv_asset = blank
+  case product.handle
+    when '1-4-zip-fleece-customizable'
+      assign vv_asset = 'humc-vv-1-4-zip-fleece-customizable.png'
+    when 'item-personalization'
+      assign vv_asset = 'humc-vv-item-personalization.png'
+    when 'large-rec-duffle', 'large-rec-duffel'
+      assign vv_asset = 'humc-vv-large-rec-duffel.jpg'
+    when 'otto-cap-6-panel-low-profile-mesh-back-trucker-hat'
+      assign vv_asset = 'humc-vv-otto-cap.jpg'
+    when 'tilikum-cap'
+      assign vv_asset = 'humc-vv-tilikum-cap.jpg'
+    when 'unisex-soft-blend-tee-customizable'
+      assign vv_asset = 'humc-vv-soft-blend-tee.jpg'
+    when 'women-s-sustainable-full-zip-hoodie-w-single-color-humc-logo', 'womens-sustainable-full-zip-hoodie-w-single-color-humc-logo-and-la-county-logo-on-sleeve'
+      assign vv_asset = 'humc-vv-womens-hoodie.jpg'
+  endcase
+  assign load = loading | default: 'lazy'
+-%}
+{%- if vv_asset != blank -%}
+  <img
+    class="{{ class }}"
+    src="{{ vv_asset | asset_url }}"
+    alt="{{ product.title | escape }}"
+    width="800"
+    height="800"
+    loading="{{ load }}"
+  >
+{%- elsif product.featured_image -%}
+  {{
+    product.featured_image
+    | image_url: width: 800
+    | image_tag: class: class, loading: load, widths: '200, 400, 800', sizes: '(min-width: 990px) 22vw, 45vw', alt: product.title
+  }}
+{%- else -%}
+  <span class="humc-catalog__empty">Photo coming soon</span>
+{%- endif -%}
