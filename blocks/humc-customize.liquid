@@ -325,6 +325,11 @@
       return root.getAttribute('data-asset-base') || '';
     }
 
+    // Gallery (stage + angle tabs) may be moved into Horizon media — query it globally.
+    function galleryHost() {
+      return document.querySelector('[data-humc-gallery]') || root;
+    }
+
     function mountChipplyLayout() {
       document.body.classList.add('has-humc-demo');
       var gallery = root.querySelector('[data-humc-gallery]');
@@ -428,9 +433,10 @@
     }
 
     function fillThumbs() {
+      var host = galleryHost();
       viewAngles().forEach(function (angle) {
-        var btn = root.querySelector('[data-view="' + angle + '"]');
-        var thumb = root.querySelector('[data-humc-view-thumb="' + angle + '"]');
+        var btn = host.querySelector('[data-view="' + angle + '"]');
+        var thumb = host.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = stockUrl(familyId, currentColorId, angle);
         probeUrl(
           url,
@@ -473,7 +479,7 @@
           : currentView === 'Right'
             ? 'Right sleeve'
             : currentView;
-      root.querySelectorAll('[data-view]').forEach(function (btn) {
+      galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -488,8 +494,8 @@
         function () {
           setMainPhoto(front);
           currentView = 'Front';
-          label = 'Front';
-          root.querySelectorAll('[data-view]').forEach(function (btn) {
+          label = logoMapKind === 'soft-tee' ? 'Front design' : 'Front';
+          galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
             var on = btn.getAttribute('data-view') === 'Front';
             btn.classList.toggle('is-on', on);
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -681,7 +687,7 @@
     mountChipplyLayout();
     syncListingTitle();
 
-    root.querySelectorAll('[data-view]').forEach(function (btn) {
+    galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         setView(btn.getAttribute('data-view'));
       });
