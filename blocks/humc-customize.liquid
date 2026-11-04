@@ -186,24 +186,39 @@
   >
     {%- if logo_map_kind == 'soft-tee' -%}
       <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
-        <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+        <span class="humc-customize__thumb" data-humc-thumb-stage="Front">
+          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+          <img data-humc-view-layer="Front" alt="" width="72" height="72" hidden>
+        </span>
         <span>Front design</span>
       </button>
       <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
-        <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+        <span class="humc-customize__thumb" data-humc-thumb-stage="Back">
+          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+          <img data-humc-view-layer="Back" alt="" width="72" height="72" hidden>
+        </span>
         <span>Back design</span>
       </button>
     {%- else -%}
       <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
-        <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+        <span class="humc-customize__thumb" data-humc-thumb-stage="Front">
+          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+          <img data-humc-view-layer="Front" alt="" width="72" height="72" hidden>
+        </span>
         <span>Front</span>
       </button>
       <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
-        <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+        <span class="humc-customize__thumb" data-humc-thumb-stage="Back">
+          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+          <img data-humc-view-layer="Back" alt="" width="72" height="72" hidden>
+        </span>
         <span>Back</span>
       </button>
       <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
-        <img data-humc-view-thumb="Right" alt="" width="72" height="72">
+        <span class="humc-customize__thumb" data-humc-thumb-stage="Right">
+          <img data-humc-view-thumb="Right" alt="" width="72" height="72">
+          <img data-humc-view-layer="Right" alt="" width="72" height="72" hidden>
+        </span>
         <span>Right sleeve</span>
       </button>
     {%- endif -%}
@@ -564,6 +579,22 @@
       return ['Front', 'Back', 'Right'];
     }
 
+    function fillThumbLayer(angle) {
+      var host = viewsHost();
+      var stamp = host.querySelector('[data-humc-view-layer="' + angle + '"]');
+      if (!stamp) return;
+      var spec = layerFor(designs[angle] || 'BLANK');
+      stamp.className = '';
+      if (!spec || !spec.file) {
+        stamp.removeAttribute('src');
+        stamp.hidden = true;
+        return;
+      }
+      stamp.classList.add('is-' + (spec.place || 'left-chest'));
+      stamp.setAttribute('src', layerUrl(spec.file));
+      stamp.hidden = false;
+    }
+
     function fillThumbs() {
       var host = viewsHost();
       viewAngles().forEach(function (angle) {
@@ -590,6 +621,8 @@
             }
           }
         );
+        // Each thumb remembers that location's color (garment) + chosen logo.
+        fillThumbLayer(angle);
       });
     }
 
@@ -1018,13 +1051,58 @@
     cursor: pointer;
   }
 
-  .humc-customize__view img {
+  .humc-customize__thumb {
+    position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .humc-customize__view img[data-humc-view-thumb] {
+    display: block;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    margin-block-end: 0.2rem;
     background: #f7f7f7;
+  }
+
+  .humc-customize__view img[data-humc-view-layer] {
+    position: absolute;
+    object-fit: contain;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .humc-customize__view img[data-humc-view-layer].is-left-chest {
+    width: 14%;
+    left: 60%;
+    top: 26%;
+  }
+
+  body[data-humc-kind='zip'] .humc-customize__view img[data-humc-view-layer].is-left-chest {
+    width: 12%;
+    left: 55%;
+    top: 34%;
+  }
+
+  .humc-customize__view img[data-humc-view-layer].is-full-chest {
+    width: 40%;
+    left: 30%;
+    top: 28%;
+  }
+
+  .humc-customize__view img[data-humc-view-layer].is-full-back {
+    width: 46%;
+    left: 27%;
+    top: 22%;
+  }
+
+  .humc-customize__view img[data-humc-view-layer].is-sleeve {
+    width: 15%;
+    left: 63%;
+    top: 34%;
   }
 
   .humc-customize__view.is-on {
