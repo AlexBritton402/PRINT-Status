@@ -169,42 +169,43 @@
     <span data-humc-crumb-title>{{ title | escape }}</span>
   </nav>
 
+  {%- comment -%} Stage only moves into Horizon media; view tabs stay with the buy form like vv Zepto. {%- endcomment -%}
   <div class="humc-customize__gallery" data-humc-gallery>
     <div class="humc-customize__stage" data-humc-stage>
-      {%- comment -%} One stage image at a time; angle thumbs swap pre-meshed mockups (not logo overlays). {%- endcomment -%}
       <img data-humc-demo-photo alt="{{ title | escape }}" width="600" height="600">
     </div>
-    <div
-      class="humc-customize__views{% if logo_map_kind == 'soft-tee' %} humc-customize__views--tee{% elsif logo_map_kind == 'zip' %} humc-customize__views--zip{% endif %}"
-      data-humc-views
-      role="tablist"
-      aria-label="Product views"
-    >
-      {%- if logo_map_kind == 'soft-tee' -%}
-        <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
-          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
-          <span>Front design</span>
-        </button>
-        <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
-          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
-          <span>Back design</span>
-        </button>
-      {%- else -%}
-        <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
-          <img data-humc-view-thumb="Front" alt="" width="72" height="72">
-          <span>Front</span>
-        </button>
-        <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
-          <img data-humc-view-thumb="Back" alt="" width="72" height="72">
-          <span>Back</span>
-        </button>
-        <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
-          <img data-humc-view-thumb="Right" alt="" width="72" height="72">
-          <span>Right sleeve</span>
-        </button>
-      {%- endif -%}
-    </div>
     <p class="humc-customize__caption" data-humc-demo-caption></p>
+  </div>
+
+  <div
+    class="humc-customize__views{% if logo_map_kind == 'soft-tee' %} humc-customize__views--tee{% elsif logo_map_kind == 'zip' %} humc-customize__views--zip{% endif %}"
+    data-humc-views
+    role="tablist"
+    aria-label="Product views"
+  >
+    {%- if logo_map_kind == 'soft-tee' -%}
+      <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
+        <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+        <span>Front design</span>
+      </button>
+      <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
+        <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+        <span>Back design</span>
+      </button>
+    {%- else -%}
+      <button type="button" class="humc-customize__view is-on" data-view="Front" aria-pressed="true">
+        <img data-humc-view-thumb="Front" alt="" width="72" height="72">
+        <span>Front</span>
+      </button>
+      <button type="button" class="humc-customize__view" data-view="Back" aria-pressed="false">
+        <img data-humc-view-thumb="Back" alt="" width="72" height="72">
+        <span>Back</span>
+      </button>
+      <button type="button" class="humc-customize__view" data-view="Right" aria-pressed="false">
+        <img data-humc-view-thumb="Right" alt="" width="72" height="72">
+        <span>Right sleeve</span>
+      </button>
+    {%- endif -%}
   </div>
 
   {%- comment -%} vv order: views → color swatches → front design / logo {%- endcomment -%}
@@ -325,9 +326,12 @@
       return root.getAttribute('data-asset-base') || '';
     }
 
-    // Gallery (stage + angle tabs) may be moved into Horizon media — query it globally.
+    // Stage may move into Horizon media; view tabs stay on the form. Query both.
     function galleryHost() {
       return document.querySelector('[data-humc-gallery]') || root;
+    }
+    function viewsHost() {
+      return root.querySelector('[data-humc-views]') || document.querySelector('[data-humc-views]') || root;
     }
 
     function mountChipplyLayout() {
@@ -433,7 +437,7 @@
     }
 
     function fillThumbs() {
-      var host = galleryHost();
+      var host = viewsHost();
       viewAngles().forEach(function (angle) {
         var btn = host.querySelector('[data-view="' + angle + '"]');
         var thumb = host.querySelector('[data-humc-view-thumb="' + angle + '"]');
@@ -479,7 +483,7 @@
           : currentView === 'Right'
             ? 'Right sleeve'
             : currentView;
-      galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
+      viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -495,7 +499,7 @@
           setMainPhoto(front);
           currentView = 'Front';
           label = logoMapKind === 'soft-tee' ? 'Front design' : 'Front';
-          galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
+          viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
             var on = btn.getAttribute('data-view') === 'Front';
             btn.classList.toggle('is-on', on);
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -687,7 +691,7 @@
     mountChipplyLayout();
     syncListingTitle();
 
-    galleryHost().querySelectorAll('[data-view]').forEach(function (btn) {
+    viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         setView(btn.getAttribute('data-view'));
       });
