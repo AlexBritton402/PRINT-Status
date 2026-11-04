@@ -446,6 +446,7 @@
 
     function mountChipplyLayout() {
       document.body.classList.add('has-humc-demo');
+      document.body.setAttribute('data-humc-kind', logoMapKind);
       var gallery = root.querySelector('[data-humc-gallery]');
       var media = document.querySelector('.product-information__media');
       if (gallery && media && gallery.parentNode !== media) {
@@ -946,9 +947,16 @@
   }
 
   .humc-customize__stage [data-humc-design-layer].is-left-chest {
-    width: 17%;
-    left: 58%;
-    top: 30%;
+    width: 14%;
+    left: 60%;
+    top: 26%;
+  }
+
+  /* Zip model photos frame the torso differently than flat tee blanks */
+  body[data-humc-kind='zip'] .humc-customize__stage [data-humc-design-layer].is-left-chest {
+    width: 12%;
+    left: 55%;
+    top: 34%;
   }
 
   .humc-customize__stage [data-humc-design-layer].is-full-chest {
