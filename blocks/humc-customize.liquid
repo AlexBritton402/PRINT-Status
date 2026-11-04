@@ -20,7 +20,7 @@
   assign default_logo = 'Standard HUMC'
   assign family_id = ''
   assign show_logo_picker = false
-  assign logo_map_kind = 'zip'
+  assign logo_map_kind = 'none'
   if title_l contains 'customizable'
     assign show_logo_picker = true
   endif
@@ -30,6 +30,8 @@
   elsif title_l contains 'sustainable'
     assign logo_map_kind = 'hoodie'
     assign default_logo = 'Single-color HUMC'
+  elsif title_l contains '1/4 zip' or title_l contains 'zip fleece'
+    assign logo_map_kind = 'zip'
   endif
   comment
     Logo label from listing title. Check Standard / Single Color before bare
