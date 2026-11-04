@@ -336,11 +336,27 @@
       BLANK: ''
     };
 
-    // Blank garment packs (Chipply plain / no-print shots) under the logo layer.
-    var BLANK_PACK = logoMapKind === 'soft-tee' ? '19027956' : '18991186';
     // Color-map family ids (for swatch catalog lookup only).
     var COLOR_FAMILY = logoMapKind === 'soft-tee' ? '18991476' : '18993506';
     familyId = COLOR_FAMILY;
+
+    // Map our swatch names → Zepto blank garment file slugs (assets/pz-tee-* / pz-zip-*).
+    var TEE_GARMENT = {
+      'Aqua Heather': 'aqua-heather',
+      'Awareness Pink Heather': 'awareness-pink',
+      Black: 'black',
+      'Blush Frost': 'blush-frost',
+      Charcoal: 'charcoal',
+      'Deep Orange Heather': 'deep-orange'
+    };
+    var ZIP_GARMENT = {
+      Black: 'black',
+      Charcoal: 'charcoal',
+      'Heathered Charcoal': 'heather-charcoal',
+      'Light Heather Grey': 'light-heather',
+      'New Navy': 'navy',
+      'Deep Royal': 'royal'
+    };
 
     function assetBase() {
       return root.getAttribute('data-asset-base') || '';
@@ -383,6 +399,7 @@
     }
 
     function setDesignLayer(designName) {
+      layerImg = document.querySelector('[data-humc-design-layer]') || layerImg;
       if (!layerImg) return;
       var file = layerFor(designName);
       if (!file) {
@@ -484,19 +501,30 @@
       summary.textContent = bits.filter(Boolean).join(' · ');
     }
 
-    function stockUrl(fid, colorId, angle, blank) {
-      if (!fid || !colorId) return '';
-      var base = assetBase() + 'humc-m-' + fid + '-' + colorId;
-      if (blank && angle === 'Front') return base + '-plain.jpg';
-      if (blank && angle === 'Right') return base + '-right-plain.jpg';
-      if (blank && angle === 'Back') return base + '-back.jpg';
-      var suffix = !angle || angle === 'Front' ? '' : '-' + angle.toLowerCase();
-      return base + suffix + '.jpg';
+    function garmentSlug() {
+      var map = logoMapKind === 'soft-tee' ? TEE_GARMENT : ZIP_GARMENT;
+      return map[currentColorName] || map.Black || 'black';
     }
 
     function urlForLocation(location) {
-      // Always use a blank/plain garment shot; the selected design is the pz layer on top (vv Zepto model).
-      return stockUrl(BLANK_PACK, currentColorId, location, true) || stockUrl(BLANK_PACK, currentColorId, location, false);
+      // Zepto blank garments + pz design layer (not Chipply meshed packs — those double-print logos).
+      var slug = garmentSlug();
+      var angle = location || 'Front';
+      if (logoMapKind === 'soft-tee') {
+        if (angle === 'Back') {
+          if (slug === 'deep-orange') return assetBase() + 'pz-tee-deep-orange-heather-back.jpg';
+          return assetBase() + 'pz-tee-' + slug + '-back.jpg';
+        }
+        return assetBase() + 'pz-tee-' + slug + '-front.jpg';
+      }
+      // zip
+      if (angle === 'Back') return assetBase() + 'pz-zip-QZ-' + slug + '-back.png';
+      if (angle === 'Right') {
+        // Zepto file uses capital N for navy sleeve only
+        if (slug === 'navy') return assetBase() + 'pz-zip-QZ-Navy-right-sleeve.png';
+        return assetBase() + 'pz-zip-QZ-' + slug + '-right-sleeve.png';
+      }
+      return assetBase() + 'pz-zip-QZ-' + slug + '-front.png';
     }
 
     function setMainPhoto(url) {
@@ -539,7 +567,11 @@
         var btn = host.querySelector('[data-view="' + angle + '"]');
         var thumb = host.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = urlForLocation(angle);
-        var fallback = stockUrl(BLANK_PACK, currentColorId, angle, false);
+        // Never hide the vv angle tabs — always keep Front/Back/(Right) available.
+        if (btn) {
+          btn.hidden = false;
+          btn.disabled = false;
+        }
         probeUrl(
           url,
           function (okUrl) {
@@ -547,33 +579,12 @@
               thumb.setAttribute('src', okUrl);
               thumb.hidden = false;
             }
-            if (btn) {
-              btn.hidden = false;
-              btn.disabled = false;
-            }
           },
           function () {
-            probeUrl(
-              fallback,
-              function (okUrl) {
-                if (thumb) {
-                  thumb.setAttribute('src', okUrl);
-                  thumb.hidden = false;
-                }
-                if (btn) {
-                  btn.hidden = false;
-                  btn.disabled = false;
-                }
-              },
-              function () {
-                if (thumb) {
-                  thumb.removeAttribute('src');
-                  thumb.hidden = true;
-                }
-                if (btn && angle !== 'Front') btn.hidden = true;
-                if (currentView === angle && angle !== 'Front') setView('Front');
-              }
-            );
+            if (thumb) {
+              thumb.removeAttribute('src');
+              thumb.hidden = true;
+            }
           }
         );
       });
@@ -583,6 +594,7 @@
       currentView = angle || 'Front';
       var label = designLabelFor(currentView);
       viewsHost().querySelectorAll('[data-view]').forEach(function (btn) {
+        btn.hidden = false;
         var on = btn.getAttribute('data-view') === currentView;
         btn.classList.toggle('is-on', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -596,14 +608,7 @@
           setMainPhoto(okUrl);
         },
         function () {
-          // Fall back to non-plain / front blank if plain pack missing for this angle.
-          probeUrl(
-            front,
-            function (okUrl) { setMainPhoto(okUrl); },
-            function () {
-              setMainPhoto(stockUrl(BLANK_PACK, currentColorId, 'Front', false));
-            }
-          );
+          setMainPhoto(front);
         }
       );
       setDesignLayer(designs[currentView]);
@@ -944,6 +949,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
+    max-height: 11rem;
+    overflow-y: auto;
   }
 
   .humc-customize__chips--design .humc-customize__chip {
