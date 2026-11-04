@@ -91,13 +91,13 @@
     </div>
     {%- if store != blank and store.products_count > 0 -%}
       {%- comment -%} Match vv featured row: Tilikum, Women's hoodie, Duffel, OTTO (skip Personalization / CUSTOMIZABLE). {%- endcomment -%}
-      {%- assign featured_handles = 'tilikum-cap,women-s-sustainable-full-zip-hoodie-w-single-color-humc-logo,large-rec-duffle,large-rec-duffel,otto-cap-6-panel-low-profile-mesh-back-trucker-hat' | split: ',' -%}
+      {%- assign featured_handles = 'tilikum-cap,women-s-sustainable-full-zip-hoodie-w-single-color-humc-logo,large-rec-duffle,otto-cap-6-panel-low-profile-mesh-back-trucker-hat' | split: ',' -%}
       <ul class="humc-grid" role="list">
         {%- assign featured_n = 0 -%}
         {%- for handle in featured_handles -%}
           {%- if featured_n >= 4 -%}{%- break -%}{%- endif -%}
-          {%- assign product = store.products | where: 'handle', handle | first -%}
-          {%- if product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign product = all_products[handle] -%}
+          {%- if product == blank or product.id == blank -%}{%- continue -%}{%- endif -%}
           {%- unless product.published_at -%}{%- continue -%}{%- endunless -%}
           {%- assign featured_n = featured_n | plus: 1 -%}
           <li>
