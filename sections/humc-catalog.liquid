@@ -1,7 +1,7 @@
 {%- comment -%}
-  HUMC Products page. Layout follows humcgear.com/shop: category
-  sidebar + square photo cards. Products already in the humc-gear
-  collection. Does not invent SKUs.
+  HUMC Catalog — match vvpx4r-z1 Radiant /collections/all:
+  Products heading, count, square photo grid, all collection SKUs
+  (including Item Personalization). No Chipply category sidebar.
 {%- endcomment -%}
 
 {%- liquid
@@ -9,190 +9,89 @@
   if store == blank
     assign store = collections['humc-gear']
   endif
-
-  assign preview_q = ''
-  if theme.id == 189047013667
-    assign preview_q = 'preview_theme_id=189047013667'
-  endif
 -%}
 
-{%- capture shop_base -%}
-  {{ store.url | default: '/collections/humc-gear' }}
-{%- endcapture -%}
-{%- assign shop_base = shop_base | strip -%}
-
 <div class="humc-catalog" data-humc-catalog>
-  <nav class="humc-catalog__crumb" aria-label="Breadcrumb">
-    <a href="{{ pages['humc-gear'].url | default: '/pages/humc-gear' }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}">Home</a>
-    <span>›</span>
-    <span>Catalog</span>
-  </nav>
-
-  <div class="humc-catalog__layout">
-    <aside class="humc-catalog__cats" aria-label="Categories">
-      <a href="{{ shop_base }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}" data-cat="all">View all</a>
-      <a href="{{ shop_base }}?cat=value{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="value">VALUE BUY</a>
-      <a href="{{ shop_base }}?cat=outerwear{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="outerwear">Outerwear</a>
-      <a href="{{ shop_base }}?cat=tees{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="tees">Tees</a>
-      <a href="{{ shop_base }}?cat=polos{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="polos">Polos</a>
-      <a href="{{ shop_base }}?cat=scrubs{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="scrubs">Scrubs</a>
-      <a href="{{ shop_base }}?cat=headwear{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="headwear">Headwear</a>
-      <a href="{{ shop_base }}?cat=bags{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="bags">Bags</a>
-      <a href="{{ shop_base }}?cat=drinkware{% if preview_q != blank %}&{{ preview_q }}{% endif %}" data-cat="drinkware">Drinkware</a>
-    </aside>
-
-    <div class="humc-catalog__main">
-      <p class="humc-catalog__count" data-count></p>
-      <ul class="humc-catalog__grid" role="list">
-        {%- if store != blank -%}
-          {%- for product in store.products -%}
-            {%- unless product.published_at -%}
-              {%- continue -%}
-            {%- endunless -%}
-            {%- assign type_l = product.type | downcase -%}
-            {%- assign title_l = product.title | downcase -%}
-            {%- comment -%} Match vv Radiant: PPLR_HIDDEN_PRODUCT stays in catalog JSON but is not listed for shoppers. {%- endcomment -%}
-            {%- if type_l == 'pplr_hidden_product' or title_l contains 'personalization' -%}
-              {%- continue -%}
-            {%- endif -%}
-            {%- assign groups = 'all' -%}
-            {%- if product.title contains 'Heavyweight' or type_l == 'value buy' -%}
-              {%- assign groups = groups | append: ' value' -%}
-            {%- endif -%}
-            {%- if type_l == 'tee' or title_l contains 'tee' -%}
-              {%- assign groups = groups | append: ' tees' -%}
-            {%- endif -%}
-            {%- if type_l == 'outerwear' or title_l contains 'fleece' or title_l contains 'hoodie' or title_l contains 'zip' -%}
-              {%- assign groups = groups | append: ' outerwear' -%}
-            {%- endif -%}
-            {%- if type_l == 'polo' or title_l contains 'polo' -%}
-              {%- assign groups = groups | append: ' polos' -%}
-            {%- endif -%}
-            {%- if type_l == 'scrub' or title_l contains 'scrub' -%}
-              {%- assign groups = groups | append: ' scrubs' -%}
-            {%- endif -%}
-            {%- if type_l == 'headwear' or title_l contains 'hat' or title_l contains 'cap' or title_l contains 'trucker' -%}
-              {%- assign groups = groups | append: ' headwear' -%}
-            {%- endif -%}
-            {%- if type_l == 'bag' or title_l contains 'bag' or title_l contains 'tote' -%}
-              {%- assign groups = groups | append: ' bags' -%}
-            {%- endif -%}
-            {%- if type_l == 'drinkware' or title_l contains 'tumbler' or title_l contains 'mug' -%}
-              {%- assign groups = groups | append: ' drinkware' -%}
-            {%- endif -%}
-            <li data-groups="{{ groups | strip }}">
-              <a class="humc-catalog__card" href="{{ product.url }}{% if preview_q != blank %}?{{ preview_q }}{% endif %}">
-                <span class="humc-catalog__photo">
-                  {%- if product.featured_image -%}
-                    {{
-                      product.featured_image
-                      | image_url: width: 800
-                      | image_tag: loading: 'lazy', widths: '200, 400, 800', sizes: '(min-width: 990px) 20vw, 45vw', alt: product.title
-                    }}
-                  {%- elsif product.title contains 'OTTO' or product.title contains 'Trucker' -%}
-                    <img
-                      src="{{ 'humc-m-19193876-148992677.jpg' | asset_url }}"
-                      alt="{{ product.title | escape }}"
-                      width="800"
-                      height="800"
-                      loading="lazy"
-                    >
-                  {%- else -%}
-                    <span class="humc-catalog__empty">Photo coming soon</span>
-                  {%- endif -%}
-                  {%- unless product.available -%}
-                    <span class="humc-catalog__sold">Sold out</span>
-                  {%- endunless -%}
-                </span>
-                <span class="humc-catalog__title">{{ product.title | escape }}</span>
-                <span class="humc-catalog__price">{{ product.price | money }} USD*</span>
-              </a>
-            </li>
-          {%- endfor -%}
+  <header class="humc-catalog__head">
+    <h1 class="humc-catalog__title-page">{{ section.settings.heading | default: 'Products' | escape }}</h1>
+    {%- if store != blank -%}
+      {%- assign shown = 0 -%}
+      {%- for product in store.products -%}
+        {%- if product.published_at -%}
+          {%- assign shown = shown | plus: 1 -%}
         {%- endif -%}
-      </ul>
-    </div>
-  </div>
-</div>
+      {%- endfor -%}
+      <p class="humc-catalog__count">{{ shown }} products</p>
+    {%- endif -%}
+  </header>
 
-<script>
-  (function () {
-    var root = document.currentScript.previousElementSibling;
-    if (!root || !root.hasAttribute('data-humc-catalog')) return;
-    var cat = new URLSearchParams(window.location.search).get('cat') || 'all';
-    var items = root.querySelectorAll('[data-groups]');
-    var shown = 0;
-    items.forEach(function (item) {
-      var groups = ' ' + (item.getAttribute('data-groups') || '') + ' ';
-      var on = cat === 'all' || groups.indexOf(' ' + cat + ' ') !== -1;
-      item.hidden = !on;
-      if (on) shown += 1;
-    });
-    var count = root.querySelector('[data-count]');
-    if (count) {
-      count.textContent = shown ? 'Items 1 to ' + shown + ' of ' + shown : 'No products listed for sale.';
-    }
-    root.querySelectorAll('.humc-catalog__cats a').forEach(function (link) {
-      var on = link.getAttribute('data-cat') === cat;
-      if (on) link.setAttribute('aria-current', 'page');
-      else link.removeAttribute('aria-current');
-    });
-  })();
-</script>
+  <ul class="humc-catalog__grid" role="list">
+    {%- if store != blank -%}
+      {%- for product in store.products -%}
+        {%- unless product.published_at -%}
+          {%- continue -%}
+        {%- endunless -%}
+        <li>
+          <a class="humc-catalog__card" href="{{ product.url }}">
+            <span class="humc-catalog__photo">
+              {%- if product.featured_image -%}
+                {{
+                  product.featured_image
+                  | image_url: width: 800
+                  | image_tag: loading: 'lazy', widths: '200, 400, 800', sizes: '(min-width: 990px) 22vw, 45vw', alt: product.title
+                }}
+              {%- else -%}
+                <span class="humc-catalog__empty">Photo coming soon</span>
+              {%- endif -%}
+              {%- unless product.available -%}
+                <span class="humc-catalog__sold">Sold out</span>
+              {%- endunless -%}
+            </span>
+            <span class="humc-catalog__title">{{ product.title | escape }}</span>
+            <span class="humc-catalog__price">
+              <span class="humc-catalog__price-label">Regular price</span>
+              {{ product.price | money }} USD
+            </span>
+          </a>
+        </li>
+      {%- endfor -%}
+    {%- else -%}
+      <li class="humc-catalog__empty-list">No products in this catalog yet.</li>
+    {%- endif -%}
+  </ul>
+</div>
 
 {% stylesheet %}
   .humc-catalog {
-    max-width: 1600px;
+    max-width: 1400px;
     margin-inline: auto;
-    padding: 18px var(--page-margin) 72px;
+    padding: 28px var(--page-margin, 24px) 72px;
     font-family: Karla, Helvetica, sans-serif;
+    color: #121212;
   }
 
-  .humc-catalog__crumb {
+  .humc-catalog__head {
     display: flex;
-    gap: 8px;
-    margin-block-end: 18px;
-    font-size: 0.8rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-block-end: 28px;
   }
 
-  .humc-catalog__crumb a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .humc-catalog__layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-
-  @media screen and (min-width: 750px) {
-    .humc-catalog__layout {
-      grid-template-columns: 11rem minmax(0, 1fr);
-      gap: 36px;
-    }
-  }
-
-  .humc-catalog__cats {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 0.95rem;
-  }
-
-  .humc-catalog__cats a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .humc-catalog__cats a[aria-current='page'] {
+  .humc-catalog__title-page {
+    margin: 0;
+    font-family: Montserrat, Helvetica, Arial, sans-serif;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
     font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #121212;
   }
 
   .humc-catalog__count {
-    margin: 0 0 18px;
-    text-align: right;
-    font-size: 0.85rem;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #580202;
   }
 
   .humc-catalog__grid {
@@ -201,7 +100,13 @@
     padding: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 16px;
+    gap: 32px 20px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .humc-catalog__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   @media screen and (min-width: 990px) {
@@ -213,7 +118,7 @@
   .humc-catalog__card {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     color: inherit;
     text-decoration: none;
   }
@@ -222,15 +127,15 @@
     position: relative;
     display: block;
     aspect-ratio: 1;
-    background: #fff;
+    background: #f7f7f7;
   }
 
   .humc-catalog__sold {
     position: absolute;
-    inset: auto 8px 8px auto;
-    padding: 4px 8px;
-    background: #121212;
-    color: #f5f5f5;
+    inset: 10px auto auto 10px;
+    padding: 6px 10px;
+    background: #c41e3a;
+    color: #fff;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -257,18 +162,30 @@
     object-fit: contain;
   }
 
-  .humc-catalog__title,
-  .humc-catalog__price {
-    font-size: 0.85rem;
+  .humc-catalog__title {
+    font-size: 0.95rem;
     line-height: 1.35;
   }
 
   .humc-catalog__price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.9rem;
     font-weight: 600;
   }
 
-  .humc-catalog [hidden] {
-    display: none;
+  .humc-catalog__price-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .humc-catalog__empty-list {
+    grid-column: 1 / -1;
+    color: #580202;
   }
 {% endstylesheet %}
 
@@ -276,6 +193,13 @@
 {
   "name": "HUMC catalog",
   "tag": "section",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Products"
+    }
+  ]
 }
 {% endschema %}

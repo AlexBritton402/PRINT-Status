@@ -7,7 +7,7 @@
 {%- liquid
   assign store = collections['humc-gear']
   assign shop_link = section.settings.shop_link | default: store.url | default: '/collections/humc-gear'
-  assign learn_link = pages['humc-learn-more'].url | default: '/pages/humc-learn-more'
+  assign learn_link = pages['contact'].url | default: '/pages/contact'
   assign hero_image = section.settings.hero_image | default: 'humc-bg-home.png'
   assign polo_image = section.settings.polo_image | default: 'humc-custompolo.jpg'
   assign sleeve_image = section.settings.sleeve_image | default: 'humc-long-sleeve.png'
@@ -90,9 +90,16 @@
       {%- endif -%}
     </div>
     {%- if store != blank and store.products_count > 0 -%}
+      {%- comment -%} Match vv featured row: Tilikum, Women's hoodie, Duffel, OTTO (skip Personalization / CUSTOMIZABLE). {%- endcomment -%}
+      {%- assign featured_handles = 'tilikum-cap,women-s-sustainable-full-zip-hoodie-w-single-color-humc-logo,large-rec-duffle,large-rec-duffel,otto-cap-6-panel-low-profile-mesh-back-trucker-hat' | split: ',' -%}
       <ul class="humc-grid" role="list">
-        {%- for product in store.products limit: 4 -%}
+        {%- assign featured_n = 0 -%}
+        {%- for handle in featured_handles -%}
+          {%- if featured_n >= 4 -%}{%- break -%}{%- endif -%}
+          {%- assign product = store.products | where: 'handle', handle | first -%}
+          {%- if product == blank -%}{%- continue -%}{%- endif -%}
           {%- unless product.published_at -%}{%- continue -%}{%- endunless -%}
+          {%- assign featured_n = featured_n | plus: 1 -%}
           <li>
             <a class="humc-card" href="{{ product.url }}">
               <span class="humc-card__photo">
