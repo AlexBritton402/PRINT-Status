@@ -173,6 +173,7 @@
   <div class="humc-customize__gallery" data-humc-gallery>
     <div class="humc-customize__stage" data-humc-stage>
       <img data-humc-demo-photo alt="{{ title | escape }}" width="600" height="600">
+      <img data-humc-design-layer alt="" width="600" height="600" hidden>
     </div>
     <p class="humc-customize__caption" data-humc-demo-caption></p>
   </div>
@@ -226,38 +227,43 @@
   </fieldset>
 
   {%- if show_logo_picker -%}
+    {%- comment -%} Full vv Zepto design lists (docs/reference/vv/ZEPTO.md). Layers = assets/pz-*.png {%- endcomment -%}
     <fieldset class="humc-customize__set" data-design-panel="Front">
       <legend data-design-legend>Front design</legend>
-      <div class="humc-customize__chips" role="list" data-design-chips="Front">
+      <div class="humc-customize__chips humc-customize__chips--design" role="list" data-design-chips="Front">
+        <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Front" data-value="Left Chest LA County" data-layer="pz-LC-LA-COUNTY.png" aria-pressed="true">Left Chest LA County</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest White LA County" data-layer="pz-LC-WHITE-LA-CO.png" aria-pressed="false">Left Chest White LA County</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest Full Color HUMC" data-layer="pz-LC-FC-HUMC.png" aria-pressed="false">Left Chest Full Color HUMC</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest White HUMC" data-layer="pz-LC-WHITE-HUMC.png" aria-pressed="false">Left Chest White HUMC</button>
         {%- if logo_map_kind == 'soft-tee' -%}
-          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Front" data-value="Left Chest LA County" data-family-id="18991476" aria-pressed="true">Left Chest LA County</button>
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest Single-color HUMC" data-family-id="19027956" aria-pressed="false">Left Chest Single-color HUMC</button>
-        {%- else -%}
-          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Front" data-value="Left Chest LA County" data-family-id="18993506" aria-pressed="true">Left Chest LA County</button>
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest White LA County" data-family-id="18867111" aria-pressed="false">Left Chest White LA County</button>
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Left Chest Full Color HUMC" data-family-id="18991186" aria-pressed="false">Left Chest Full Color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Full Chest LA County" data-layer="pz-FC-LA-COUNTY.png" aria-pressed="false">Full Chest LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Full Chest White LA County" data-layer="pz-FC-WHITE-LA-CO.png" aria-pressed="false">Full Chest White LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Full Chest Full Color HUMC" data-layer="pz-FC-FC-HUMC.png" aria-pressed="false">Full Chest Full Color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Front" data-value="Full Chest White HUMC" data-layer="pz-FC-WHITE-HUMC.png" aria-pressed="false">Full Chest White HUMC</button>
         {%- endif -%}
       </div>
     </fieldset>
 
     <fieldset class="humc-customize__set" data-design-panel="Back" hidden>
       <legend>Back design</legend>
-      <div class="humc-customize__chips" role="list" data-design-chips="Back">
-        <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Back" data-value="BLANK" data-family-id="" aria-pressed="true">BLANK</button>
-        {%- if logo_map_kind == 'soft-tee' -%}
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back LA County" data-family-id="18991476" aria-pressed="false">Full Back LA County</button>
-        {%- else -%}
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back LA County" data-family-id="18993506" aria-pressed="false">Full Back LA County</button>
-        {%- endif -%}
+      <div class="humc-customize__chips humc-customize__chips--design" role="list" data-design-chips="Back">
+        <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Back" data-value="BLANK" data-layer="" aria-pressed="true">BLANK</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back LA County" data-layer="pz-FC-LA-COUNTY.png" aria-pressed="false">Full Back LA County</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back White LA County" data-layer="pz-FC-WHITE-LA-CO.png" aria-pressed="false">Full Back White LA County</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back Full Color HUMC" data-layer="pz-FC-FC-HUMC.png" aria-pressed="false">Full Back Full Color HUMC</button>
+        <button type="button" class="humc-customize__chip" data-field="design" data-location="Back" data-value="Full Back White HUMC" data-layer="pz-FC-WHITE-HUMC.png" aria-pressed="false">Full Back White HUMC</button>
       </div>
     </fieldset>
 
     {%- if logo_map_kind == 'zip' -%}
       <fieldset class="humc-customize__set" data-design-panel="Right" hidden>
         <legend>Right sleeve design</legend>
-        <div class="humc-customize__chips" role="list" data-design-chips="Right">
-          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Right" data-value="BLANK" data-family-id="" aria-pressed="true">BLANK</button>
-          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="LA County" data-family-id="18991186" aria-pressed="false">LA County</button>
+        <div class="humc-customize__chips humc-customize__chips--design" role="list" data-design-chips="Right">
+          <button type="button" class="humc-customize__chip is-on" data-field="design" data-location="Right" data-value="BLANK" data-layer="" aria-pressed="true">BLANK</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="LA County" data-layer="pz-FC-LA-COUNTY.png" aria-pressed="false">LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="White LA County" data-layer="pz-FC-WHITE-LA-CO.png" aria-pressed="false">White LA County</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="Full Color HUMC" data-layer="pz-FC-FC-HUMC.png" aria-pressed="false">Full Color HUMC</button>
+          <button type="button" class="humc-customize__chip" data-field="design" data-location="Right" data-value="White HUMC" data-layer="pz-FC-WHITE-HUMC.png" aria-pressed="false">White HUMC</button>
         </div>
       </fieldset>
     {%- endif -%}
@@ -290,6 +296,7 @@
     var summary = root.querySelector('[data-summary]');
     var errorEl = root.querySelector('[data-error]');
     var photo = root.querySelector('[data-humc-demo-photo]');
+    var layerImg = root.querySelector('[data-humc-design-layer]');
     var caption = root.querySelector('[data-humc-demo-caption]');
 
     var previewMap = {};
@@ -308,37 +315,32 @@
       Right: 'BLANK'
     };
 
-    // Pre-meshed family ids for each location + design (no crest overlays).
-    var DESIGN_FAMILY = logoMapKind === 'soft-tee'
-      ? {
-          Front: {
-            'Left Chest LA County': '18991476',
-            'Left Chest Single-color HUMC': '19027956'
-          },
-          Back: {
-            BLANK: '19027956',
-            'Full Back LA County': '18991476'
-          },
-          Right: {}
-        }
-      : {
-          Front: {
-            'Left Chest LA County': '18993506',
-            'Left Chest White LA County': '18867111',
-            'Left Chest Full Color HUMC': '18991186'
-          },
-          Back: {
-            BLANK: '18993506',
-            'Full Back LA County': '18993506'
-          },
-          Right: {
-            BLANK: '18991186',
-            'LA County': '18991186'
-          }
-        };
+    // Zepto design layers (assets/pz-*.png) — same artwork as vv.
+    var DESIGN_LAYER = {
+      'Left Chest LA County': 'pz-LC-LA-COUNTY.png',
+      'Left Chest White LA County': 'pz-LC-WHITE-LA-CO.png',
+      'Left Chest Full Color HUMC': 'pz-LC-FC-HUMC.png',
+      'Left Chest White HUMC': 'pz-LC-WHITE-HUMC.png',
+      'Full Chest LA County': 'pz-FC-LA-COUNTY.png',
+      'Full Chest White LA County': 'pz-FC-WHITE-LA-CO.png',
+      'Full Chest Full Color HUMC': 'pz-FC-FC-HUMC.png',
+      'Full Chest White HUMC': 'pz-FC-WHITE-HUMC.png',
+      'Full Back LA County': 'pz-FC-LA-COUNTY.png',
+      'Full Back White LA County': 'pz-FC-WHITE-LA-CO.png',
+      'Full Back Full Color HUMC': 'pz-FC-FC-HUMC.png',
+      'Full Back White HUMC': 'pz-FC-WHITE-HUMC.png',
+      'LA County': 'pz-FC-LA-COUNTY.png',
+      'White LA County': 'pz-FC-WHITE-LA-CO.png',
+      'Full Color HUMC': 'pz-FC-FC-HUMC.png',
+      'White HUMC': 'pz-FC-WHITE-HUMC.png',
+      BLANK: ''
+    };
 
-    // Blank / plain shot helpers (Chipply plain packs when a location is BLANK).
+    // Blank garment packs (Chipply plain / no-print shots) under the logo layer.
     var BLANK_PACK = logoMapKind === 'soft-tee' ? '19027956' : '18991186';
+    // Color-map family ids (for swatch catalog lookup only).
+    var COLOR_FAMILY = logoMapKind === 'soft-tee' ? '18991476' : '18993506';
+    familyId = COLOR_FAMILY;
 
     function assetBase() {
       return root.getAttribute('data-asset-base') || '';
@@ -370,9 +372,26 @@
       return 'Front design';
     }
 
-    function familyFor(location, designName) {
-      var map = DESIGN_FAMILY[location] || {};
-      return map[designName] || familyId || root.getAttribute('data-family-id') || '';
+    function layerFor(designName) {
+      if (!designName || designName === 'BLANK') return '';
+      return DESIGN_LAYER[designName] || '';
+    }
+
+    function layerUrl(file) {
+      if (!file) return '';
+      return assetBase() + file;
+    }
+
+    function setDesignLayer(designName) {
+      if (!layerImg) return;
+      var file = layerFor(designName);
+      if (!file) {
+        layerImg.removeAttribute('src');
+        layerImg.hidden = true;
+        return;
+      }
+      layerImg.setAttribute('src', layerUrl(file));
+      layerImg.hidden = false;
     }
 
     function syncDesignInputs() {
@@ -476,11 +495,8 @@
     }
 
     function urlForLocation(location) {
-      var design = designs[location] || 'BLANK';
-      var blank = design === 'BLANK';
-      var fid = blank ? BLANK_PACK : familyFor(location, design);
-      if (!fid) fid = familyId;
-      return stockUrl(fid, currentColorId, location, blank);
+      // Always use a blank/plain garment shot; the selected design is the pz layer on top (vv Zepto model).
+      return stockUrl(BLANK_PACK, currentColorId, location, true) || stockUrl(BLANK_PACK, currentColorId, location, false);
     }
 
     function setMainPhoto(url) {
@@ -523,7 +539,7 @@
         var btn = host.querySelector('[data-view="' + angle + '"]');
         var thumb = host.querySelector('[data-humc-view-thumb="' + angle + '"]');
         var url = urlForLocation(angle);
-        var fallback = stockUrl(familyFor('Front', designs.Front) || familyId, currentColorId, angle, false);
+        var fallback = stockUrl(BLANK_PACK, currentColorId, angle, false);
         probeUrl(
           url,
           function (okUrl) {
@@ -580,9 +596,17 @@
           setMainPhoto(okUrl);
         },
         function () {
-          setMainPhoto(front);
+          // Fall back to non-plain / front blank if plain pack missing for this angle.
+          probeUrl(
+            front,
+            function (okUrl) { setMainPhoto(okUrl); },
+            function () {
+              setMainPhoto(stockUrl(BLANK_PACK, currentColorId, 'Front', false));
+            }
+          );
         }
       );
+      setDesignLayer(designs[currentView]);
       if (caption) {
         caption.textContent = [currentColorName, label, designs[currentView]].filter(Boolean).join(' · ');
       }
@@ -590,19 +614,9 @@
       refreshSummary();
     }
 
-    function selectDesign(location, name, fid) {
+    function selectDesign(location, name) {
       if (!location) return;
       designs[location] = name || designs[location];
-      if (fid) {
-        // Keep primary family for color map lookups from the front design.
-        if (location === 'Front') {
-          familyId = fid;
-          root.setAttribute('data-family-id', familyId);
-        }
-      } else if (location === 'Front') {
-        familyId = familyFor('Front', designs.Front) || familyId;
-        root.setAttribute('data-family-id', familyId);
-      }
       root.querySelectorAll('[data-field="design"][data-location="' + location + '"]').forEach(function (btn) {
         var on = btn.getAttribute('data-value') === designs[location];
         btn.classList.toggle('is-on', on);
@@ -610,15 +624,9 @@
       });
       syncDesignInputs();
       syncListingTitle();
-      var entry = previewMap[familyId];
-      if (entry && location === 'Front') {
-        entry.id = familyId;
-        renderSwatches(entry, true);
-      } else {
-        fillThumbs();
-        setView(currentView);
-        refreshSummary();
-      }
+      fillThumbs();
+      setView(currentView);
+      refreshSummary();
     }
 
     function selectColor(name, colorId) {
@@ -698,7 +706,7 @@
       // Match vv Zepto shopper color rows (not the full Chipply catalog).
       var allow =
         logoMapKind === 'soft-tee'
-          ? ['Aqua Heather', 'Awareness Pink Heather', 'Black', 'Heathered Red', 'Charcoal', 'Deep Orange Heather']
+          ? ['Aqua Heather', 'Awareness Pink Heather', 'Black', 'Blush Frost', 'Charcoal', 'Deep Orange Heather']
           : logoMapKind === 'zip'
             ? ['Black', 'Charcoal', 'Heathered Charcoal', 'Light Heather Grey', 'New Navy', 'Deep Royal']
             : null;
@@ -782,11 +790,7 @@
 
     root.querySelectorAll('[data-field="design"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        selectDesign(
-          btn.getAttribute('data-location'),
-          btn.getAttribute('data-value'),
-          btn.getAttribute('data-family-id')
-        );
+        selectDesign(btn.getAttribute('data-location'), btn.getAttribute('data-value'));
       });
     });
 
@@ -858,8 +862,11 @@
     );
 
     readCatalog();
-    familyId = familyFor('Front', designs.Front) || familyId;
+    familyId = COLOR_FAMILY;
     root.setAttribute('data-family-id', familyId);
+    // Re-bind layer img if gallery moves later
+    layerImg = document.querySelector('[data-humc-design-layer]') || layerImg;
+    photo = document.querySelector('[data-humc-demo-photo]') || photo;
     syncDesignInputs();
     showLocationPanels('Front');
     if (showLogoPicker) {
@@ -910,6 +917,7 @@
   }
 
   .humc-customize__stage {
+    position: relative;
     background: #fff;
     border: 1px solid #ddd;
     aspect-ratio: 1 / 1;
@@ -921,6 +929,26 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+  }
+
+  .humc-customize__stage [data-humc-design-layer] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .humc-customize__chips--design {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .humc-customize__chips--design .humc-customize__chip {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.55rem;
   }
 
   .humc-customize__views {
