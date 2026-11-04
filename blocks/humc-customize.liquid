@@ -315,25 +315,25 @@
       Right: 'BLANK'
     };
 
-    // Zepto design layers (assets/pz-*.png) — same artwork as vv.
+    // Trimmed Zepto stamps + placement class (full-canvas overlays were oversized on these blanks).
     var DESIGN_LAYER = {
-      'Left Chest LA County': 'pz-LC-LA-COUNTY.png',
-      'Left Chest White LA County': 'pz-LC-WHITE-LA-CO.png',
-      'Left Chest Full Color HUMC': 'pz-LC-FC-HUMC.png',
-      'Left Chest White HUMC': 'pz-LC-WHITE-HUMC.png',
-      'Full Chest LA County': 'pz-FC-LA-COUNTY.png',
-      'Full Chest White LA County': 'pz-FC-WHITE-LA-CO.png',
-      'Full Chest Full Color HUMC': 'pz-FC-FC-HUMC.png',
-      'Full Chest White HUMC': 'pz-FC-WHITE-HUMC.png',
-      'Full Back LA County': 'pz-FC-LA-COUNTY.png',
-      'Full Back White LA County': 'pz-FC-WHITE-LA-CO.png',
-      'Full Back Full Color HUMC': 'pz-FC-FC-HUMC.png',
-      'Full Back White HUMC': 'pz-FC-WHITE-HUMC.png',
-      'LA County': 'pz-FC-LA-COUNTY.png',
-      'White LA County': 'pz-FC-WHITE-LA-CO.png',
-      'Full Color HUMC': 'pz-FC-FC-HUMC.png',
-      'White HUMC': 'pz-FC-WHITE-HUMC.png',
-      BLANK: ''
+      'Left Chest LA County': { file: 'pz-stamp-LC-LA-COUNTY.png', place: 'left-chest' },
+      'Left Chest White LA County': { file: 'pz-stamp-LC-WHITE-LA-CO.png', place: 'left-chest' },
+      'Left Chest Full Color HUMC': { file: 'pz-stamp-LC-FC-HUMC.png', place: 'left-chest' },
+      'Left Chest White HUMC': { file: 'pz-stamp-LC-WHITE-HUMC.png', place: 'left-chest' },
+      'Full Chest LA County': { file: 'pz-stamp-FC-LA-COUNTY.png', place: 'full-chest' },
+      'Full Chest White LA County': { file: 'pz-stamp-FC-WHITE-LA-CO.png', place: 'full-chest' },
+      'Full Chest Full Color HUMC': { file: 'pz-stamp-FC-FC-HUMC.png', place: 'full-chest' },
+      'Full Chest White HUMC': { file: 'pz-stamp-FC-WHITE-HUMC.png', place: 'full-chest' },
+      'Full Back LA County': { file: 'pz-stamp-FC-LA-COUNTY.png', place: 'full-back' },
+      'Full Back White LA County': { file: 'pz-stamp-FC-WHITE-LA-CO.png', place: 'full-back' },
+      'Full Back Full Color HUMC': { file: 'pz-stamp-FC-FC-HUMC.png', place: 'full-back' },
+      'Full Back White HUMC': { file: 'pz-stamp-FC-WHITE-HUMC.png', place: 'full-back' },
+      'LA County': { file: 'pz-stamp-LC-LA-COUNTY.png', place: 'sleeve' },
+      'White LA County': { file: 'pz-stamp-LC-WHITE-LA-CO.png', place: 'sleeve' },
+      'Full Color HUMC': { file: 'pz-stamp-LC-FC-HUMC.png', place: 'sleeve' },
+      'White HUMC': { file: 'pz-stamp-LC-WHITE-HUMC.png', place: 'sleeve' },
+      BLANK: null
     };
 
     // Color-map family ids (for swatch catalog lookup only).
@@ -389,8 +389,8 @@
     }
 
     function layerFor(designName) {
-      if (!designName || designName === 'BLANK') return '';
-      return DESIGN_LAYER[designName] || '';
+      if (!designName || designName === 'BLANK') return null;
+      return DESIGN_LAYER[designName] || null;
     }
 
     function layerUrl(file) {
@@ -401,13 +401,15 @@
     function setDesignLayer(designName) {
       layerImg = document.querySelector('[data-humc-design-layer]') || layerImg;
       if (!layerImg) return;
-      var file = layerFor(designName);
-      if (!file) {
+      var spec = layerFor(designName);
+      layerImg.className = '';
+      if (!spec || !spec.file) {
         layerImg.removeAttribute('src');
         layerImg.hidden = true;
         return;
       }
-      layerImg.setAttribute('src', layerUrl(file));
+      layerImg.classList.add('is-' + (spec.place || 'left-chest'));
+      layerImg.setAttribute('src', layerUrl(spec.file));
       layerImg.hidden = false;
     }
 
@@ -938,11 +940,33 @@
 
   .humc-customize__stage [data-humc-design-layer] {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
     object-fit: contain;
     pointer-events: none;
+    height: auto;
+  }
+
+  .humc-customize__stage [data-humc-design-layer].is-left-chest {
+    width: 17%;
+    left: 58%;
+    top: 30%;
+  }
+
+  .humc-customize__stage [data-humc-design-layer].is-full-chest {
+    width: 40%;
+    left: 30%;
+    top: 28%;
+  }
+
+  .humc-customize__stage [data-humc-design-layer].is-full-back {
+    width: 46%;
+    left: 27%;
+    top: 22%;
+  }
+
+  .humc-customize__stage [data-humc-design-layer].is-sleeve {
+    width: 15%;
+    left: 63%;
+    top: 34%;
   }
 
   .humc-customize__chips--design {
