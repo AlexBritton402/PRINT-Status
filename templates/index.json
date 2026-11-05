@@ -277,7 +277,7 @@
       },
       "name": "Featured collection",
       "settings": {
-        "collection": "print-status-manual-backup",
+        "collection": "print-status",
         "layout_type": "grid",
         "carousel_on_mobile": false,
         "max_products": 3,
